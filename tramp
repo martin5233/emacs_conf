@@ -1,0 +1,259 @@
+;; -*- emacs-lisp -*- <13/11/20 13:06:27 /home/home_dev/apel/.emacs.d/tramp>
+;; Tramp connection history.  Don't change this file.
+;; You can delete it, forcing Tramp to reapply the checks.
+
+((["ssh" "root" "localhost#1470" nil nil]
+  ("uname" "Linux 3.6.11+")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("readlink" "\\readlink")
+  ("stat" "\\stat")
+  ("file-exists" "test -e")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl"))
+ (["smb" "apel%intec" "dev-windows" nil nil]
+  ("smbclient-version" "Version 3.6.16")
+  ("smbserver-version" "Domain=[INTEC] OS=[Windows Server 2008 R2 Standard 7601 Service Pack 1] Server=[Windows Server 2008 R2 Standard 6.1]")
+  ("share-cache"
+   (("friedrich" "dr-xr-xr-x" 0
+     (0 0))
+    ("F$" "dr-xr-xr-x" 0
+     (0 0))
+    ("E$" "dr-xr-xr-x" 0
+     (0 0))
+    ("E" "dr-xr-xr-x" 0
+     (0 0))
+    ("C$" "dr-xr-xr-x" 0
+     (0 0))
+    ("ADMIN$" "dr-xr-xr-x" 0
+     (0 0)))))
+ (["ssh" "root" "simdev-server" nil nil]
+  ("uname" "Linux 2.6.32-5-686")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl"))
+ (["smb" "apel%intec" "pklma" nil nil]
+  ("smbclient-version" "Version 4.0.11-Debian")
+  ("smbserver-version" "Domain=[INTEC] OS=[Windows 7 Professional 7601 Service Pack 1] Server=[Windows 7 Professional 6.1]")
+  ("share-cache"
+   (("F$" "dr-xr-xr-x" 0
+     (0 0))
+    ("E$" "dr-xr-xr-x" 0
+     (0 0))
+    ("E" "dr-xr-xr-x" 0
+     (0 0))
+    ("C$" "dr-xr-xr-x" 0
+     (0 0))
+    ("ADMIN$" "dr-xr-xr-x" 0
+     (0 0)))))
+ (["ssh" "apel" "build-linux64" nil nil]
+  ("uname" "Linux 2.6.18-308.el5")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 500)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("uid-integer" 579)
+  ("trash" nil))
+ (["ssh" "simdev" "simdev-server" nil nil]
+  ("uname" "Linux 2.6.32-5-686")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/simdev")
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 1001)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("uid-integer" 1001)
+  ("tmpdir" "/ssh:simdev@simdev-server:/tmp")
+  ("trash" nil))
+ (["ssh" "simbuild" "build-linux64" nil nil]
+  ("uname" "Linux 2.6.18-308.el5")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/home_dev/simbuild")
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 500)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("readlink" "\\readlink"))
+ (["smb" "apel%intec" "2012-win64" nil nil]
+  ("smbclient-version" "Version 3.6.18")
+  ("smbserver-version" "Domain=[INTEC] OS=[Windows Server 2012 Standard Evaluation 9200] Server=[Windows Server 2012 Standard Evaluation 6.2]")
+  ("share-cache"
+   (("E$" "dr-xr-xr-x" 0
+     (0 0))
+    ("E" "dr-xr-xr-x" 0
+     (0 0))
+    ("C$" "dr-xr-xr-x" 0
+     (0 0))
+    ("ADMIN$" "dr-xr-xr-x" 0
+     (0 0)))))
+ (["ssh" "klocwork" "klocwork" nil nil]
+  ("uname" "Linux 2.6.18-92.1.6.el5")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/home_dev/klocwork")
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 100)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("trash" nil))
+ (["ssh" "simbuild" "debian64" nil nil]
+  ("uname" "Linux 3.10-3-amd64")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/home_dev/simbuild")
+  ("readlink" "\\readlink")
+  ("stat" "\\stat")
+  ("file-exists" "test -e")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 500)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl"))
+ (["ssh" "simbuild" "build-linux32" nil nil]
+  ("uname" "Linux 2.6.18-308.el5")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/home_dev/simbuild")
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 500)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl"))
+ (["smb" "apel%intec" "build-win32" nil nil]
+  ("smbclient-version" "Version 3.6.19"))
+ (["smb" "apel%intec" "2008-win32" nil nil]
+  ("smbclient-version" "Version 3.6.19")
+  ("smbserver-version" "Domain=[INTEC] OS=[Windows Server 2008 R2 Standard 7601 Service Pack 1] Server=[Windows Server 2008 R2 Standard 6.1]")
+  ("share-cache"
+   (("G$" "dr-xr-xr-x" 0
+     (0 0))
+    ("F$" "dr-xr-xr-x" 0
+     (0 0))
+    ("E$" "dr-xr-xr-x" 0
+     (0 0))
+    ("C$" "dr-xr-xr-x" 0
+     (0 0))
+    ("ADMIN$" "dr-xr-xr-x" 0
+     (0 0)))))
+ (["ssh" "root" "jiratest" nil nil]
+  ("uname" "Linux 3.2.0-4-amd64")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/root")
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl"))
+ (["su" "root" "localhost" nil nil]
+  ("uname" "Linux 3.10-3-amd64")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("readlink" "\\readlink")
+  ("stat" "\\stat")
+  ("file-exists" "test -e")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("uid-integer" 0))
+ (["ssh" "martin" "jiratest" nil nil]
+  ("uname" "Linux 3.2.0-4-amd64")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("~" "/home/martin")
+  ("file-exists" "test -e")
+  ("ls" "/bin/ls --color=never")
+  ("ls-dired" t)
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 1000)
+  ("trash" nil)
+  ("readlink" "\\readlink")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("uid-integer" 1000)))

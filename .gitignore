@@ -1,0 +1,10 @@
+/.mc-lists.el
+/.org-id-locations
+/RFC/
+/ac-comphist.dat
+*.elc
+/auto-save-list
+/elpa/
+/org-jira/
+/restclient/
+/url/
