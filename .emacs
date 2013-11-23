@@ -88,8 +88,10 @@
 (require 'smex)
 (require 'find-lisp)
 (require 'filecache)
-(require 'mu4e)
-(require 'org-mu4e)
+(if work
+    (progn
+      (require 'mu4e)
+      (require 'org-mu4e)))
 (require 'org-toodledo)
 (require 'socks)
 
@@ -737,7 +739,6 @@
  '(mu4e-use-fancy-chars t)
  '(nxml-child-indent 3)
  '(org-agenda-custom-commands (quote (("w" "Work agenda only" agenda "" ((org-agenda-files (quote ("~/org/na.org" "~/org/devs.org"))))) ("h" "Home agenda only" agenda "" ((org-agenda-files (quote ("~/ownCloud/private.org" "~/ownCloud/geburtstage.org"))))) ("s" "Unscheduled items" alltodo "" ((org-agenda-skip-function (quote (org-agenda-skip-entry-if (quote scheduled) (quote nottodo) (quote todo)))))) ("r" "Activities to report" tags "REPORT" ((org-agenda-remove-tags t) (org-agenda-prefix-format "") (org-agenda-todo-keyword-format "%-17s") (ps-landscape-mode t) (ps-number-of-columns 1)) ("~/org/Activities.pdf")))))
- '(org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/org/devs.org" "~/ownCloud/private.org")))
  '(org-agenda-repeating-timestamp-show-all nil)
  '(org-agenda-skip-deadline-prewarning-if-scheduled t)
  '(org-agenda-skip-scheduled-if-deadline-is-shown t)
@@ -782,7 +783,6 @@
  '(tramp-default-proxies-alist nil)
  '(truncate-lines t)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
- '(url-proxy-services (quote (("http" . "proxy.intec.dom:3128") ("https" . "proxy.intec.dom:3128") ("no_proxy" . "jiratest.intec.dom"))))
  '(use-file-dialog nil)
  '(user-full-name "Martin Apel")
  '(user-mail-address "martin.apel@simpack.de")
