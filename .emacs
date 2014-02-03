@@ -150,11 +150,14 @@
   :type '(choice (const "world")
                  (const "simpack-gui")
                  (const "simpack-slv")
+                 (const "solver")
                  (const "DoRunTests")
                  (const "ParserTest")
                  (const "RWCmpTest")
                  (const "simpack-post")
+                 (const "fat4fem")
                  (const "_simpack-doe-master")
+                 (const "GUIUtils")
                   )
   :group 'ma
 )
@@ -643,13 +646,164 @@
  '(browse-url-firefox-program "/home/home_dev/apel/tools/firefox/firefox")
  '(c-basic-offset 3)
  '(c-cleanup-list (quote (scope-operator compact-empty-funcall)))
- '(c-default-style (quote ((c-mode . "cc-mode") (c++-mode . "cc-mode") (java-mode . "java") (other . "gnu"))))
- '(c-offsets-alist (quote ((incomposition . +) (inmodule . +) (composition-close . 0) (module-close . 0) (composition-open . 0) (module-open . 0) (cpp-define-intro c-lineup-cpp-define +) (substatement-label . 2) (string . c-lineup-dont-change) (c . c-lineup-C-comments) (defun-open . 0) (defun-close . 0) (defun-block-intro . +) (class-open . 0) (class-close . 0) (inline-close . 0) (func-decl-cont . +) (knr-argdecl-intro . +) (knr-argdecl . 0) (topmost-intro . 0) (topmost-intro-cont . 0) (member-init-intro . +) (member-init-cont . c-lineup-multi-inher) (inher-intro . +) (inher-cont . c-lineup-multi-inher) (block-open . 0) (block-close . 0) (brace-list-open . 0) (brace-list-close . 0) (brace-list-intro . +) (brace-list-entry . 0) (brace-entry-open . 0) (statement . 0) (statement-cont . +) (statement-block-intro . +) (statement-case-intro . +) (statement-case-open . 0) (substatement . +) (substatement-open . 0) (case-label . 0) (access-label . -) (label . 2) (do-while-closure . 0) (else-clause . 0) (catch-clause . 0) (comment-intro . c-lineup-comment) (arglist-intro . +) (arglist-cont . 0) (arglist-cont-nonempty . c-lineup-arglist) (arglist-close . +) (stream-op . c-lineup-streamop) (inclass . +) (cpp-macro . [0]) (cpp-macro-cont . c-lineup-dont-change) (friend . 0) (objc-method-intro . [0]) (objc-method-args-cont . c-lineup-ObjC-method-args) (objc-method-call-cont . c-lineup-ObjC-method-call) (extern-lang-open . 0) (extern-lang-close . 0) (inextern-lang . +) (namespace-open . 0) (namespace-close . 0) (innamespace . 0) (template-args-cont c-lineup-template-args +) (inlambda . c-lineup-inexpr-block) (lambda-intro-cont . +) (inexpr-statement . 0) (inexpr-class . +) (inline-open . 0))))
+ '(c-default-style
+   (quote
+    ((c-mode . "cc-mode")
+     (c++-mode . "cc-mode")
+     (java-mode . "java")
+     (other . "gnu"))))
+ '(c-offsets-alist
+   (quote
+    ((incomposition . +)
+     (inmodule . +)
+     (composition-close . 0)
+     (module-close . 0)
+     (composition-open . 0)
+     (module-open . 0)
+     (cpp-define-intro c-lineup-cpp-define +)
+     (substatement-label . 2)
+     (string . c-lineup-dont-change)
+     (c . c-lineup-C-comments)
+     (defun-open . 0)
+     (defun-close . 0)
+     (defun-block-intro . +)
+     (class-open . 0)
+     (class-close . 0)
+     (inline-close . 0)
+     (func-decl-cont . +)
+     (knr-argdecl-intro . +)
+     (knr-argdecl . 0)
+     (topmost-intro . 0)
+     (topmost-intro-cont . 0)
+     (member-init-intro . +)
+     (member-init-cont . c-lineup-multi-inher)
+     (inher-intro . +)
+     (inher-cont . c-lineup-multi-inher)
+     (block-open . 0)
+     (block-close . 0)
+     (brace-list-open . 0)
+     (brace-list-close . 0)
+     (brace-list-intro . +)
+     (brace-list-entry . 0)
+     (brace-entry-open . 0)
+     (statement . 0)
+     (statement-cont . +)
+     (statement-block-intro . +)
+     (statement-case-intro . +)
+     (statement-case-open . 0)
+     (substatement . +)
+     (substatement-open . 0)
+     (case-label . 0)
+     (access-label . -)
+     (label . 2)
+     (do-while-closure . 0)
+     (else-clause . 0)
+     (catch-clause . 0)
+     (comment-intro . c-lineup-comment)
+     (arglist-intro . +)
+     (arglist-cont . 0)
+     (arglist-cont-nonempty . c-lineup-arglist)
+     (arglist-close . +)
+     (stream-op . c-lineup-streamop)
+     (inclass . +)
+     (cpp-macro .
+                [0])
+     (cpp-macro-cont . c-lineup-dont-change)
+     (friend . 0)
+     (objc-method-intro .
+                        [0])
+     (objc-method-args-cont . c-lineup-ObjC-method-args)
+     (objc-method-call-cont . c-lineup-ObjC-method-call)
+     (extern-lang-open . 0)
+     (extern-lang-close . 0)
+     (inextern-lang . +)
+     (namespace-open . 0)
+     (namespace-close . 0)
+     (innamespace . 0)
+     (template-args-cont c-lineup-template-args +)
+     (inlambda . c-lineup-inexpr-block)
+     (lambda-intro-cont . +)
+     (inexpr-statement . 0)
+     (inexpr-class . +)
+     (inline-open . 0))))
  '(c-style-variables-are-local-p nil)
- '(calendar-holidays (quote ((holiday-fixed 1 1 "New Year's Day") (holiday-float 1 1 3 "Martin Luther King Day") (holiday-fixed 2 2 "Groundhog Day") (holiday-fixed 2 14 "Valentine's Day") (holiday-float 2 1 3 "President's Day") (holiday-fixed 3 17 "St. Patrick's Day") (holiday-fixed 4 1 "April Fools' Day") (holiday-float 5 0 2 "Mother's Day") (holiday-float 5 1 -1 "Memorial Day") (holiday-fixed 6 14 "Flag Day") (holiday-float 6 0 3 "Father's Day") (holiday-fixed 7 4 "Independence Day") (holiday-float 9 1 1 "Labor Day") (holiday-float 10 1 2 "Columbus Day") (holiday-fixed 10 31 "Halloween") (holiday-fixed 11 11 "Veteran's Day") (holiday-float 11 4 4 "Thanksgiving") (holiday-easter-etc) (holiday-fixed 12 25 "Christmas") (if calendar-christian-all-holidays-flag (append (holiday-fixed 1 6 "Epiphany") (holiday-julian 12 25 "Eastern Orthodox Christmas") (holiday-greek-orthodox-easter) (holiday-fixed 8 15 "Assumption") (holiday-advent 0 "Advent"))) (solar-equinoxes-solstices) (holiday-sexp calendar-daylight-savings-starts (format "Daylight Saving Time Begins %s" (solar-time-string (/ calendar-daylight-savings-starts-time (float 60)) calendar-standard-time-zone-name))) (holiday-sexp calendar-daylight-savings-ends (format "Daylight Saving Time Ends %s" (solar-time-string (/ calendar-daylight-savings-ends-time (float 60)) calendar-daylight-time-zone-name))))))
+ '(calendar-holidays
+   (quote
+    ((holiday-fixed 1 1 "New Year's Day")
+     (holiday-float 1 1 3 "Martin Luther King Day")
+     (holiday-fixed 2 2 "Groundhog Day")
+     (holiday-fixed 2 14 "Valentine's Day")
+     (holiday-float 2 1 3 "President's Day")
+     (holiday-fixed 3 17 "St. Patrick's Day")
+     (holiday-fixed 4 1 "April Fools' Day")
+     (holiday-float 5 0 2 "Mother's Day")
+     (holiday-float 5 1 -1 "Memorial Day")
+     (holiday-fixed 6 14 "Flag Day")
+     (holiday-float 6 0 3 "Father's Day")
+     (holiday-fixed 7 4 "Independence Day")
+     (holiday-float 9 1 1 "Labor Day")
+     (holiday-float 10 1 2 "Columbus Day")
+     (holiday-fixed 10 31 "Halloween")
+     (holiday-fixed 11 11 "Veteran's Day")
+     (holiday-float 11 4 4 "Thanksgiving")
+     (holiday-easter-etc)
+     (holiday-fixed 12 25 "Christmas")
+     (if calendar-christian-all-holidays-flag
+         (append
+          (holiday-fixed 1 6 "Epiphany")
+          (holiday-julian 12 25 "Eastern Orthodox Christmas")
+          (holiday-greek-orthodox-easter)
+          (holiday-fixed 8 15 "Assumption")
+          (holiday-advent 0 "Advent")))
+     (solar-equinoxes-solstices)
+     (holiday-sexp calendar-daylight-savings-starts
+                   (format "Daylight Saving Time Begins %s"
+                           (solar-time-string
+                            (/ calendar-daylight-savings-starts-time
+                               (float 60))
+                            calendar-standard-time-zone-name)))
+     (holiday-sexp calendar-daylight-savings-ends
+                   (format "Daylight Saving Time Ends %s"
+                           (solar-time-string
+                            (/ calendar-daylight-savings-ends-time
+                               (float 60))
+                            calendar-daylight-time-zone-name))))))
  '(calendar-mark-holidays-flag t)
- '(cc-other-file-alist (quote (("\\.cc\\'" (".hh" ".h")) ("\\.hh\\'" (".cc" ".C")) ("\\.c\\'" (".h")) ("Impl\\.h\\'" ("Impl.cpp" ".h")) ("\\.h\\'" (".c" ".cc" ".C" ".CC" ".cxx" ".cpp" "Impl.h")) ("\\.C\\'" (".H" ".hh" ".h")) ("\\.H\\'" (".C" ".CC")) ("\\.CC\\'" (".HH" ".H" ".hh" ".h")) ("\\.HH\\'" (".CC")) ("\\.c\\+\\+\\'" (".h++" ".hh" ".h")) ("\\.h\\+\\+\\'" (".c++")) ("\\.cpp\\'" (".hpp" ".hh" ".h")) ("\\.hpp\\'" (".cpp")) ("\\.cxx\\'" (".hxx" ".hh" ".h")) ("\\.hxx\\'" (".cxx")))))
- '(cc-search-directories (quote ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa")))
+ '(cc-other-file-alist
+   (quote
+    (("\\.cc\\'"
+      (".hh" ".h"))
+     ("\\.hh\\'"
+      (".cc" ".C"))
+     ("\\.c\\'"
+      (".h"))
+     ("Impl\\.h\\'"
+      ("Impl.cpp" ".h"))
+     ("\\.h\\'"
+      (".c" ".cc" ".C" ".CC" ".cxx" ".cpp" "Impl.h"))
+     ("\\.C\\'"
+      (".H" ".hh" ".h"))
+     ("\\.H\\'"
+      (".C" ".CC"))
+     ("\\.CC\\'"
+      (".HH" ".H" ".hh" ".h"))
+     ("\\.HH\\'"
+      (".CC"))
+     ("\\.c\\+\\+\\'"
+      (".h++" ".hh" ".h"))
+     ("\\.h\\+\\+\\'"
+      (".c++"))
+     ("\\.cpp\\'"
+      (".hpp" ".hh" ".h"))
+     ("\\.hpp\\'"
+      (".cpp"))
+     ("\\.cxx\\'"
+      (".hxx" ".hh" ".h"))
+     ("\\.hxx\\'"
+      (".cxx")))))
+ '(cc-search-directories
+   (quote
+    ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa")))
  '(comment-style (quote plain))
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
@@ -660,7 +814,8 @@
  '(compilation-skip-visited t)
  '(confirm-kill-emacs (quote yes-or-no-p))
  '(copyright-limit 10000)
- '(copyright-regexp "\\(Copyright (c) \\)\\([-0-9, ';/*%#\\n\\t]*[0-9]+\\), \\(?:INTEC GmbH\\|\\SIMPACK AG\\|Simpack AG\\)")
+ '(copyright-regexp
+   "\\(Copyright (c) \\)\\([-0-9, ';/*%#\\n\\t]*[0-9]+\\), \\(?:INTEC GmbH\\|\\SIMPACK AG\\|Simpack AG\\)")
  '(cperl-continued-statement-offset 0)
  '(cperl-indent-level 3)
  '(dabbrev-case-fold-search nil)
@@ -668,22 +823,29 @@
  '(desktop-restore-eager 20)
  '(desktop-save (quote ask-if-new))
  '(desktop-save-mode t)
+ '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^apel@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(doxymacs-blank-multiline-comment-template my-doxymacs-blank-multiline-comment-template)
  '(doxymacs-blank-singleline-comment-template my-doxymacs-blank-singleline-comment-template)
  '(doxymacs-command-character "\\")
- '(doxymacs-doxygen-dirs (quote (("^/scratch/apel/new_arch/develop/src/ooa/" "http://simdev-server.intec.dom/na_tags" "http://simdev-server.intec.dom/na_docs"))))
+ '(doxymacs-doxygen-dirs
+   (quote
+    (("^/scratch/apel/new_arch/develop/src/ooa/" "http://simdev-server.intec.dom/na_tags" "http://simdev-server.intec.dom/na_docs"))))
  '(doxymacs-doxygen-style "JavaDoc")
  '(doxymacs-function-comment-template my-doxymacs-function-comment-template)
  '(doxymacs-use-external-xml-parser t)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
- '(erc-autojoin-channels-alist (quote (("freenode.net" "#gerrit" "#emacs" "#libgit2" "##spirit"))))
+ '(erc-autojoin-channels-alist
+   (quote
+    (("freenode.net" "#gerrit" "#emacs" "#libgit2" "##spirit"))))
  '(erc-autojoin-timing (quote ident))
  '(erc-fill-column 100)
  '(erc-hide-list (quote ("JOIN" "PART" "QUIT")))
  '(erc-keywords (quote ("ardmore")))
- '(erc-modules (quote (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom services smiley stamp spelling track)))
+ '(erc-modules
+   (quote
+    (autojoin button completion fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring scrolltobottom services smiley stamp spelling track)))
  '(erc-nick "ardmore")
  '(erc-nickserv-passwords (quote ((freenode (("ardmore" . "hBdL6A06wyXwFTsmDNsb"))))))
  '(erc-port 6667)
@@ -703,7 +865,9 @@
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
  '(ff-ignore-include nil)
- '(file-cache-filter-regexps (quote ("~$" "\\.o$" "\\.rpo$" "\\.exe$" "\\.a$" "\\.elc$" ",v$" "\\.output$" "\\.$" "#$" "\\.class$" "\\.bak$" "\\.svn-base$" "\\.html$" "\\.svn" "\\.so$" "\\.dll$" "CMakeFiles" "extern/share" "extern/linux" "extern/win" "partners" "/obj/" "^project\\.pj$" "\\.sbr$" "\\.tes$" "\\.intinfo$" "\\.dim$")))
+ '(file-cache-filter-regexps
+   (quote
+    ("~$" "\\.o$" "\\.rpo$" "\\.exe$" "\\.a$" "\\.elc$" ",v$" "\\.output$" "\\.$" "#$" "\\.class$" "\\.bak$" "\\.svn-base$" "\\.html$" "\\.svn" "\\.so$" "\\.dll$" "CMakeFiles" "extern/share" "extern/linux" "extern/win" "partners" "/obj/" "^project\\.pj$" "\\.sbr$" "\\.tes$" "\\.intinfo$" "\\.dim$")))
  '(fill-column 120)
  '(focus-follows-mouse t)
  '(gdb-find-source-frame t)
@@ -723,6 +887,7 @@
  '(inhibit-startup-screen t)
  '(js-indent-level 3)
  '(latex-run-command "pdflatex")
+ '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
  '(make-backup-files nil)
  '(message-from-style (quote default))
  '(message-send-mail-function (quote smtpmail-send-it))
@@ -738,26 +903,92 @@
  '(mu4e-update-interval 300)
  '(mu4e-use-fancy-chars t)
  '(nxml-child-indent 3)
- '(org-agenda-custom-commands (quote (("w" "Work agenda only" agenda "" ((org-agenda-files (quote ("~/org/na.org" "~/org/devs.org"))))) ("h" "Home agenda only" agenda "" ((org-agenda-files (quote ("~/ownCloud/private.org" "~/ownCloud/geburtstage.org"))))) ("s" "Unscheduled items" alltodo "" ((org-agenda-skip-function (quote (org-agenda-skip-entry-if (quote scheduled) (quote nottodo) (quote todo)))))) ("r" "Activities to report" tags "REPORT" ((org-agenda-remove-tags t) (org-agenda-prefix-format "") (org-agenda-todo-keyword-format "%-17s") (ps-landscape-mode t) (ps-number-of-columns 1)) ("~/org/Activities.pdf")))))
+ '(org-agenda-custom-commands
+   (quote
+    (("w" "Work agenda only" agenda ""
+      ((org-agenda-files
+        (quote
+         ("~/org/na.org" "~/org/devs.org")))))
+     ("h" "Home agenda only" agenda ""
+      ((org-agenda-files
+        (quote
+         ("~/ownCloud/private.org" "~/ownCloud/geburtstage.org")))))
+     ("s" "Unscheduled items" alltodo ""
+      ((org-agenda-skip-function
+        (quote
+         (org-agenda-skip-entry-if
+          (quote scheduled)
+          (quote nottodo)
+          (quote todo))))))
+     ("r" "Activities to report" tags "REPORT"
+      ((org-agenda-remove-tags t)
+       (org-agenda-prefix-format "")
+       (org-agenda-todo-keyword-format "%-17s")
+       (ps-landscape-mode t)
+       (ps-number-of-columns 1))
+      ("~/org/Activities.pdf")))))
  '(org-agenda-repeating-timestamp-show-all nil)
  '(org-agenda-skip-deadline-prewarning-if-scheduled t)
  '(org-agenda-skip-scheduled-if-deadline-is-shown t)
  '(org-agenda-start-on-weekday nil)
- '(org-capture-templates (quote (("d" "DevIssue from MKS" entry (file "~/org/devs.org") "* ASSIGNED %:description  :REPORT:
+ '(org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
+ '(org-capture-templates
+   (quote
+    (("d" "DevIssue from MKS" entry
+      (file "~/org/devs.org")
+      "* ASSIGNED %:description  :REPORT:
 %:initial
-" :immediate-finish t) ("g" "General" entry (file+olp "~/org/na.org" "Unsorted") "** TODO %?") ("m" "TODO from Mail" entry (file+olp "~/org/na.org" "Unsorted") "** TODO %a" :immediate-finish t))))
- '(org-feed-alist (quote (("DRadio Forschung aktuell" "http://www.dradio.de/rss/podcast/sendungen/forschak/" "~/org/podcasts.org" "DRadio Forschung aktuell" :formatter ma-format-dradio-feed-entry) ("DRadio Zeitfragen" "http://www.dradio.de/rss/podcast/sendungen/zeitfragen/" "~/org/podcasts.org" "DRadio Zeitfragen" :formatter ma-format-dradio-feed-entry) ("DRadio Umwelt und Verbraucher" "http://www.dradio.de/rss/podcast/sendungen/umweltundverbraucher/" "~/org/podcasts.org" "DRadio Umwelt und Verbraucher" :formatter ma-format-dradio-feed-entry) ("DRadio Computer und Kommunikation" "http://www.dradio.de/rss/podcast/sendungen/computer/" "~/org/podcasts.org" "DRadio Computer und Kommunikation" :formatter ma-format-dradio-feed-entry) ("FLOSS" "http://www.leoville.tv/podcasts/floss.xml" "~/org/podcasts.org" "FLOSS" :formatter ma-format-dradio-feed-entry))))
+" :immediate-finish t)
+     ("g" "General" entry
+      (file+olp "~/org/na.org" "Unsorted")
+      "** TODO %?")
+     ("m" "TODO from Mail" entry
+      (file+olp "~/org/na.org" "Unsorted")
+      "** TODO %a" :immediate-finish t))))
+ '(org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
+ '(org-feed-alist
+   (quote
+    (("DRadio Forschung aktuell" "http://www.dradio.de/rss/podcast/sendungen/forschak/" "~/org/podcasts.org" "DRadio Forschung aktuell" :formatter ma-format-dradio-feed-entry)
+     ("DRadio Zeitfragen" "http://www.dradio.de/rss/podcast/sendungen/zeitfragen/" "~/org/podcasts.org" "DRadio Zeitfragen" :formatter ma-format-dradio-feed-entry)
+     ("DRadio Umwelt und Verbraucher" "http://www.dradio.de/rss/podcast/sendungen/umweltundverbraucher/" "~/org/podcasts.org" "DRadio Umwelt und Verbraucher" :formatter ma-format-dradio-feed-entry)
+     ("DRadio Computer und Kommunikation" "http://www.dradio.de/rss/podcast/sendungen/computer/" "~/org/podcasts.org" "DRadio Computer und Kommunikation" :formatter ma-format-dradio-feed-entry)
+     ("FLOSS" "http://www.leoville.tv/podcasts/floss.xml" "~/org/podcasts.org" "FLOSS" :formatter ma-format-dradio-feed-entry))))
  '(org-scheduled-past-days 5)
  '(org-sort-agenda-notime-is-late nil)
  '(org-toodledo-inhibit-https t)
  '(org-toodledo-password "uENfYn30UIzJZs5f1h4s")
  '(org-toodledo-sync-on-save "yes")
  '(org-toodledo-userid "td50effa7ae84c9")
- '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("marmalade" . "http://marmalade-repo.org/packages/"))))
+ '(package-archives
+   (quote
+    (("gnu" . "http://elpa.gnu.org/packages/")
+     ("marmalade" . "http://marmalade-repo.org/packages/"))))
  '(password-cache-expiry 3600)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
- '(safe-local-variable-values (quote ((tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS") (tags-file-name . "/scratch2/apel/llvm-3.0.src/TAGS") (tags-file-name . "/scratch/apel/new_arch/.tags") (tags-file-name "/scratch2/apel/llvm-3.0.src/TAGS") (tags-file-name "/scratch/apel/new_arch/.tags") (tags-table-list "/scratch2/apel/llvm-3.0.src/TAGS") (tags-table-list "/scratch/apel/new_arch/.tags") (tags-table-list (quote ("/scratch/apel/new_arch/.tags"))) (tags-table-list (quote ("/scratch2/apel/llvm-3.0.src/TAGS"))) (ma-build-dir) (ma-make-target) (ma-make-target . undef) (crontab-host . build-linux) (crontab-host . redhat64) (crontab-apply-after-save . t) (ma-compile-command . "~/bin/my_compile") (ma-compile-command . "make -C /home/home_dev/apel/llvm_test/obj"))))
+ '(safe-local-variable-values
+   (quote
+    ((tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS")
+     (tags-file-name . "/scratch2/apel/llvm-3.0.src/TAGS")
+     (tags-file-name . "/scratch/apel/new_arch/.tags")
+     (tags-file-name "/scratch2/apel/llvm-3.0.src/TAGS")
+     (tags-file-name "/scratch/apel/new_arch/.tags")
+     (tags-table-list "/scratch2/apel/llvm-3.0.src/TAGS")
+     (tags-table-list "/scratch/apel/new_arch/.tags")
+     (tags-table-list
+      (quote
+       ("/scratch/apel/new_arch/.tags")))
+     (tags-table-list
+      (quote
+       ("/scratch2/apel/llvm-3.0.src/TAGS")))
+     (ma-build-dir)
+     (ma-make-target)
+     (ma-make-target . undef)
+     (crontab-host . build-linux)
+     (crontab-host . redhat64)
+     (crontab-apply-after-save . t)
+     (ma-compile-command . "~/bin/my_compile")
+     (ma-compile-command . "make -C /home/home_dev/apel/llvm_test/obj"))))
  '(save-abbrevs nil)
  '(scroll-bar-mode (quote right))
  '(send-mail-function nil)
