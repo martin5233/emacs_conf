@@ -499,7 +499,9 @@
 (defun ma-run-compile ()
   "Run compilation"
   (interactive)
-  (setq comp-command ma-compile-command)
+  (if (boundp 'ma-compile-command)
+      (setq comp-command ma-compile-command)
+    (setq comp-command "~/bin/my_compile"))
   (if (or (boundp 'ma-build-dir) (stringp 'ma-build-dir))
       (setq comp-command (concat comp-command " " ma-build-dir)))
   (if (or (boundp 'ma-make-target) (stringp 'ma-make-target))
