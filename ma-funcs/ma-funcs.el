@@ -1,3 +1,5 @@
+(require 'hideshow)
+
 (defgroup ma nil
   "Martins customizations"
 )
