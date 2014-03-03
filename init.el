@@ -45,8 +45,8 @@
 		  (setq etags-select-go-if-unambiguous t)
 		  (setq etags-select-use-short-name-completion t)))
 	(:name org-mode)
-	(:name http-post-simple
-	 :features http-post-simple)
+;; 	(:name http-post-simple
+;; 	 :features http-post-simple)
 	;; (:name org-toodledo
 	;;  :type github
 	;;  :pkgname "christopherjwhite/org-toodledo"
@@ -284,7 +284,7 @@
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
  '(compilation-read-command nil)
- '(compilation-scroll-output t)
+ '(compilation-scroll-output (quote first-error))
  '(compilation-search-path (quote ("/scratch/apel/new_arch")))
  '(compilation-skip-threshold 2)
  '(compilation-skip-visited t)
