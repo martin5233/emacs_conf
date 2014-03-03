@@ -40,8 +40,9 @@
 		  (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
 	(:name etags-select
 	 :after (progn
-		  (add-hook 'c-mode-common-hook
-			    (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point))
+             (add-hook 'c-mode-common-hook
+                       (lambda()
+                         (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point)))
 		  (setq etags-select-go-if-unambiguous t)
 		  (setq etags-select-use-short-name-completion t)))
 	(:name org-mode)

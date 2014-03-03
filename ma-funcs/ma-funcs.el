@@ -81,6 +81,16 @@
     )
 )
   
+(defun show-frame (&optional frame)
+  "Show the current Emacs frame or the FRAME given as argument.
+   And make sure that it really shows up!"
+  (raise-frame)
+  ; yes, you have to call this twice. Don’t ask me why…
+  ; select-frame-set-input-focus calls x-focus-frame and does a bit of
+  ; additional magic.
+  (select-frame-set-input-focus (selected-frame))
+  (select-frame-set-input-focus (selected-frame)))
+
 
 (defun ma-kill-old-buffers ()
   "Kill buffers from end of buffer list (not used recently) until no more than 50 buffers are left. Remove temporary buffers first."
