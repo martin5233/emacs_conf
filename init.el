@@ -20,97 +20,106 @@
 
 (setq el-get-sources
       '((:name tempo
-	 :type builtin
-	 :features tempo
-	 :after (progn 
-		  (tempo-define-template "change-hist-new-line" '( n " *            |                    |           " p))
+    :type builtin
+    :features tempo
+    :after (progn
+        (tempo-define-template "change-hist-new-line" '( n " *            |                    |           " p))
                   (add-hook 'c-mode-common-hook
-			    (lambda() (local-set-key (kbd "S-<return>") 'tempo-template-change-hist-new-line)))
-		  ))
-	(:name tempo-snippets
-	 :type http
-	 :url "http://nschum.de/src/emacs/tempo-snippets/tempo-snippets.el")
-        (:name expand-region
-	 :after (global-set-key "\M-o" 'er/expand-region))
-	(:name multiple-cursors
-	 :after (progn
-		  (global-set-key (kbd "C-c C-n") 'mc/mark-next-like-this)
-		  (global-set-key (kbd "C-c C-p") 'mc/mark-previous-like-this)
-		  (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
-		  (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
-	(:name etags-select
-	 :after (progn
+             (lambda() (local-set-key (kbd "S-<return>") 'tempo-template-change-hist-new-line)))
+        ))
+   (:name tempo-snippets
+    :type http
+    :url "http://nschum.de/src/emacs/tempo-snippets/tempo-snippets.el")
+   (:name expand-region
+    :after (global-set-key "\M-o" 'er/expand-region))
+   (:name multiple-cursors
+    :after (progn
+        (global-set-key (kbd "C-c C-n") 'mc/mark-next-like-this)
+        (global-set-key (kbd "C-c C-p") 'mc/mark-previous-like-this)
+        (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
+        (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
+   (:name etags-select
+    :after (progn
              (add-hook 'c-mode-common-hook
                        (lambda()
                          (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point)))
-		  (setq etags-select-go-if-unambiguous t)
-		  (setq etags-select-use-short-name-completion t)))
-	(:name org-mode)
-;; 	(:name http-post-simple
-;; 	 :features http-post-simple)
-	;; (:name org-toodledo
-	;;  :type github
-	;;  :pkgname "christopherjwhite/org-toodledo"
-	;;  :features org-toodledo
-	;;  :depends (org-mode http-post-simple))
-	(:name uniquify
-	 :type builtin
-	 :features uniquify
-	 :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
-	(:name magit)
-	(:name csv-mode)
-	(:name llvm-mode)
-	(:name ascii-table)
-	(:name crontab-mode)
-	(:name browse-kill-ring)
-	(:name wgrep)
-	(:name generic
-	 :type builtin)
-	(:name skeleton
-	 :type builtin)
-	(:name smex
-	 :after (global-set-key (kbd "M-x") 'smex))
-	(:name auto-insert
-	 :type builtin
-	 :depends skeleton
-	 :after (progn
-		  (add-hook 'find-file-hook 'auto-insert)
-		  (define-auto-insert "\\.h\\'" 'header-skeleton)
-		  ))
-	(:name files
-	 :type builtin)
-	(:name password-cache
+        (setq etags-select-go-if-unambiguous t)
+        (setq etags-select-use-short-name-completion t)))
+   (:name org-mode)
+   (:name http-post-simple
+    :type http
+    :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
+    :features http-post-simple)
+   ;; (:name org-toodledo
+   ;;  :type github
+   ;;  :pkgname "christopherjwhite/org-toodledo"
+   ;;  :features org-toodledo
+   ;;  :depends (org-mode http-post-simple))
+   (:name uniquify
+    :type builtin
+    :features uniquify
+    :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+   (:name magit)
+   (:name csv-mode)
+   (:name llvm-mode)
+   (:name ascii-table)
+   (:name crontab-mode)
+   (:name browse-kill-ring)
+   (:name wgrep)
+   (:name generic
+    :type builtin)
+   (:name skeleton
+    :type builtin)
+   (:name smex
+    :after (global-set-key (kbd "M-x") 'smex))
+   (:name auto-insert
+    :type builtin
+    :depends skeleton
+    :after (progn
+        (add-hook 'find-file-hook 'auto-insert)
+        (define-auto-insert "\\.h\\'" 'header-skeleton)
+        ))
+   (:name files
+    :type builtin)
+   (:name password-cache
          :type builtin)
-	(:name subword
+   (:name subword
          :type builtin
-	 :after (add-hook 'c-mode-common-hook
-			  (lambda()
-			    (local-set-key (kbd "M-<left>") 'subword-backward)
-			    (local-set-key (kbd "M-<right>") 'subword-forward)
-			    (subword-mode t))))
-;;	(:name ma-funcs
-	(:name desktop
-	 :type builtin
-;;	 :depends ma-funcs
-	 :after (add-hook 'kill-emacs-hook 'ma-kill-old-buffers))
-	(:name cmake-mode
-	       :after (add-hook 'cmake-mode-hook
-				'(lambda ()
-				   (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
-        (:name idle-highlight-mode)))
+    :after (add-hook 'c-mode-common-hook
+           (lambda()
+             (local-set-key (kbd "M-<left>") 'subword-backward)
+             (local-set-key (kbd "M-<right>") 'subword-forward)
+             (subword-mode t))))
+;;   (:name ma-funcs
+   (:name desktop
+    :type builtin
+;;    :depends ma-funcs
+    :after (add-hook 'kill-emacs-hook 'ma-kill-old-buffers))
+   (:name cmake-mode
+    :after (add-hook 'cmake-mode-hook
+                     '(lambda ()
+                        (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
+   (:name idle-highlight-mode)
+   (:name ethan-wspace
+          :after (global-ethan-wspace-mode 1))
+   ))
 
 (if work
-    (setq el-get-sources 
-	  (append el-get-sources
-		  '((:name filecache
+    (setq el-get-sources
+     (append el-get-sources
+        '((:name filecache
                      :type builtin)
-		    (:name doxymacs)
-		    (:name org-jira
-		     :after (setq jiralib-url "http://jiratest.intec.dom:8080"))))))
+          (:name doxymacs)
+          (:name org-jira
+           :after (setq jiralib-url "http://jiratest.intec.dom:8080"))))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
 
 (el-get 'sync my-packages)
+
+;; For some strange reason org-toodledo does not play well with el-get
+(setq load-path (cons (expand-file-name "~/.emacs.d/org-toodledo-master") load-path))
+(require 'org-toodledo)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -337,6 +346,10 @@
  '(minibuffer-message-timeout 2 t)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
+ '(org-toodledo-inhibit-https t)
+ '(org-toodledo-password "uENfYn30UIzJZs5f1h4s")
+ '(org-toodledo-sync-on-save "yes")
+ '(org-toodledo-userid "td50effa7ae84c9")
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
@@ -403,6 +416,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
+ '(ethan-wspace-face ((t (:background "tomato"))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
 (put 'downcase-region 'disabled nil)
@@ -413,8 +427,6 @@
                        '(font . "DejaVu Sans Mono-10"))
 
 (tool-bar-mode 0)
-
-;; (require 'org-toodledo)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -427,7 +439,7 @@
 (global-set-key "\M- " 'dabbrev-expand)
 (global-set-key (kbd "C-.") 'goto-last-change)
 (global-set-key (kbd "<kp-end>") 'shell)
-(global-set-key (kbd "<kp-next>") '(lambda () "Open .emacs" (interactive) (find-file "~/.emacs")))
+(global-set-key (kbd "<kp-next>") '(lambda () "Open init.el" (interactive) (find-file "~/.emacs.d/init.el")))
 
 (windmove-default-keybindings)
 
@@ -437,7 +449,7 @@
           (lambda() (yes-or-no-p "All change packages reviewed?")))
 
 ;; Remove buffers after EDiff is finished
-(add-hook 'ediff-cleanup-hook 
+(add-hook 'ediff-cleanup-hook
           (lambda () (ediff-janitor t nil)))
 
 (add-hook 'c-mode-common-hook
@@ -477,5 +489,3 @@
 
 
 (setq-default ediff-ignore-similar-regions t)
-
-

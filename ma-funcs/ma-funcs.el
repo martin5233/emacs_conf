@@ -225,6 +225,11 @@
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
 
+(add-hook 'c-mode-common-hook
+	  (lambda ()
+	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
+
 
 (require 'dbus)
 (defun ma-send-desktop-notification (summary body timeout)
