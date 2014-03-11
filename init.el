@@ -45,7 +45,8 @@
                          (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point)))
         (setq etags-select-go-if-unambiguous t)
         (setq etags-select-use-short-name-completion t)))
-   (:name org-mode)
+   (:name org-mode
+    :branch "maint")
    (:name http-post-simple
     :type http
     :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
@@ -100,8 +101,6 @@
                      '(lambda ()
                         (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
    (:name idle-highlight-mode)
-   (:name ethan-wspace
-          :after (global-ethan-wspace-mode 1))
    ))
 
 (if work

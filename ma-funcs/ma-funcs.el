@@ -289,7 +289,7 @@
     (if (not buf)
       (progn
         (org-agenda-list 1)
-        NIL)
+        nil)
       (if (not (get-buffer-window buf))
           (progn
             (switch-to-buffer buf)
@@ -305,4 +305,19 @@
     (progn
       (run-with-idle-timer 600 t 'ma-show-agenda-if-hidden)))
 
+(defun ma-instrument-func ()
+  "Adds a Logger statement to the current function displaying its name upon entry and exit"
+  (interactive)
+  (setq funcname (which-function))
+  (beginning-of-defun)
+  (forward-line 2)
+  (insert "Logger::INFO << \"" funcname "\" << \" entered\\n\";\n")
+  (forward-line -1)
+  (c-indent-line)
+  (end-of-defun)
+  (forward-line -1)
+  (insert "Logger::INFO << \"" funcname "\" << \" exited\\n\";\n")
+  (forward-line -1)
+  (c-indent-line)
+)
 (provide 'ma-funcs)
