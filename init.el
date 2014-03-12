@@ -2,7 +2,10 @@
 (setq work (string-match "^apel$" (user-login-name)))
 
 (if work
-(setq url-proxy-services (quote (("http" . "proxy.intec.dom:3128") ("https" . "proxy.intec.dom:3128"))))
+    (setq url-proxy-services
+          '(("http" . "proxy.intec.dom:3128")
+            ("https" . "proxy.intec.dom:3128")
+            ("no_proxy" . "intec.dom")))
 )
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
@@ -107,10 +110,14 @@
     (setq el-get-sources
      (append el-get-sources
         '((:name filecache
-                     :type builtin)
+           :type builtin)
           (:name doxymacs)
           (:name org-jira
-           :after (setq jiralib-url "http://jiratest.intec.dom:8080"))))))
+           :after (setq jiralib-url "http://jiratest.intec.dom:8080"))
+          (:name restclient
+           :type github
+           :pkgname "pashky/restclient.el")
+          ))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
 
@@ -465,7 +472,8 @@
             (flyspell-prog-mode)
             (cwarn-mode)
             (hs-minor-mode)
-            (hs-hide-initial-comment-block)))
+;;            (hs-hide-initial-comment-block)
+            ))
 
 
 (add-hook 'python-mode-hook
@@ -488,3 +496,5 @@
 
 
 (setq-default ediff-ignore-similar-regions t)
+
+(add-to-list 'auto-mode-alist '("\\.sjs$" . javascript-mode))

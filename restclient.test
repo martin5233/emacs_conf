@@ -1,0 +1,20 @@
+# -*- restclient -*-
+# Gets user timeline, formats JSON, shows response status and headers underneath
+#
+#
+GET http://api.twitter.com/1/statuses/user_timeline.json?screen_name=twitterapi&count=2
+#
+# XML is supported - highlight, pretty-print
+#
+GET http://www.redmine.org/issues.xml?limit=10
+
+#
+# It can even show an image!
+#
+GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png
+#
+# A bit of json GET, you can pass headers too
+#
+GET https://jira.intec.dom:8443/rest/api/latest/issue/IM-24235
+Content-Type: application/json
+Authorization: Basic (base64-encode-region username:password
