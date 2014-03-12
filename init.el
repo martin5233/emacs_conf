@@ -104,6 +104,7 @@
                      '(lambda ()
                         (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
    (:name idle-highlight-mode)
+   (:name auto-complete-emacs-lisp)
    ))
 
 (if work
@@ -112,8 +113,14 @@
         '((:name filecache
            :type builtin)
           (:name doxymacs)
+          (:name ac-etags
+           :type github
+           :pkgname "syohex/emacs-ac-etags"
+           :after (ac-etags-setup))
           (:name org-jira
-           :after (setq jiralib-url "http://jiratest.intec.dom:8080"))
+           :type github
+           :pkgname "baohaojun/org-jira"
+           :after (setq jiralib-url "https://jira.intec.dom:8443"))
           (:name restclient
            :type github
            :pkgname "pashky/restclient.el")
@@ -126,6 +133,7 @@
 ;; For some strange reason org-toodledo does not play well with el-get
 (setq load-path (cons (expand-file-name "~/.emacs.d/org-toodledo-master") load-path))
 (require 'org-toodledo)
+(load "~/.emacs.d/init-org-toodledo")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -405,6 +413,7 @@
  '(tex-open-quote "\"")
  '(texinfo-close-quote "''")
  '(texinfo-open-quote "``")
+ '(tool-bar-mode nil)
  '(tramp-default-method "ssh")
  '(tramp-default-proxies-alist nil)
  '(truncate-lines t)
@@ -422,7 +431,6 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
- '(ethan-wspace-face ((t (:background "tomato"))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
 (put 'downcase-region 'disabled nil)
@@ -431,8 +439,6 @@
 
 (add-to-list 'default-frame-alist
                        '(font . "DejaVu Sans Mono-10"))
-
-(tool-bar-mode 0)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -472,6 +478,7 @@
             (flyspell-prog-mode)
             (cwarn-mode)
             (hs-minor-mode)
+            (ac-etags-ac-setup)
             (hs-hide-initial-comment-block)))
 
 
