@@ -472,8 +472,7 @@
             (flyspell-prog-mode)
             (cwarn-mode)
             (hs-minor-mode)
-;;            (hs-hide-initial-comment-block)
-            ))
+            (hs-hide-initial-comment-block)))
 
 
 (add-hook 'python-mode-hook
