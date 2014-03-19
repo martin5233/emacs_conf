@@ -28,8 +28,14 @@
     (ma-make-target . nil)
     (ma-build-dir . nil))))
 
+(dir-locals-set-class-variables 'squish
+ '((python-mode
+  (tags-file-name . "/scratch2/apel/SpckTest/SquishTestSuites/TAGS"))))
+
+
 (dir-locals-set-directory-class  "/scratch/apel/new_arch/develop/" 'new_arch)
 (dir-locals-set-directory-class  "/home/home_dev/apel/llvm_test/" 'llvm_test)
 (dir-locals-set-directory-class  "/scratch2/apel/llvm-3.1.src" 'llvm_src)
 (dir-locals-set-directory-class  "/usr/local/include/llvm" 'llvm_src)
 (dir-locals-set-directory-class  "/home/home_dev/apel/atomic/" 'atomic)
+(dir-locals-set-directory-class  "/scratch2/apel/SpckTest/SquishTestSuites" 'squish)
