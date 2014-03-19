@@ -320,4 +320,30 @@
   (forward-line -1)
   (c-indent-line)
 )
+
+(defun ma-setup-ediff ()
+  "Sets up the editor for ediff"
+  (interactive)
+  (window-configuration-to-register 'e)
+  (frameset-to-register 'f)
+  (set-frame-parameter nil 'width 240)
+  (set-frame-parameter nil 'height 64)
+  (show-frame)
+)
+
+(defun ma-cleanup-ediff ()
+  "Restores the previous configuration after ediff"
+  (interactive)
+  (jump-to-register 'e)
+  (jump-to-register 'f)
+)
+
+(add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
+(add-hook 'ediff-cleanup-hook 'ma-cleanup-ediff)
+
+;; Remove buffers after EDiff is finished
+(add-hook 'ediff-cleanup-hook
+          (lambda () (ediff-janitor t nil)))
+
+
 (provide 'ma-funcs)

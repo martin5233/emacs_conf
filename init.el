@@ -63,7 +63,8 @@
     :type builtin
     :features uniquify
     :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
-   (:name magit)
+   (:name magit
+    :after (global-set-key (kbd "C-c C-z") 'magit-status))
    (:name csv-mode)
    (:name llvm-mode)
    (:name ascii-table)
@@ -105,6 +106,10 @@
                         (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
    (:name idle-highlight-mode)
    (:name auto-complete-emacs-lisp)
+   (:name smartparens
+          :after (progn (smartparens-mode)
+			(sp-local-pair 'c++-mode "<" ">")
+			(sp-local-pair 'c++-mode "{" nil :post-handlers '("[i]\n||\n[i]"))))
    ))
 
 (if work
@@ -399,6 +404,7 @@
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote parenthesis))
+ '(smartparens-global-mode t)
  '(smtpmail-local-domain "simpack.de")
  '(smtpmail-smtp-server "exchange.intec.dom")
  '(split-height-threshold 40)
@@ -459,10 +465,6 @@
 
 (add-hook 'kill-emacs-query-functions
           (lambda() (yes-or-no-p "All change packages reviewed?")))
-
-;; Remove buffers after EDiff is finished
-(add-hook 'ediff-cleanup-hook
-          (lambda () (ediff-janitor t nil)))
 
 (add-hook 'c-mode-common-hook
        (lambda ()
