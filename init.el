@@ -75,6 +75,7 @@
     :type builtin)
    (:name skeleton
     :type builtin)
+   (:name request)
    (:name smex
     :after (global-set-key (kbd "M-x") 'smex))
    (:name auto-insert
@@ -106,10 +107,6 @@
                         (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
    (:name idle-highlight-mode)
    (:name auto-complete-emacs-lisp)
-   (:name smartparens
-          :after (progn (smartparens-mode)
-			(sp-local-pair 'c++-mode "<" ">")
-			(sp-local-pair 'c++-mode "{" nil :post-handlers '("[i]\n||\n[i]"))))
    ))
 
 (if work
@@ -506,3 +503,5 @@
 (setq-default ediff-ignore-similar-regions t)
 
 (add-to-list 'auto-mode-alist '("\\.sjs$" . javascript-mode))
+(add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+(electric-pair-mode)

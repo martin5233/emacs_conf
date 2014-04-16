@@ -18,3 +18,44 @@ GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png
 GET https://jira.intec.dom:8443/rest/api/latest/issue/IM-24235
 Content-Type: application/json
 Authorization: Basic (base64-encode-region username:password
+#
+#
+#
+GET http://jiratest.intec.dom:7990/rest/api/1.0/projects/JSI/repos/stash-auto-review/pull-requests
+Content-Type: application/json
+Authorization: Basic (base64-encode-region username:password
+#
+#
+#
+GET http://jiratest.intec.dom:7990/rest/inbox/1.0/pull-requests
+Content-Type: application/json
+Authorization: Basic (base64-encode-region username:password
+#
+#
+#
+GET http://jiratest.intec.dom:7990/rest/inbox/1.0/pull-requests/count
+Content-Type: application/json
+Authorization: Basic base64-encode-region username:password
+#
+# Retrieve Klocwork ids blocking a dev issue
+#
+GET https://jira.intec.dom:8443/rest/api/2/issue/IM-26203?fields=customfield_10027
+Content-Type: application/json
+Authorization: Basic base64-encode-region username:password
+#
+# Update Klocwork ids for a dev issue
+#
+PUT https://jira.intec.dom:8443/rest/api/2/issue/IM-26203
+Content-Type: application/json
+Authorization: Basic base64-encode-region username:password
+{
+"fields": {
+          "customfield_10027": "Juchhu"
+}
+}
+#
+# Retrieve issues between development in progress and Integration Test
+#
+GET https://jira.intec.dom:8443/rest/api/2/search?jql=project%20%3D%20IM%20AND%20issuetype%20%3D%20Development%20AND%20status%20in%20(%22IN%20PROGRESS%22%2C%20%22READY%22%2C%20%22INTEGRATION%20TEST%22)&validateQuery=true&fields=key&startAt=0
+Content-Type: application/json
+Authorization: Basic base64-encode-region username:password
