@@ -402,7 +402,6 @@
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote parenthesis))
- '(smartparens-global-mode t)
  '(smtpmail-local-domain "simpack.de")
  '(smtpmail-smtp-server "exchange.intec.dom")
  '(split-height-threshold 40)
@@ -479,12 +478,14 @@
             (cwarn-mode)
             (hs-minor-mode)
             (ac-etags-ac-setup)
+            (idle-highlight-mode)
             (hs-hide-initial-comment-block)))
 
 
 (add-hook 'python-mode-hook
   '(lambda ()
      (local-unset-key [?\C-C ?\C-r])
+     (idle-highlight-mode)
      (imenu-add-to-menubar "Functions")))
 
 (add-hook 'shell-mode-hook
