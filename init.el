@@ -99,7 +99,9 @@
    (:name desktop
     :type builtin
 ;;    :depends ma-funcs
-    :after (add-hook 'kill-emacs-hook 'ma-kill-old-buffers))
+    :after (progn
+             (desktop-save-mode t)
+             (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
    (:name cmake-mode
     :after (add-hook 'cmake-mode-hook
                      '(lambda ()
@@ -327,7 +329,6 @@
  '(default-input-method "german-postfix")
  '(desktop-restore-eager 20)
  '(desktop-save (quote ask-if-new))
- '(desktop-save-mode t)
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^apel@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(ediff-split-window-function (quote split-window-horizontally))
