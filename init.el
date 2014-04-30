@@ -460,8 +460,9 @@
 
 (browse-kill-ring-default-keybindings)
 
-(add-hook 'kill-emacs-query-functions
-          (lambda() (yes-or-no-p "All change packages reviewed?")))
+(if work
+    (add-hook 'kill-emacs-query-functions
+              (lambda() (yes-or-no-p "All change packages reviewed?"))))
 
 (add-hook 'c-mode-common-hook
        (lambda ()
@@ -477,7 +478,6 @@
             (flyspell-prog-mode)
             (cwarn-mode)
             (hs-minor-mode)
-            (ac-etags-ac-setup)
             (idle-highlight-mode)
             (hs-hide-initial-comment-block)))
 
@@ -498,9 +498,7 @@
 
 (global-font-lock-mode 1)
 
-
 (global-set-key [f2] 'customize-group)
-
 
 (setq-default ediff-ignore-similar-regions t)
 
