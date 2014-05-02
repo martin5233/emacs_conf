@@ -100,7 +100,9 @@
    (:name desktop
     :type builtin
 ;;    :depends ma-funcs
-    :after (add-hook 'kill-emacs-hook 'ma-kill-old-buffers))
+    :after (progn
+             (desktop-save-mode t)
+             (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
    (:name cmake-mode
     :after (add-hook 'cmake-mode-hook
                      '(lambda ()
@@ -324,7 +326,6 @@
  '(default-input-method "german-postfix")
  '(desktop-restore-eager 20)
  '(desktop-save (quote ask-if-new))
- '(desktop-save-mode t)
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^apel@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(ediff-split-window-function (quote split-window-horizontally))
@@ -402,7 +403,6 @@
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote parenthesis))
- '(smartparens-global-mode t)
  '(smtpmail-local-domain "simpack.de")
  '(smtpmail-smtp-server "exchange.intec.dom")
  '(split-height-threshold 40)
@@ -461,8 +461,9 @@
 
 (browse-kill-ring-default-keybindings)
 
-(add-hook 'kill-emacs-query-functions
-          (lambda() (yes-or-no-p "All change packages reviewed?")))
+(if work
+    (add-hook 'kill-emacs-query-functions
+              (lambda() (yes-or-no-p "All change packages reviewed?"))))
 
 (add-hook 'c-mode-common-hook
        (lambda ()
@@ -478,13 +479,14 @@
             (flyspell-prog-mode)
             (cwarn-mode)
             (hs-minor-mode)
-            (ac-etags-ac-setup)
+            (idle-highlight-mode)
             (hs-hide-initial-comment-block)))
 
 
 (add-hook 'python-mode-hook
   '(lambda ()
      (local-unset-key [?\C-C ?\C-r])
+     (idle-highlight-mode)
      (imenu-add-to-menubar "Functions")))
 
 (add-hook 'shell-mode-hook
@@ -497,9 +499,7 @@
 
 (global-font-lock-mode 1)
 
-
 (global-set-key [f2] 'customize-group)
-
 
 (setq-default ediff-ignore-similar-regions t)
 
