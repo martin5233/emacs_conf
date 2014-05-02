@@ -343,10 +343,10 @@
 )
 
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
-(add-hook 'ediff-cleanup-hook 'ma-cleanup-ediff)
+(add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
 
 ;; Remove buffers after EDiff is finished
-(add-hook 'ediff-cleanup-hook
+(add-hook 'ediff-quit-hook
           (lambda () (ediff-janitor t nil)))
 
 
