@@ -41,18 +41,20 @@ Authorization: Basic base64-encode-region username:password
 #
 GET https://jira.intec.dom:8443/rest/api/2/issue/IM-26203?fields=customfield_10027
 Content-Type: application/json
-Authorization: Basic base64-encode-region username:password
+Authorization: Basic 
+#
+# Retrieve current status of a dev issue
+#
+GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203?fields=status
+Content-Type: application/json
+Authorization: Basic 
 #
 # Update Klocwork ids for a dev issue
 #
-PUT https://jira.intec.dom:8443/rest/api/2/issue/IM-26203
+PUT https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203
 Content-Type: application/json
-Authorization: Basic base64-encode-region username:password
-{
-"fields": {
-          "customfield_10027": "Juchhu"
-}
-}
+Authorization: Basic 
+{ "fields": { "customfield_10027": "JuchHu" } }
 #
 # Retrieve issues between development in progress and Integration Test
 #
