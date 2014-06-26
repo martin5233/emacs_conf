@@ -346,8 +346,8 @@
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
 
 ;; Remove buffers after EDiff is finished
-(add-hook 'ediff-quit-hook
-          (lambda () (ediff-janitor t nil)))
+;; (add-hook 'ediff-quit-hook
+;;           (lambda () (ediff-janitor t nil)))
 
 
 (provide 'ma-funcs)

@@ -9,3 +9,5 @@
 /tramp
 /.emacs.desktop
 /.emacs.desktop.lock
+/request/
+/abbrev_defs

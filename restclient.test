@@ -19,23 +19,55 @@ GET https://jira.intec.dom:8443/rest/api/latest/issue/IM-24235
 Content-Type: application/json
 Authorization: Basic (base64-encode-region username:password
 #
+# A bit of json GET, you can pass headers too
 #
-#
-GET http://jiratest.intec.dom:7990/rest/api/1.0/projects/JSI/repos/stash-auto-review/pull-requests
+GET https://jira.intec.dom:8443/rest/api/2/serverInfo
 Content-Type: application/json
-Authorization: Basic (base64-encode-region username:password
+Authorization: Basic 
 #
+# Retrieve open pull requests
 #
-#
-GET http://jiratest.intec.dom:7990/rest/inbox/1.0/pull-requests
+GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/SIMPACK_Src/pull-requests
 Content-Type: application/json
-Authorization: Basic (base64-encode-region username:password
+Authorization: Basic YXBlbDoyb2xkMnImcg==
+#
+# Retrieve open pull requests
+#
+POST https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/SIMPACK_Src/pull-requests/44/comments
+Content-Type: application/json
+Authorization: Basic YXBlbDoyb2xkMnImcg==
+{ "text":"Testkommentar"}
+#
+# Retrieve open pull requests. Provided by stash-inbox plugin, which is part of stash, but REST API not documented
+#
+GET https://stash.intec.dom:7990/rest/inbox/1.0/pull-requests
+Content-Type: application/json
+Authorization: Basic YXBlbDoyb2xkMnImcg==
+#
+#
+#
+GET https://stash-staging.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/Simpack_Src/commits?until=HEAD
+Content-Type: application/json
+Authorization: Basic YXBlbDoyb2xkMnImcg==
 #
 #
 #
 GET http://jiratest.intec.dom:7990/rest/inbox/1.0/pull-requests/count
 Content-Type: application/json
 Authorization: Basic base64-encode-region username:password
+#
+# Set the build status on a commit
+#
+POST http://jiratest.intec.dom:7990/rest/build-status/1.0/commits/f3810cfceccbe3f7a3211e6039f59b37146d9717
+Content-Type: application/json
+Authorization: Basic YXBlbDoyb2xkMnImcg==
+{
+   "state" : "FAILED",
+   "key": "build-win32",
+   "name": "build-win32: PR Title",
+   "url": "http://simdev-server.intec.dom/CDash/buildSummary.php?buildid=63671",
+   "description" : "PR description"
+}
 #
 # Retrieve Klocwork ids blocking a dev issue
 #
@@ -47,7 +79,7 @@ Authorization: Basic
 #
 GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203?fields=status
 Content-Type: application/json
-Authorization: Basic 
+Authorization: Basic YXBlbDoyb2xkMnImcg==
 #
 # Update Klocwork ids for a dev issue
 #
@@ -61,3 +93,11 @@ Authorization: Basic
 GET https://jira.intec.dom:8443/rest/api/2/search?jql=project%20%3D%20IM%20AND%20issuetype%20%3D%20Development%20AND%20status%20in%20(%22IN%20PROGRESS%22%2C%20%22READY%22%2C%20%22INTEGRATION%20TEST%22)&validateQuery=true&fields=key&startAt=0
 Content-Type: application/json
 Authorization: Basic base64-encode-region username:password
+
+#
+POST http://jiratest.intec.dom:7990/rest/api/1.0/projects/TEST/repos/testrepo/pull-requests/12/comments
+Content-Type: application/json
+Authorization: Basic YXBlbDoyb2xkMnImcg==
+{
+   "text" : "Testkommentar"
+}

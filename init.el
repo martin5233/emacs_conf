@@ -108,7 +108,17 @@
                      '(lambda ()
                         (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
    (:name idle-highlight-mode)
-   (:name auto-complete-emacs-lisp)
+   (:name auto-complete-emacs-lisp
+    :depends auto-complete)
+   (:name json-snatcher)
+   (:name json-mode
+    :depends json-snatcher)
+   (:name markdown-mode)
+   (:name anchored-transpose
+    :type http
+    :url "http://www.emacswiki.org/cgi-bin/wiki/download/anchored-transpose.el"
+    :after (global-set-key (kbd "C-x t") 'anchored-transpose)
+    )
    ))
 
 (if work
@@ -328,6 +338,7 @@
  '(desktop-save (quote ask-if-new))
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^apel@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
+ '(ediff-keep-variants nil)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
  '(european-calendar-style nil)
@@ -357,6 +368,7 @@
  '(js-indent-level 3)
  '(latex-run-command "pdflatex")
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+ '(ma-stash-url "http://jiratest.intec.dom:7990")
  '(make-backup-files nil)
  '(message-from-style (quote default))
  '(message-send-mail-function (quote smtpmail-send-it))
@@ -371,7 +383,7 @@
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("marmalade" . "http://marmalade-repo.org/packages/"))))
- '(password-cache-expiry 3600)
+ '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
