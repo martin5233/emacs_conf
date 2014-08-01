@@ -65,6 +65,7 @@
     :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
    (:name magit
     :after (global-set-key (kbd "C-c C-z") 'magit-status))
+   (:name git-timemachine)
    (:name csv-mode)
    (:name llvm-mode)
    (:name ascii-table)
@@ -154,6 +155,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(auto-revert-remote-files t)
  '(blink-matching-paren-on-screen nil)
  '(browse-kill-ring-no-duplicates t)
  '(browse-url-browser-function (quote ((".*" . browse-url-firefox))))
@@ -341,6 +343,7 @@
  '(ediff-keep-variants nil)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
+ '(el-get-byte-compile-at-init t)
  '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
@@ -353,6 +356,7 @@
  '(gdb-find-source-frame t)
  '(gdb-many-windows t)
  '(gdb-show-main t)
+ '(git-commit-summary-max-length 72)
  '(global-auto-revert-mode t)
  '(gud-tooltip-mode t)
  '(guide-key-mode t)
@@ -368,7 +372,11 @@
  '(js-indent-level 3)
  '(latex-run-command "pdflatex")
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
- '(ma-stash-url "http://jiratest.intec.dom:7990")
+ '(magit-process-popup-time 3)
+ '(magit-repo-dirs
+   (quote
+    ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest")))
+ '(magit-show-child-count t)
  '(make-backup-files nil)
  '(message-from-style (quote default))
  '(message-send-mail-function (quote smtpmail-send-it))
@@ -517,4 +525,5 @@
 
 (add-to-list 'auto-mode-alist '("\\.sjs$" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (electric-pair-mode)

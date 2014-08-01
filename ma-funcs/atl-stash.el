@@ -31,7 +31,7 @@
 (defcustom ma-stash-url "https://stash.intec.dom:7990"
   "URL of Stash server")
 
-(defcustom ma-SIMPACK-ca-cert "/home/apel/SIMPACK_CA.cer"
+(defcustom ma-SIMPACK-ca-cert "/home/home_dev/apel/SIMPACK_CA.cer"
   "Location of certificate of SIMPACK CA")
 
 (defvar ma-mode-line-string "Unknown" "This variable contains the status of open pull requests from Stash")
@@ -95,7 +95,7 @@
   )
 
 (defun ma-decompose-stash-info (data)
-  "Decompose information delivered by Stash and put the result info ma-mode-line-string"
+  "Decompose information delivered by Stash and put the result into ma-mode-line-string"
   (let ((values (assoc-default 'values data)))
     (progn
       (dotimes (i (length values))
@@ -157,7 +157,7 @@
 
 (ma-update-stash-info)
 (add-to-list 'mode-line-misc-info '(" " ma-mode-line-string " ") t)
-(run-with-timer 60 t 'ma-update-stash-info)
+(run-with-timer 60 60 'ma-update-stash-info)
 
 (provide 'atl-stash)
 ;;; atl-stash.el ends here
