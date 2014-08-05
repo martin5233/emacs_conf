@@ -189,7 +189,7 @@ for all open pull requests")
                :sync nil
                :success (function*
                          (lambda (&key data &allow-other-keys)
-                           (append stash-pr-data (cons (concat (car project) "/" repo) data))
+                           (push (cons (concat (car project) "/" repo) (assoc-default 'values data)) stash-pr-data)
                            (stash-decompose-stash-info data)
                            ))))))
 
@@ -354,7 +354,7 @@ for all open pull requests")
   (interactive)
   (let ((pr (stash-get-current-pr)))
     (if pr
-        (browse-url (assoc-default 'url (assoc-default 'link pr))))))
+        (browse-url (assoc-default 'href (aref (assoc-default 'self (assoc-default 'links pr)) 0))))))
 
 (stash-update-stash-info)
 (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
