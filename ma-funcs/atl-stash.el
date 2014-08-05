@@ -33,7 +33,7 @@
 (defcustom stash-url "https://stash.intec.dom:7990"
   "URL of Stash server")
 
-(defcustom stash-SIMPACK-ca-cert "/home/apel/SIMPACK_CA.cer"
+(defcustom stash-SIMPACK-ca-cert "/home/martin/SIMPACK_CA.cer"
   "Location of certificate of SIMPACK CA")
 
 ;; Local variables belonging to this mode
@@ -49,6 +49,7 @@ It is indexed by a string concatenated from the project and repository name in S
 The right hand side is equal to the JSON string returned by Stash for that repository, which contains the data
 for all open pull requests")
 (defvar stash-show-pending nil "t if user initiated a show of all pull requests, while the data was asynchronously retrieved")
+(defvar stash-force-update nil)
 
 (defvar stash-mode-map
   (let ((map (make-sparse-keymap)))
@@ -86,7 +87,7 @@ for all open pull requests")
 
 (defun stash-update-projects-if-necessary ()
   "Update the list of projects and repositories for stash"
-  (if (not (and (floatp stash-last-repo-update) (< (- (float-time) stash-last-repo-update) 3600)))
+  (if (or stash-force-update (not (and (floatp stash-last-repo-update) (< (- (float-time) stash-last-repo-update) 3600))))
       (progn
         (message "Updating Stash project and repository list")
         (setq stash-repo-list nil)
@@ -98,8 +99,8 @@ for all open pull requests")
                            (lambda (&key data &allow-other-keys)
                              (let* ((values (assoc-default 'values data))
                                     (result nil))
-                               (dolist (value values)
-                                 (stash-update-repositories (assoc-default 'key value))
+                               (dotimes (i (length values))
+                                 (stash-update-repositories (assoc-default 'key (aref values i)))
                                  )
                                )
                              ))
@@ -120,8 +121,8 @@ for all open pull requests")
                        (let ((values (assoc-default 'values data))
                              (result nil))
                          (progn
-                           (dolist (value values result)
-                             (push (assoc-default 'slug value) result)
+                           (dotimes (i (length values) result)
+                             (push (assoc-default 'slug (aref values i)) result)
                              )
                            (add-to-list 'stash-repo-list (cons project result)))
                          )))
@@ -132,15 +133,17 @@ for all open pull requests")
   "Decompose information delivered by Stash and put the result info stash-mode-line-string"
   (let ((values (assoc-default 'values data)))
     (progn
-      (dolist (value values)
-        (let* ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author value))))
+      (dotimes (i (length values))
+        (let* ((value (aref values i))
+               (author (assoc-default 'name (assoc-default 'user (assoc-default 'author value))))
                (reviewers (assoc-default 'reviewers value))
                (saw-myself-in-reviewers nil))
           (progn
             (if (string-equal author (user-login-name))
                 (setq stash-own-pr-count (1+ stash-own-pr-count)))
-            (dolist (reviewer reviewers)
-              (let* ((name (assoc-default 'name (assoc-default 'user reviewer)))
+            (dotimes (j (length reviewers))
+              (let* ((reviewer (aref reviewers j))
+                     (name (assoc-default 'name (assoc-default 'user reviewer)))
                      (approved (assoc-default 'approved reviewer)))
                 (if (and (string-equal name (user-login-name)) (eq approved :json-false))
                     (setq saw-myself-in-reviewers t))
@@ -353,18 +356,14 @@ for all open pull requests")
     (if pr
         (browse-url (assoc-default 'url (assoc-default 'link pr))))))
 
-;; (stash-update-stash-info)
-;; (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
-;; (run-with-timer 60 t 'stash-update-stash-info)
+(stash-update-stash-info)
+(add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
+(run-with-timer 60 60 'stash-update-stash-info)
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
   (buffer-disable-undo)
   )
-
-
-(with-current-buffer "*scratch*"
-  (setq stash-pr-data (list (cons "PRJ/my-repo" (assoc-default 'values (json-read))))))
 
 (provide 'atl-stash)
 ;;; atl-stash.el ends here
