@@ -44,6 +44,12 @@ GET https://stash.intec.dom:7990/rest/inbox/1.0/pull-requests
 Content-Type: application/json
 Authorization: Basic YXBlbDoyb2xkMnImcg==
 #
+# Retrieve hook configuration
+#
+GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/SpckXXXX/settings/hooks/com.simpack.stash.jira-hook:repositoryJiraIssueValidator
+Content-Type: application/json
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+#
 #
 #
 GET https://stash-staging.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/Simpack_Src/commits?until=HEAD
@@ -101,3 +107,12 @@ Authorization: Basic YXBlbDoyb2xkMnImcg==
 {
    "text" : "Testkommentar"
 }
+#
+#
+GET https://jira.intec.dom:8443/rest/api/2/project/SPCK/role
+Content-Type: application/json
+Authorization: Basic YXBlbDoyb2xkMnImcg==
+#
+GET https://stash.intec.dom:7990/rest/api/1.0/projects
+Content-Type: application/json
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
