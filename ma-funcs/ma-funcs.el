@@ -33,56 +33,6 @@
   :group 'ma
 )
 
-(defun ma-compare-to-trunk ()
-  "Compare the file in the current buffer to the corresponding file in the trunk"
-  (interactive)
-  (let* ((cur-buf (current-buffer))
-         (cur-buf-path (buffer-file-name cur-buf))
-         (proc-buf (get-buffer-create "*my_svn*"))
-         (trunk-buf-name (concat "*" (file-name-nondirectory cur-buf-path) ".trunk*"))
-         (trunk-buf (get-buffer-create trunk-buf-name)))
-    (set-buffer proc-buf)
-    (delete-region (point-min) (point-max))
-    (call-process "svn" nil proc-buf nil "info" cur-buf-path)
-    (re-search-backward "^URL: \\(.*\\)" nil t)
-    (setq url (match-string 1))
-    (setq trunk-url (replace-regexp-in-string "/branches/CP_[0-9]+_[0-9]+/" "/trunk/" url))
-    (set-buffer trunk-buf)
-    (delete-region (point-min) (point-max))
-    (shell-command (concat "svn cat -r HEAD " trunk-url) trunk-buf)
-    (kill-buffer proc-buf)
-    (ediff-buffers cur-buf trunk-buf)
-)
-)
-
-(global-set-key [?\C-x ?v ?y] 'ma-compare-to-trunk)
-
-
-(defun ma-merge-to-branch ()
-  "Compare the file in the current buffer, with the corresponding file in current branch"
-  (interactive)
-  (let* ((cur-buf (current-buffer))
-         (cur-buf-path (buffer-file-name cur-buf))
-         (rel-path (file-relative-name cur-buf-path "/scratch/apel/new_arch/develop"))
-         (branch-buf-path (concat "/scratch2/apel/SIMPACK_9.6_Branch/develop/" rel-path))
-         (branch-buf (find-file-noselect branch-buf-path)))
-    (ediff-buffers cur-buf branch-buf)
-    )
-)
-  
-
-(defun ma-merge-to-trunk ()
-  "Compare the file in the current buffer, with the corresponding file in current branch"
-  (interactive)
-  (let* ((cur-buf (current-buffer))
-         (cur-buf-path (buffer-file-name cur-buf))
-         (rel-path (file-relative-name cur-buf-path "/scratch/apel/new_arch/develop"))
-         (branch-buf-path (concat "/scratch/apel/s_9XXXX/develop/" rel-path))
-         (branch-buf (find-file-noselect branch-buf-path)))
-    (ediff-buffers cur-buf branch-buf)
-    )
-)
-  
 (defun show-frame (&optional frame)
   "Show the current Emacs frame or the FRAME given as argument.
    And make sure that it really shows up!"
@@ -135,38 +85,6 @@
        (interactive)
        (switch-to-buffer (get-buffer-create "*scratch*"))
        (lisp-interaction-mode))
-
-(defun ma-debug-simpack-gui ()
-   "Calls gdb with simpack-gui"
-   (interactive)
-   (gdb "gdb -i=mi /scratch/apel/new_arch/obj/dbg32/run/bin/linux32/simpack-gui")
-)
-
-(defun ma-debug-simpack-slv ()
-   "Calls gdb with simpack-slv"
-   (interactive)
-   (gdb "gdb -i=mi /scratch/apel/new_arch/obj/dbg32/run/bin/linux32/simpack-slv")
-)
-
-(defun ma-debug-ParserTest ()
-   "Calls gdb with ParserTest"
-   (interactive)
-   (gdb "gdb -i=mi /scratch/apel/new_arch/obj/dbg32/run/bin/linux32/ParserTest")
-)
-
-(defun ma-debug-RunAllTests ()
-   "Calls gdb with RunAllTests"
-   (interactive)
-   (gdb "gdb -i=mi /scratch/apel/new_arch/obj/dbg32/run/bin/linux32/RunAllTests")
-)
-
-(add-hook 'c++-mode-hook
-	  (lambda ()
-	    (local-set-key [?\C-c ?g] 'ma-debug-simpack-gui)
-	    (local-set-key [?\C-c ?s] 'ma-debug-simpack-slv)
-	    (local-set-key [?\C-c ?p] 'ma-debug-ParserTest)
-	    (local-set-key [?\C-c ?r] 'ma-debug-RunAllTests)))
-
 
 (defun ma-assistant ()
   "runs qt assistant"
@@ -249,22 +167,11 @@
    '(:array)
    '(:array :signature "{sv}")
    ':int32 timeout))
-    
+
 (defun ma-compile-notify (buffer message)
   (ma-send-desktop-notification "emacs compile" message 2000))
 
 (setq compilation-finish-function 'ma-compile-notify)
-
-(defun ma-edit-changelog ()
-  "Edit a given file's changelog. This automatically expands the hidden header comment
-   and positions the cursor to the right location"
-
-  (hs-show-all)
-  (goto-char (point-min))
-  (if (re-search-forward "\[[0-9]+:[0-9]+\]" nil t)
-      (forward-char)
-    )
-)
 
 (add-hook 'server-visit-hook
           'ma-edit-changelog)
