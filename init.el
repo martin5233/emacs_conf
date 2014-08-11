@@ -344,6 +344,9 @@
  '(ediff-split-window-function (quote split-window-horizontally))
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
  '(el-get-byte-compile-at-init t)
+ '(emacs-lisp-mode-hook
+   (quote
+    (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
  '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
