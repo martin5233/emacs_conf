@@ -458,6 +458,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
+ '(stash-section-title ((t (:background "light gray"))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
 (put 'downcase-region 'disabled nil)

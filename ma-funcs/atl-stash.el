@@ -238,7 +238,7 @@ for all open pull requests")
         )
     (setq line (format "%-10s #%3d %-8s  %-40s  %-s" repo id author title (mapconcat 'identity reviewers ",")))
     (if (not short)
-        (setq line (concat line "\n" descr)))
+        (setq line (concat line "\n" (replace-regexp-in-string "\r" "" descr))))
     (propertize line 'pr (stash-pr-to-id pr))))
 
 (defun stash-am-i-reviewer (pr)
