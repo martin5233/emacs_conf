@@ -120,6 +120,10 @@
     :url "http://www.emacswiki.org/cgi-bin/wiki/download/anchored-transpose.el"
     :after (global-set-key (kbd "C-x t") 'anchored-transpose)
     )
+   (:name visual-regexp
+          :after (progn
+                   (global-set-key (kbd "M-%") 'vr/replace)
+                   (global-set-key (kbd "C-M-%") 'vr/query-replace)))
    ))
 
 (if work
