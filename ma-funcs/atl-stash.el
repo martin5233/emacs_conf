@@ -27,6 +27,7 @@
 (require 'request)
 (require 'password-cache)
 (require 'json)
+(require 'magit)
 
 ;; Custom variables
 
@@ -57,6 +58,7 @@ for all open pull requests")
     (define-key map (kbd "a") 'stash-accept-pull-request)
     (define-key map (kbd "b") 'stash-browse-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
+    (define-key map (kbd "g") 'stash-show-pull-requests)
     (define-key map (kbd "m") 'stash-merge-pull-request)
     (define-key map (kbd "n") 'stash-next-pull-request)                 ;; done
     (define-key map (kbd "p") 'stash-prev-pull-request)                 ;; done
@@ -355,6 +357,20 @@ for all open pull requests")
   (let ((pr (stash-get-current-pr)))
     (if pr
         (browse-url (assoc-default 'href (aref (assoc-default 'self (assoc-default 'links pr)) 0))))))
+
+(defun stash-review-pull-request()
+  "Open a magit diff buffer for the current pull request"
+  (interactive)
+  (let* ((pr (stash-get-current-pr))
+        (from-branch (assoc-default 'id (assoc-default 'fromRef)))
+        (to-branch (assoc-default 'id (assoc-default 'toRef)))
+        )
+    (magit-call-git "fetch" "origin")
+    (magit-diff (concat (replace-regexp-in-string "^refs/heads/" "origin/" from-branch)
+                        ".."
+                        (replace-regexp-in-string "^refs/heads/" "origin/" to-branch)))
+    ))
+
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
