@@ -37,10 +37,10 @@
     :after (global-set-key "\M-o" 'er/expand-region))
    (:name multiple-cursors
     :after (progn
-        (global-set-key (kbd "C-c C-n") 'mc/mark-next-like-this)
-        (global-set-key (kbd "C-c C-p") 'mc/mark-previous-like-this)
-        (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
-        (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
+        (global-set-key (kbd "C-x C-n") 'mc/mark-next-like-this)
+        (global-set-key (kbd "C-x C-p") 'mc/mark-previous-like-this)
+        (global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this-in-defun)
+        (global-set-key (kbd "C-x C-|") 'mc/edit-lines)))
    (:name etags-select
     :after (progn
              (add-hook 'c-mode-common-hook
@@ -64,7 +64,9 @@
     :features uniquify
     :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
    (:name magit
-    :after (global-set-key (kbd "C-c C-z") 'magit-status))
+          :after (global-set-key (kbd "C-c C-z") 'magit-status))
+   (:name mo-git-blame
+          :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
    (:name git-timemachine)
    (:name csv-mode)
    (:name llvm-mode)
@@ -122,8 +124,9 @@
     )
    (:name visual-regexp
           :after (progn
-                   (global-set-key (kbd "M-%") 'vr/replace)
-                   (global-set-key (kbd "C-M-%") 'vr/query-replace)))
+                   (global-set-key (kbd "M-%") 'vr/query-replace)
+                   (global-set-key (kbd "C-M-%") 'vr/replace)))
+   (:name visual-regexp-steroids)
    ))
 
 (if work
@@ -159,6 +162,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ac-modes
+   (quote
+    (emacs-lisp-mode lisp-mode lisp-interaction-mode slime-repl-mode go-mode java-mode malabar-mode clojure-mode clojurescript-mode scala-mode scheme-mode ocaml-mode tuareg-mode coq-mode haskell-mode agda-mode agda2-mode perl-mode cperl-mode python-mode ruby-mode lua-mode tcl-mode ecmascript-mode javascript-mode js-mode js2-mode php-mode css-mode makefile-mode sh-mode fortran-mode f90-mode ada-mode xml-mode sgml-mode ts-mode sclang-mode verilog-mode qml-mode)))
  '(auto-revert-remote-files t)
  '(blink-matching-paren-on-screen nil)
  '(browse-kill-ring-no-duplicates t)
@@ -351,6 +357,8 @@
  '(emacs-lisp-mode-hook
    (quote
     (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
+ '(eudc-protocol (quote ldap))
+ '(eudc-server "arabella32.intec.dom")
  '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
@@ -378,18 +386,28 @@
  '(inhibit-startup-screen t)
  '(js-indent-level 3)
  '(latex-run-command "pdflatex")
+ '(ldap-default-base "dc=intec,dc=dom")
+ '(ldap-default-host "arabella32.intec.dom")
+ '(ldap-host-parameters-alist
+   (quote
+    (("arabella32.intec.dom" base "dc=intec,dc=dom" binddn "simbuild@intec.dom" passwd "!simbuild!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+ '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
+ '(magit-diff-refine-hunk t)
  '(magit-process-popup-time 3)
  '(magit-repo-dirs
    (quote
     ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest")))
+ '(magit-rewrite-inclusive nil)
  '(magit-show-child-count t)
  '(make-backup-files nil)
  '(message-from-style (quote default))
  '(message-send-mail-function (quote smtpmail-send-it))
  '(minibuffer-message-timeout 2 t)
+ '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
+ '(org-export-backends (quote (ascii html icalendar latex md)))
  '(org-toodledo-inhibit-https t)
  '(org-toodledo-password "uENfYn30UIzJZs5f1h4s")
  '(org-toodledo-sync-on-save "yes")
@@ -453,6 +471,7 @@
  '(user-mail-address "martin.apel@simpack.de")
  '(vc-command-messages t)
  '(vc-consult-headers nil)
+ '(vc-git-diff-switches "-w")
  '(w3m-pop-up-windows t)
  '(which-function-mode t nil (which-func)))
 (custom-set-faces
@@ -525,6 +544,12 @@
 
 (add-hook 'after-save-hook
   'executable-make-buffer-file-executable-if-script-p)
+
+;; Workaround for a bug in compilation mode
+(add-hook 'grep-mode-hook
+          (lambda()
+            (kill-local-variable 'compilation-auto-jump-to-next))
+          )
 
 (server-start)
 
