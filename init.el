@@ -127,6 +127,7 @@
                    (global-set-key (kbd "M-%") 'vr/query-replace)
                    (global-set-key (kbd "C-M-%") 'vr/replace)))
    (:name visual-regexp-steroids)
+   (:name guide-key)
    ))
 
 (if work
@@ -375,7 +376,7 @@
  '(global-auto-revert-mode t)
  '(gud-tooltip-mode t)
  '(guide-key-mode t)
- '(guide-key/guide-key-sequence (quote ("C-c i" "C-c s" "C-x r")))
+ '(guide-key/guide-key-sequence (quote ("C-x r")))
  '(guide-key/idle-delay 0.0)
  '(guide-key/popup-window-position (quote bottom))
  '(ido-enable-flex-matching t)
