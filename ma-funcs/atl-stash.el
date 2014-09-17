@@ -79,8 +79,10 @@ for all open pull requests")
 
 (defun stash-init-headers ()
   "Initialize headers variable stash-access-headers for Stash access"
-  (let* ((pwd (password-read-and-add (concat "Stash password for user " (user-login-name) ": ") "dummy"))
-         (auth (concat "Basic " (base64-encode-string (concat (user-login-name) ":" pwd)))))
+  (let* ((encoded-user-and-pwd (with-temp-buffer
+                                 (insert-file-contents "~/.authinfo")
+                                (buffer-substring (line-beginning-position) (line-end-position))))
+         (auth (concat "Basic " encoded-user-and-pwd)))
     (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth)))
     )
   )
