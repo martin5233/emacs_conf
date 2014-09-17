@@ -363,9 +363,5 @@ for all open pull requests")
   (buffer-disable-undo)
   )
 
-(stash-update-stash-info)
-(add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
-(run-with-timer 60 60 'stash-update-stash-info)
-
 (provide 'atl-stash)
 ;;; atl-stash.el ends here

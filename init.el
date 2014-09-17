@@ -564,3 +564,11 @@
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (electric-pair-mode)
+
+(if work
+    (progn
+      (require 'atl-stash)
+      (stash-update-stash-info)
+      (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
+      (run-with-timer 60 60 'stash-update-stash-info)
+      ))
