@@ -23,112 +23,109 @@
 
 (setq el-get-sources
       '((:name tempo
-    :type builtin
-    :features tempo
-    :after (progn
-        (tempo-define-template "change-hist-new-line" '( n " *            |                    |           " p))
-                  (add-hook 'c-mode-common-hook
-             (lambda() (local-set-key (kbd "S-<return>") 'tempo-template-change-hist-new-line)))
+               :type builtin
+               :features tempo)
+        (:name tempo-snippets
+               :type http
+               :url "http://nschum.de/src/emacs/tempo-snippets/tempo-snippets.el")
+        (:name expand-region
+               :after (global-set-key "\M-o" 'er/expand-region))
+        (:name multiple-cursors
+               :after (progn
+                        (global-set-key (kbd "C-x C-n") 'mc/mark-next-like-this)
+                        (global-set-key (kbd "C-x C-p") 'mc/mark-previous-like-this)
+                        (global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this-in-defun)
+                        (global-set-key (kbd "C-x C-|") 'mc/edit-lines)))
+        (:name etags-select
+               :after (progn
+                        (add-hook 'c-mode-common-hook
+                                  (lambda()
+                                    (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point)))
+                        (setq etags-select-go-if-unambiguous t)
+                        (setq etags-select-use-short-name-completion t)))
+        (:name org-mode
+               :branch "maint")
+        (:name http-post-simple
+               :type http
+               :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
+               :features http-post-simple)
+        ;; (:name org-toodledo
+        ;;  :type github
+        ;;  :pkgname "christopherjwhite/org-toodledo"
+        ;;  :features org-toodledo
+        ;;  :depends (org-mode http-post-simple))
+        (:name uniquify
+               :type builtin
+               :features uniquify
+               :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+        (:name magit
+               :after (global-set-key (kbd "C-c C-z") 'magit-status))
+        (:name mo-git-blame
+               :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
+        (:name git-timemachine)
+        (:name csv-mode)
+        (:name llvm-mode)
+        (:name ascii-table)
+        (:name crontab-mode)
+        (:name browse-kill-ring)
+        (:name wgrep)
+        (:name generic
+               :type builtin)
+        (:name skeleton
+               :type builtin)
+        (:name request)
+        (:name smex
+               :after (global-set-key (kbd "M-x") 'smex))
+        (:name auto-insert
+               :type builtin
+               :depends skeleton
+               :after (progn
+                        (add-hook 'find-file-hook 'auto-insert)
+                        (define-auto-insert "\\.h\\'" 'header-skeleton)
+                        ))
+        (:name smerge-mode
+               :type builtin)
+        (:name files
+               :type builtin)
+        (:name password-cache
+               :type builtin)
+        (:name subword
+               :type builtin
+               :after (add-hook 'c-mode-common-hook
+                                (lambda()
+                                  (local-set-key (kbd "M-<left>") 'subword-backward)
+                                  (local-set-key (kbd "M-<right>") 'subword-forward)
+                                  (subword-mode t))))
+        ;;   (:name ma-funcs
+        (:name desktop
+               :type builtin
+               ;;    :depends ma-funcs
+               :after (progn
+                        (desktop-save-mode t)
+                        (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
+        (:name cmake-mode
+               :after (add-hook 'cmake-mode-hook
+                                '(lambda ()
+                                   (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
+        (:name idle-highlight-mode)
+        (:name auto-complete-emacs-lisp
+               :depends auto-complete)
+        (:name json-snatcher)
+        (:name json-mode
+               :depends json-snatcher)
+        (:name markdown-mode)
+        (:name anchored-transpose
+               :type http
+               :url "http://www.emacswiki.org/cgi-bin/wiki/download/anchored-transpose.el"
+               :after (global-set-key (kbd "C-x t") 'anchored-transpose)
+               )
+        (:name visual-regexp
+               :after (progn
+                        (global-set-key (kbd "M-%") 'vr/query-replace)
+                        (global-set-key (kbd "C-M-%") 'vr/replace)))
+        (:name visual-regexp-steroids)
+        (:name guide-key)
         ))
-   (:name tempo-snippets
-    :type http
-    :url "http://nschum.de/src/emacs/tempo-snippets/tempo-snippets.el")
-   (:name expand-region
-    :after (global-set-key "\M-o" 'er/expand-region))
-   (:name multiple-cursors
-    :after (progn
-        (global-set-key (kbd "C-x C-n") 'mc/mark-next-like-this)
-        (global-set-key (kbd "C-x C-p") 'mc/mark-previous-like-this)
-        (global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this-in-defun)
-        (global-set-key (kbd "C-x C-|") 'mc/edit-lines)))
-   (:name etags-select
-    :after (progn
-             (add-hook 'c-mode-common-hook
-                       (lambda()
-                         (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point)))
-        (setq etags-select-go-if-unambiguous t)
-        (setq etags-select-use-short-name-completion t)))
-   (:name org-mode
-    :branch "maint")
-   (:name http-post-simple
-    :type http
-    :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
-    :features http-post-simple)
-   ;; (:name org-toodledo
-   ;;  :type github
-   ;;  :pkgname "christopherjwhite/org-toodledo"
-   ;;  :features org-toodledo
-   ;;  :depends (org-mode http-post-simple))
-   (:name uniquify
-    :type builtin
-    :features uniquify
-    :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
-   (:name magit
-          :after (global-set-key (kbd "C-c C-z") 'magit-status))
-   (:name mo-git-blame
-          :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
-   (:name git-timemachine)
-   (:name csv-mode)
-   (:name llvm-mode)
-   (:name ascii-table)
-   (:name crontab-mode)
-   (:name browse-kill-ring)
-   (:name wgrep)
-   (:name generic
-    :type builtin)
-   (:name skeleton
-    :type builtin)
-   (:name request)
-   (:name smex
-    :after (global-set-key (kbd "M-x") 'smex))
-   (:name auto-insert
-    :type builtin
-    :depends skeleton
-    :after (progn
-        (add-hook 'find-file-hook 'auto-insert)
-        (define-auto-insert "\\.h\\'" 'header-skeleton)
-        ))
-   (:name files
-    :type builtin)
-   (:name password-cache
-         :type builtin)
-   (:name subword
-         :type builtin
-    :after (add-hook 'c-mode-common-hook
-           (lambda()
-             (local-set-key (kbd "M-<left>") 'subword-backward)
-             (local-set-key (kbd "M-<right>") 'subword-forward)
-             (subword-mode t))))
-;;   (:name ma-funcs
-   (:name desktop
-    :type builtin
-;;    :depends ma-funcs
-    :after (progn
-             (desktop-save-mode t)
-             (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
-   (:name cmake-mode
-    :after (add-hook 'cmake-mode-hook
-                     '(lambda ()
-                        (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
-   (:name idle-highlight-mode)
-   (:name auto-complete-emacs-lisp
-    :depends auto-complete)
-   (:name json-snatcher)
-   (:name json-mode
-    :depends json-snatcher)
-   (:name markdown-mode)
-   (:name anchored-transpose
-    :type http
-    :url "http://www.emacswiki.org/cgi-bin/wiki/download/anchored-transpose.el"
-    :after (global-set-key (kbd "C-x t") 'anchored-transpose)
-    )
-   (:name visual-regexp
-          :after (progn
-                   (global-set-key (kbd "M-%") 'vr/query-replace)
-                   (global-set-key (kbd "C-M-%") 'vr/replace)))
-   (:name visual-regexp-steroids)
-   (:name guide-key)
-   ))
 
 (if work
     (setq el-get-sources
@@ -147,6 +144,10 @@
           (:name restclient
            :type github
            :pkgname "pashky/restclient.el")
+          (:name php-mode-improved
+		 :type http
+		 :url "http://www.emacswiki.org/cgi-bin/wiki/download/php-mode-improved.el"
+		 :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
           ))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
