@@ -123,7 +123,7 @@
 (defun ma-run-cmake-and-compile ()
   "Run CMake in the current build directory"
   (interactive)
-  (compile "cd /scratch/apel/new_arch/obj/32; cmake .; ~/bin/my_compile /scratch/apel/new_arch/obj/32")
+  (compile (concat "cd " ma-build-dir "; cmake .; ~/bin/my_compile " ma-build-dir " " ma-make-target))
 )
 
 (defun ma-run-compile ()
@@ -172,10 +172,6 @@
   (ma-send-desktop-notification "emacs compile" message 2000))
 
 (setq compilation-finish-function 'ma-compile-notify)
-
-(add-hook 'server-visit-hook
-          'ma-edit-changelog)
-
 
 (defun ma-rm-namespaces ()
   "Remove common namespace prefixes in marked region"
@@ -251,10 +247,5 @@
 
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
-
-;; Remove buffers after EDiff is finished
-;; (add-hook 'ediff-quit-hook
-;;           (lambda () (ediff-janitor t nil)))
-
 
 (provide 'ma-funcs)
