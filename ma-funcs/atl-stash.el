@@ -28,6 +28,7 @@
 (require 'password-cache)
 (require 'json)
 (require 'auth-source)
+(require 'url-parse)
 (require 'magit)
 
 ;; Custom variables
@@ -82,11 +83,11 @@ for all open pull requests")
 
 (defun stash-init-headers ()
   "Initialize headers variable stash-access-headers for Stash access"
-  (let* ((auth-source-creation-defaults '((user . (user-login-name))))
-         (auth-source-creation-prompts '((user . "Stash user at %h: ")
+  (let* ((auth-source-creation-prompts '((user . "Stash user at %h: ")
                                          (secret . "Stash Password: ")))
+         (hostname (url-host (url-generic-parse-url stash-url)))
          (found (nth 0 (auth-source-search :max 1
-                                           :host "stash.intec.dom"
+                                           :host hostname
                                            :require '(:user :secret)
                                            :create t))))
     (when found
