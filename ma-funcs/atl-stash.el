@@ -27,6 +27,7 @@
 (require 'request)
 (require 'password-cache)
 (require 'json)
+(require 'auth-source)
 (require 'magit)
 
 ;; Custom variables
@@ -81,11 +82,22 @@ for all open pull requests")
 
 (defun stash-init-headers ()
   "Initialize headers variable stash-access-headers for Stash access"
-  (let* ((pwd (password-read-and-add (concat "Stash password for user " (user-login-name) ": ") "dummy"))
-         (auth (concat "Basic " (base64-encode-string (concat (user-login-name) ":" pwd)))))
-    (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth)))
-    )
-  )
+  (let* ((auth-source-creation-defaults '((user . (user-login-name))))
+         (auth-source-creation-prompts '((user . "Stash user at %h: ")
+                                         (secret . "Stash Password: ")))
+         (found (nth 0 (auth-source-search :max 1
+                                           :host "stash.intec.dom"
+                                           :require '(:user :secret)
+                                           :create t))))
+    (when found
+      (let* ((user (plist-get found :user))
+             (secret (plist-get found :secret))
+             (password (if (functionp secret) (funcall secret) secret))
+             (save-func (plist-get found :save-function))
+             (auth (concat "Basic " (base64-encode-string (concat user ":" password)))))
+        (when (functionp save-func)
+          (funcall save-func))
+        (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth)))))))
 
 (defun stash-update-projects-if-necessary ()
   "Update the list of projects and repositories for stash"
