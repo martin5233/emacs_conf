@@ -27,6 +27,9 @@
 (require 'request)
 (require 'password-cache)
 (require 'json)
+(require 'auth-source)
+(require 'url-parse)
+(require 'magit)
 
 ;; Custom variables
 
@@ -57,6 +60,7 @@ for all open pull requests")
     (define-key map (kbd "a") 'stash-accept-pull-request)
     (define-key map (kbd "b") 'stash-browse-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
+    (define-key map (kbd "g") 'stash-show-pull-requests)
     (define-key map (kbd "m") 'stash-merge-pull-request)
     (define-key map (kbd "n") 'stash-next-pull-request)                 ;; done
     (define-key map (kbd "p") 'stash-prev-pull-request)                 ;; done
@@ -79,13 +83,22 @@ for all open pull requests")
 
 (defun stash-init-headers ()
   "Initialize headers variable stash-access-headers for Stash access"
-  (let* ((encoded-user-and-pwd (with-temp-buffer
-                                 (insert-file-contents "~/.authinfo")
-                                (buffer-substring (line-beginning-position) (line-end-position))))
-         (auth (concat "Basic " encoded-user-and-pwd)))
-    (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth)))
-    )
-  )
+  (let* ((auth-source-creation-prompts '((user . "Stash user at %h: ")
+                                         (secret . "Stash Password: ")))
+         (hostname (url-host (url-generic-parse-url stash-url)))
+         (found (nth 0 (auth-source-search :max 1
+                                           :host hostname
+                                           :require '(:user :secret)
+                                           :create t))))
+    (when found
+      (let* ((user (plist-get found :user))
+             (secret (plist-get found :secret))
+             (password (if (functionp secret) (funcall secret) secret))
+             (save-func (plist-get found :save-function))
+             (auth (concat "Basic " (base64-encode-string (concat user ":" password)))))
+        (when (functionp save-func)
+          (funcall save-func))
+        (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth)))))))
 
 (defun stash-update-projects-if-necessary ()
   "Update the list of projects and repositories for stash"
@@ -357,6 +370,20 @@ for all open pull requests")
   (let ((pr (stash-get-current-pr)))
     (if pr
         (browse-url (assoc-default 'href (aref (assoc-default 'self (assoc-default 'links pr)) 0))))))
+
+(defun stash-review-pull-request()
+  "Open a magit diff buffer for the current pull request"
+  (interactive)
+  (let* ((pr (stash-get-current-pr))
+        (from-branch (assoc-default 'id (assoc-default 'fromRef)))
+        (to-branch (assoc-default 'id (assoc-default 'toRef)))
+        )
+    (magit-call-git "fetch" "origin")
+    (magit-diff (concat (replace-regexp-in-string "^refs/heads/" "origin/" from-branch)
+                        ".."
+                        (replace-regexp-in-string "^refs/heads/" "origin/" to-branch)))
+    ))
+
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
