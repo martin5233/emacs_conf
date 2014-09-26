@@ -59,7 +59,10 @@
                :features uniquify
                :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
         (:name magit
-               :after (global-set-key (kbd "C-c C-z") 'magit-status))
+               :after
+               (progn
+                 (advice-add 'magit-wash-branch-line :after #'ma-magit-highlight-own-branches)
+                 (global-set-key (kbd "C-c C-z") 'magit-status)))
         (:name mo-git-blame
                :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
         (:name git-timemachine)
@@ -119,6 +122,10 @@
                :url "http://www.emacswiki.org/cgi-bin/wiki/download/anchored-transpose.el"
                :after (global-set-key (kbd "C-x t") 'anchored-transpose)
                )
+        (:name apt-utils
+               :type http
+               :url "http://www.emacswiki.org/cgi-bin/wiki/download/apt-utils.el"
+               )
         (:name visual-regexp
                :after (progn
                         (global-set-key (kbd "M-%") 'vr/query-replace)
@@ -167,6 +174,7 @@
  '(ac-modes
    (quote
     (emacs-lisp-mode lisp-mode lisp-interaction-mode slime-repl-mode go-mode java-mode malabar-mode clojure-mode clojurescript-mode scala-mode scheme-mode ocaml-mode tuareg-mode coq-mode haskell-mode agda-mode agda2-mode perl-mode cperl-mode python-mode ruby-mode lua-mode tcl-mode ecmascript-mode javascript-mode js-mode js2-mode php-mode css-mode makefile-mode sh-mode fortran-mode f90-mode ada-mode xml-mode sgml-mode ts-mode sclang-mode verilog-mode qml-mode)))
+ '(auth-sources (quote ("~/.authinfo.gpg" "~/.authinfo")))
  '(auto-revert-check-vc-info t)
  '(auto-revert-remote-files t)
  '(auto-revert-verbose nil)
@@ -366,7 +374,7 @@
  '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
- '(ff-ignore-include nil)
+ '(ff-ignore-include t)
  '(file-cache-filter-regexps
    (quote
     ("~$" "\\.o$" "\\.rpo$" "\\.exe$" "\\.a$" "\\.elc$" ",v$" "\\.output$" "\\.$" "#$" "\\.class$" "\\.bak$" "\\.svn-base$" "\\.html$" "\\.svn" "\\.so$" "\\.dll$" "CMakeFiles" "extern/share" "extern/linux" "extern/win" "partners" "/obj/" "^project\\.pj$" "\\.sbr$" "\\.tes$" "\\.intinfo$" "\\.dim$")))
@@ -489,6 +497,12 @@
  '(stash-section-title ((t (:background "light gray"))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
+;; Avoid version-control checks for tramp buffers
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
@@ -550,6 +564,10 @@
 (add-hook 'after-save-hook
   'executable-make-buffer-file-executable-if-script-p)
 
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda ()
+             (local-set-key (kbd "M-.") 'find-function-other-window)))
+
 ;; Workaround for a bug in compilation mode
 (add-hook 'grep-mode-hook
           (lambda()
@@ -575,4 +593,5 @@
       (stash-update-stash-info)
       (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
       (run-with-timer 60 60 'stash-update-stash-info)
+      (global-set-key (kbd "C-c p") 'stash-show-pull-requests)
       ))

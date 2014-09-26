@@ -60,11 +60,11 @@ for all open pull requests")
     (define-key map (kbd "a") 'stash-accept-pull-request)
     (define-key map (kbd "b") 'stash-browse-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
-    (define-key map (kbd "g") 'stash-show-pull-requests)
+    (define-key map (kbd "g") 'stash-show-pull-requests)                ;; done
     (define-key map (kbd "m") 'stash-merge-pull-request)
     (define-key map (kbd "n") 'stash-next-pull-request)                 ;; done
     (define-key map (kbd "p") 'stash-prev-pull-request)                 ;; done
-    (define-key map (kbd "r") 'stash-review-pull-request)
+    (define-key map (kbd "r") 'stash-review-pull-request)               ;; done (ediff still not working properly)
     (define-key map (kbd "TAB") 'stash-pull-request-expand-or-collapse) ;; done
     map)
   "Keymap for Stash mode")
@@ -83,22 +83,23 @@ for all open pull requests")
 
 (defun stash-init-headers ()
   "Initialize headers variable stash-access-headers for Stash access"
-  (let* ((auth-source-creation-prompts '((user . "Stash user at %h: ")
-                                         (secret . "Stash Password: ")))
-         (hostname (url-host (url-generic-parse-url stash-url)))
-         (found (nth 0 (auth-source-search :max 1
-                                           :host hostname
-                                           :require '(:user :secret)
-                                           :create t))))
-    (when found
-      (let* ((user (plist-get found :user))
-             (secret (plist-get found :secret))
-             (password (if (functionp secret) (funcall secret) secret))
-             (save-func (plist-get found :save-function))
-             (auth (concat "Basic " (base64-encode-string (concat user ":" password)))))
-        (when (functionp save-func)
-          (funcall save-func))
-        (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth)))))))
+  (unless stash-access-headers
+    (let* ((auth-source-creation-prompts '((user . "Stash user at %h: ")
+                                           (secret . "Stash Password: ")))
+           (hostname (url-host (url-generic-parse-url stash-url)))
+           (found (nth 0 (auth-source-search :max 1
+                                             :host hostname
+                                             :require '(:user :secret)
+                                             :create t))))
+      (when found
+        (let* ((user (plist-get found :user))
+               (secret (plist-get found :secret))
+               (password (if (functionp secret) (funcall secret) secret))
+               (save-func (plist-get found :save-function))
+               (auth (concat "Basic " (base64-encode-string (concat user ":" password)))))
+          (when (functionp save-func)
+            (funcall save-func))
+          (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth))))))))
 
 (defun stash-update-projects-if-necessary ()
   "Update the list of projects and repositories for stash"
@@ -375,15 +376,14 @@ for all open pull requests")
   "Open a magit diff buffer for the current pull request"
   (interactive)
   (let* ((pr (stash-get-current-pr))
-        (from-branch (assoc-default 'id (assoc-default 'fromRef)))
-        (to-branch (assoc-default 'id (assoc-default 'toRef)))
+        (from-branch (assoc-default 'id (assoc-default 'fromRef pr)))
+        (to-branch (assoc-default 'id (assoc-default 'toRef pr)))
         )
     (magit-call-git "fetch" "origin")
-    (magit-diff (concat (replace-regexp-in-string "^refs/heads/" "origin/" from-branch)
-                        ".."
-                        (replace-regexp-in-string "^refs/heads/" "origin/" to-branch)))
+    (magit-diff (concat (replace-regexp-in-string "^refs/heads/" "origin/" to-branch)
+                        "..."
+                        (replace-regexp-in-string "^refs/heads/" "origin/" from-branch)))
     ))
-
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"

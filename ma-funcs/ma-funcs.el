@@ -19,6 +19,7 @@
                  (const "GUIUtils")
                  (const "DoE")
                  (const "Model")
+                 (const "_simpack-sfx")
                   )
   :group 'ma
 )
@@ -244,6 +245,16 @@
   (jump-to-register 'e)
   (jump-to-register 'f)
 )
+
+(defun ma-magit-highlight-own-branches (dummy)
+  "Applies a different face to branch lines, which match a specific regex"
+  (let* ((start (line-beginning-position 0))
+         (end (line-end-position 0))
+         (line (buffer-substring start end)))
+     (when (string-match "^[0-9a-f]+   origin/SPCK-[0-9]+-MA-" line)
+       (put-text-property (+ start 10) end 'face 'highlight)
+       )))
+
 
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
