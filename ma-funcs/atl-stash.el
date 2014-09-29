@@ -64,7 +64,7 @@ for all open pull requests")
     (define-key map (kbd "m") 'stash-merge-pull-request)
     (define-key map (kbd "n") 'stash-next-pull-request)                 ;; done
     (define-key map (kbd "p") 'stash-prev-pull-request)                 ;; done
-    (define-key map (kbd "r") 'stash-review-pull-request)               ;; done (ediff still not working properly)
+    (define-key map (kbd "r") 'stash-review-pull-request)               ;; done
     (define-key map (kbd "TAB") 'stash-pull-request-expand-or-collapse) ;; done
     map)
   "Keymap for Stash mode")
@@ -376,14 +376,14 @@ for all open pull requests")
   "Open a magit diff buffer for the current pull request"
   (interactive)
   (let* ((pr (stash-get-current-pr))
-        (from-branch (assoc-default 'id (assoc-default 'fromRef pr)))
-        (to-branch (assoc-default 'id (assoc-default 'toRef pr)))
+        (from-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'fromRef pr))))
+        (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
         )
     (magit-call-git "fetch" "origin")
-    (magit-diff (concat (replace-regexp-in-string "^refs/heads/" "origin/" to-branch)
-                        "..."
-                        (replace-regexp-in-string "^refs/heads/" "origin/" from-branch)))
-    ))
+    (magit-call-git "merge-base" from-branch to-branch)
+    (with-current-buffer magit-process-buffer-name
+      (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2))))
+        (magit-diff (cons merge-base from-branch))))))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
