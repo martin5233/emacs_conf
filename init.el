@@ -527,10 +527,6 @@
 
 (browse-kill-ring-default-keybindings)
 
-(if work
-    (add-hook 'kill-emacs-query-functions
-              (lambda() (yes-or-no-p "All change packages reviewed?"))))
-
 (add-hook 'c-mode-common-hook
        (lambda ()
             (imenu-add-to-menubar "Functions")
