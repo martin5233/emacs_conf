@@ -33,11 +33,27 @@
 
 ;; Custom variables
 
+(defgroup stash nil
+  "Stash settings."
+  :group 'vc)
+
 (defcustom stash-url "https://stash.intec.dom:7990"
-  "URL of Stash server")
+  "URL of Stash server"
+  :group 'stash)
 
 (defcustom stash-SIMPACK-ca-cert "/home/home_dev/apel/SIMPACK_CA.cer"
-  "Location of certificate of SIMPACK CA")
+  "Location of certificate of SIMPACK CA"
+  :group 'stash)
+
+(defcustom stash-repos nil
+  "Mapping from repository name to location, where it is available"
+  :type 'alist
+  :group 'stash)
+
+(defcustom stash-reviewer-shortcuts nil
+  "Mapping from reviewer's name to his shortcut"
+  :type 'alist
+  :group 'stash)
 
 ;; Local variables belonging to this mode
 (defvar stash-mode-line-string "" "This variable contains the status of open pull requests from Stash")
@@ -57,7 +73,7 @@ for all open pull requests")
 (defvar stash-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map special-mode-map)
-    (define-key map (kbd "a") 'stash-accept-pull-request)
+    (define-key map (kbd "a") 'stash-approve-pull-request)
     (define-key map (kbd "b") 'stash-browse-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
     (define-key map (kbd "g") 'stash-show-pull-requests)                ;; done
@@ -230,6 +246,13 @@ for all open pull requests")
         (if (eq pr-id (assoc-default 'id pr))
             (setq result pr))))))
 
+(defun stash-map-reviewer (reviewer)
+  "Map REVIEWER by looking him up in `stash-reviewer-shortcuts'.
+If the reviewer is listed there, his shortcut
+is returned.  If the reviewer is not found, the original string is returned."
+  (let ((mapped (assoc-default reviewer stash-reviewer-shortcuts)))
+    (if mapped mapped reviewer)))
+
 (defun stash-gen-pr-info (pr short)
   "Generate a description string for the given pull request. If short is t, generate a one line description, otherwise a multi-line description."
   (let* ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr))))
@@ -247,14 +270,15 @@ for all open pull requests")
       (let* ((reviewer (aref reviewer-list i))
              (reviewer-name (assoc-default 'name (assoc-default 'user reviewer)))
                (approved (not (eq (assoc-default 'approved reviewer) :json-false)))
-               (text reviewer-name))
+               (text (stash-map-reviewer reviewer-name))
+               )
           (if approved
               (setq text (concat text "(a)")))
           (push text reviewers))
         )
-    (setq line (format "%-10s #%3d %-8s  %-40s  %-s" repo id author title (mapconcat 'identity reviewers ",")))
-    (if (not short)
-        (setq line (concat line "\n" (replace-regexp-in-string "\r" "" descr))))
+    (setq line (format "%-13s #%-4d %-9s %-70s  %-s" repo id author title (mapconcat 'identity (sort reviewers 'string<) ",")))
+    (if (and (not short) descr)
+        (setq line (concat line "\n" (replace-regexp-in-string "\r" "" descr) "\n")))
     (propertize line 'pr (stash-pr-to-id pr))))
 
 (defun stash-am-i-reviewer (pr)
@@ -296,6 +320,15 @@ for all open pull requests")
             (if (stash-am-i-author pr)
                 (insert (concat "\n" (stash-gen-pr-info pr t))))))))
 
+    (insert "\n\n")
+    (insert (concat (propertize "OTHER PULL REQUESTS:" 'face 'stash-section-title) "\n"))
+    (dolist (project-entry stash-pr-data)
+      (let ((prdata-for-repo (cdr project-entry)))
+        (dotimes (i (length prdata-for-repo))
+          (let ((pr (aref prdata-for-repo i)))
+            (if (and (not (stash-am-i-author pr)) (not (stash-am-i-reviewer pr)))
+                (insert (concat "\n" (stash-gen-pr-info pr t))))))))
+
     (insert "\n")
     (stash-mode)
     (beginning-of-buffer)
@@ -334,6 +367,8 @@ for all open pull requests")
         (goto-char start)
         (insert (stash-gen-pr-info cur-pr (not expand)))
         (goto-char start)
+        (when expand
+          (fill-region (line-beginning-position 2) (line-end-position 2) t))
       )
   ))
 
@@ -378,12 +413,37 @@ for all open pull requests")
   (let* ((pr (stash-get-current-pr))
         (from-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'fromRef pr))))
         (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
+        (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'fromRef pr))))
+        (repo-dir (assoc-default repo stash-repos))
+        (git-dir-opt (concat "--git-dir=" repo-dir "/.git"))
+        (default-directory repo-dir)
         )
-    (magit-call-git "fetch" "origin")
-    (magit-call-git "merge-base" from-branch to-branch)
+    (magit-call-git git-dir-opt "fetch" "origin")
+    (magit-call-git git-dir-opt "merge-base" from-branch to-branch)
     (with-current-buffer magit-process-buffer-name
       (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2))))
         (magit-diff (cons merge-base from-branch))))))
+
+(defun stash-approve-pull-request()
+  "Approve current pull request"
+  (interactive)
+  (let* ((pr (stash-get-current-pr))
+         (project (assoc-default 'key (assoc-default 'project (assoc-default 'repository (assoc-default 'toRef pr)))))
+         (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'toRef pr))))
+         (id (assoc-default 'id pr))
+         (author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr))))
+         (title (assoc-default 'title pr))
+         (url (concat stash-url (format "/rest/api/1.0/projects/%s/repos/%s/pull-requests/%s/approve" project repo id))))
+    (when (yes-or-no-p (format "Approve pull %s by %s?" title author))
+      (message (concat "Sending to " url))
+      (request url
+               :headers stash-access-headers
+               :type "POST"
+               :parser 'json-read
+               :sync t)
+      (stash-update-stash-info)
+      (stash-show-pull-requests)
+      )))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"

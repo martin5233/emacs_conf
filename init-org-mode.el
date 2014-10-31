@@ -39,10 +39,10 @@
       )
     )
 )
-  
+
 
 (if work
- (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/org/devs.org" "~/ownCloud/private.org")))
+ (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/ownCloud/private.org")))
  (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/ownCloud/private.org")))
 )
 
@@ -94,4 +94,3 @@
 (setq org-sort-agenda-notime-is-late nil)
 
 (global-set-key [?\C-c ?a]    'org-agenda)
-

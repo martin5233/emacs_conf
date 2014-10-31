@@ -465,6 +465,26 @@
  '(split-height-threshold 40)
  '(split-width-threshold 200)
  '(standard-indent 3)
+ '(stash-repos
+   (quote
+    (("spckxxxx" . "/scratch/apel/new_arch/")
+     ("spcktest" . "/scratch2/apel/SpckTest/")
+     ("documentation" . "/scratch2/apel/documentation"))))
+ '(stash-reviewer-shortcuts
+   (quote
+    (("autotest-linux" . "linux")
+     ("autotest-windows" . "win")
+     ("autotest-fortran" . "fort")
+     ("kluger" . "PKl")
+     ("sinderma" . "MSi")
+     ("bburgerm" . "BB")
+     ("menzel" . "AM")
+     ("trautbrg" . "WT")
+     ("kopp" . "PK")
+     ("apel" . "MA")
+     ("friedrich" . "MF")
+     ("zander" . "RZ")
+     ("duke" . "MD"))))
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
  '(tags-add-tables nil)
