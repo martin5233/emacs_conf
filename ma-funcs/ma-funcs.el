@@ -1,4 +1,5 @@
 (require 'hideshow)
+(require 'uuid)
 
 (defgroup ma nil
   "Martins customizations"
@@ -258,5 +259,34 @@
 
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
+
+(defconst ma-simpack-copyright "Copyright (c) SIMPACK AG")
+(defun ma-create-or-update-copyright ()
+  "Scans the current buffer for a copyright string.
+If one exists, it is updated to the correct formatting, if necessary.  If
+not, a copyright comment is inserted at the start of the file."
+  (when (string= major-mode "c++-mode")
+    (save-excursion
+      (beginning-of-buffer)
+      (let ((pos (re-search-forward "Copyright " 1000 t)))
+        (if pos
+            (let* ((copyright-start (- pos 10))
+                   (in-comment (comment-only-p copyright-start pos))
+                   (candidate (buffer-substring-no-properties copyright-start
+                                                              (+ copyright-start (length ma-simpack-copyright))))
+                   (done (string= candidate ma-simpack-copyright)))
+              (when (not done)
+                (hs-show-block)
+                (goto-char copyright-start)
+                (kill-line)
+                (insert ma-simpack-copyright)))
+          (progn
+            (beginning-of-buffer)
+            (insert (concat "/*\n * " ma-simpack-copyright "\n */\n"))
+            ))))))
+
+(defun ma-insert-random-uuid()
+  (interactive)
+  (insert (uuid)))
 
 (provide 'ma-funcs)

@@ -11,15 +11,16 @@
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
 
-(add-to-list 'load-path "~/.emacs.d/ma-funcs")
-(require 'ma-funcs)
-
 (unless (require 'el-get nil 'noerror)
   (with-current-buffer
       (url-retrieve-synchronously
        "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
     (goto-char (point-max))
     (eval-print-last-sexp)))
+
+;; These two have to be set, before el-get starts
+(setq el-get-emacswiki-base-url "http://www.emacswiki.org/emacs/download/")
+(setq el-get-github-default-url-type (quote git))
 
 (setq el-get-sources
       '((:name tempo
@@ -132,6 +133,14 @@
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
         (:name guide-key)
+        (:name uuid
+               :type http
+               :url "http://www.emacswiki.org/cgi-bin/wiki/download/uuid.el")
+        (:name helm
+               :after (global-set-key (kbd "C-x b") 'helm-buffers-list))
+        (:name helm-ls-git
+               :depends helm
+               :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
         ))
 
 (if work
@@ -161,6 +170,9 @@
 
 (el-get 'sync my-packages)
 
+(add-to-list 'load-path "~/.emacs.d/ma-funcs")
+(require 'ma-funcs)
+
 ;; For some strange reason org-toodledo does not play well with el-get
 (setq load-path (cons (expand-file-name "~/.emacs.d/org-toodledo-master") load-path))
 (require 'org-toodledo)
@@ -174,7 +186,7 @@
  '(ac-modes
    (quote
     (emacs-lisp-mode lisp-mode lisp-interaction-mode slime-repl-mode go-mode java-mode malabar-mode clojure-mode clojurescript-mode scala-mode scheme-mode ocaml-mode tuareg-mode coq-mode haskell-mode agda-mode agda2-mode perl-mode cperl-mode python-mode ruby-mode lua-mode tcl-mode ecmascript-mode javascript-mode js-mode js2-mode php-mode css-mode makefile-mode sh-mode fortran-mode f90-mode ada-mode xml-mode sgml-mode ts-mode sclang-mode verilog-mode qml-mode)))
- '(auth-sources (quote ("~/.authinfo.gpg" "~/.authinfo")))
+ '(auth-sources (quote ("~/.authinfo.gpg")))
  '(auto-revert-check-vc-info t)
  '(auto-revert-remote-files t)
  '(auto-revert-verbose nil)
@@ -362,6 +374,10 @@
  '(desktop-save (quote ask-if-new))
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^apel@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
+ '(display-buffer-alist
+   (quote
+    (("\\*compilation\\*" display-buffer-pop-up-window
+      (window-width . 1.0)))))
  '(ediff-keep-variants nil)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
@@ -390,6 +406,8 @@
  '(guide-key/guide-key-sequence (quote ("C-x r")))
  '(guide-key/idle-delay 0.0)
  '(guide-key/popup-window-position (quote bottom))
+ '(helm-buffer-max-length 40)
+ '(helm-ff-transformer-show-only-basename nil)
  '(ido-enable-flex-matching t)
  '(ido-ignore-directories (quote ("\\`CVS/" "\\`\\.\\./" "\\`\\./" "\\`\\.svn/")))
  '(ido-mode (quote buffer) nil (ido))
@@ -404,6 +422,8 @@
    (quote
     (("arabella32.intec.dom" base "dc=intec,dc=dom" binddn "simbuild@intec.dom" passwd "!simbuild!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+ '(magit-commit-extend-override-date t)
+ '(magit-commit-reword-override-date t)
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
  '(magit-process-popup-time 3)
@@ -484,7 +504,10 @@
      ("apel" . "MA")
      ("friedrich" . "MF")
      ("zander" . "RZ")
-     ("duke" . "MD"))))
+     ("duke" . "MD")
+     ("hippmann" . "GH")
+     ("miczek" . "FM")
+     ("mueller" . "DM"))))
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
  '(tags-add-tables nil)
@@ -556,7 +579,9 @@
             (local-set-key (kbd "C-M-e") 'end-of-defun)
             (local-set-key [delete] 'c-electric-delete-forward)
             (local-set-key [?\C-c ?=] 'align-regexp)
+            (local-set-key (kbd "C-M-u") 'ma-insert-random-uuid)
 
+            (add-hook 'before-save-hook 'ma-create-or-update-copyright)
             (c-toggle-hungry-state 1)
             (flyspell-prog-mode)
             (cwarn-mode)

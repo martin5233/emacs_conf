@@ -73,8 +73,9 @@ for all open pull requests")
 (defvar stash-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map special-mode-map)
-    (define-key map (kbd "a") 'stash-approve-pull-request)
+    (define-key map (kbd "a") 'stash-approve-pull-request)              ;; done
     (define-key map (kbd "b") 'stash-browse-pull-request)               ;; done
+    (define-key map (kbd "c") 'stash-create-pull-request)
     (define-key map (kbd "d") 'stash-decline-pull-request)
     (define-key map (kbd "g") 'stash-show-pull-requests)                ;; done
     (define-key map (kbd "m") 'stash-merge-pull-request)
@@ -406,6 +407,15 @@ is returned.  If the reviewer is not found, the original string is returned."
   (let ((pr (stash-get-current-pr)))
     (if pr
         (browse-url (assoc-default 'href (aref (assoc-default 'self (assoc-default 'links pr)) 0))))))
+
+(defun stash-create-pull-request()
+  "Opens the browser on the page to create a pull request for the current branch"
+  (interactive)
+  (let* ((source-branch (concat "refs/heads/" (substring (magit-get-tracked-branch) 7)))
+         (target-branch "refs/heads/master")
+         (query-string (url-build-query-string (list (list "sourceBranch" source-branch) (list "targetBranch" target-branch))))
+         (url (concat stash-url "/projects/SPCK/repos/spckxxxx/compare/commits?" query-string)))
+    (browse-url (url-encode-url url))))
 
 (defun stash-review-pull-request()
   "Open a magit diff buffer for the current pull request"
