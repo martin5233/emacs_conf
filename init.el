@@ -33,10 +33,10 @@
                :after (global-set-key "\M-o" 'er/expand-region))
         (:name multiple-cursors
                :after (progn
-                        (global-set-key (kbd "C-x C-n") 'mc/mark-next-like-this)
-                        (global-set-key (kbd "C-x C-p") 'mc/mark-previous-like-this)
-                        (global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this-in-defun)
-                        (global-set-key (kbd "C-x C-|") 'mc/edit-lines)))
+                        (global-set-key (kbd "C-c C-n") 'mc/mark-next-like-this)
+                        (global-set-key (kbd "C-c C-p") 'mc/mark-previous-like-this)
+                        (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
+                        (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
         (:name etags-select
                :after (progn
                         (add-hook 'c-mode-common-hook
