@@ -431,7 +431,8 @@ is returned.  If the reviewer is not found, the original string is returned."
     (magit-call-git git-dir-opt "fetch" "origin")
     (magit-call-git git-dir-opt "merge-base" from-branch to-branch)
     (with-current-buffer magit-process-buffer-name
-      (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2))))
+      (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2)))
+            (default-directory repo-dir))
         (magit-diff (cons merge-base from-branch))))))
 
 (defun stash-approve-pull-request()

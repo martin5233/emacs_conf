@@ -66,6 +66,7 @@
                  (global-set-key (kbd "C-c C-z") 'magit-status)))
         (:name mo-git-blame
                :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
+        (:name macrostep)
         (:name git-timemachine)
         (:name csv-mode)
         (:name llvm-mode)
@@ -422,6 +423,7 @@
    (quote
     (("arabella32.intec.dom" base "dc=intec,dc=dom" binddn "simbuild@intec.dom" passwd "!simbuild!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+ '(magit-auto-revert-mode nil)
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
@@ -489,7 +491,7 @@
    (quote
     (("spckxxxx" . "/scratch/apel/new_arch/")
      ("spcktest" . "/scratch2/apel/SpckTest/")
-     ("documentation" . "/scratch2/apel/documentation"))))
+     ("documentation" . "/scratch2/apel/documentation/"))))
  '(stash-reviewer-shortcuts
    (quote
     (("autotest-linux" . "linux")
