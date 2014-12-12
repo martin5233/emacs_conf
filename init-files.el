@@ -1,10 +1,10 @@
 (dir-locals-set-class-variables 'new_arch
  '((c++-mode
   (ma-compile-command . "~/bin/my_compile")
-  (tags-file-name . "/scratch/apel/new_arch/.tags"))
+  (tags-table-list . '("/scratch/apel/new_arch/.tags")))
    (c-mode
     (ma-compile-command . "~/bin/my_compile")
-    (tags-file-name . "/scratch/apel/new_arch/.tags"))
+    (tags-table-list . '("/scratch/apel/new_arch/.tags")))
    ))
 
 (dir-locals-set-class-variables 'llvm_test
@@ -12,7 +12,7 @@
   (ma-compile-command . "make -C /home/home_dev/apel/llvm_test/obj")
   (ma-make-target . nil)
   (ma-build-dir . nil)
-  (tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS"))
+  (tags-table-list . '("/scratch2/apel/llvm-3.1.src/TAGS")))
   (cmake-mode
   (ma-compile-command . "make -C /home/home_dev/apel/llvm_test/obj")
   (ma-make-target . nil)
@@ -20,7 +20,7 @@
 
 (dir-locals-set-class-variables 'llvm_src
  '((c++-mode
-  (tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS"))))
+  (tags-table-list . '("/scratch2/apel/llvm-3.1.src/TAGS")))))
 
 (dir-locals-set-class-variables 'atomic
  '((c++-mode
@@ -30,7 +30,7 @@
 
 (dir-locals-set-class-variables 'squish
  '((python-mode
-  (tags-file-name . "/scratch2/apel/SpckTest/SquishTestSuites/TAGS"))))
+  (tags-table-list . '("/scratch2/apel/SpckTest/SquishTestSuites/TAGS")))))
 
 
 (dir-locals-set-directory-class  "/scratch/apel/new_arch/develop/" 'new_arch)

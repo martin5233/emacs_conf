@@ -75,7 +75,7 @@ for all open pull requests")
     (set-keymap-parent map special-mode-map)
     (define-key map (kbd "a") 'stash-approve-pull-request)              ;; done
     (define-key map (kbd "b") 'stash-browse-pull-request)               ;; done
-    (define-key map (kbd "c") 'stash-create-pull-request)
+    (define-key map (kbd "c") 'stash-create-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
     (define-key map (kbd "g") 'stash-show-pull-requests)                ;; done
     (define-key map (kbd "m") 'stash-merge-pull-request)

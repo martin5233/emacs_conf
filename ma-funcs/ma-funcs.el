@@ -31,6 +31,8 @@
                  (const "/scratch/apel/new_arch/obj/dbg32")
                  (const "/scratch/apel/new_arch/obj/64")
                  (const "/scratch/apel/new_arch/obj/opt-g")
+                 (const "/scratch/apel/new_arch/obj/gcc-4.8")
+                 (const "/scratch/apel/new_arch/obj/gcc-4.9")
                  )
   :group 'ma
 )
@@ -261,11 +263,15 @@
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
 
 (defconst ma-simpack-copyright "Copyright (c) SIMPACK AG")
+(defcustom ma-skip-copyright nil "Skip copyright update upon save, if set"
+  :type 'boolean)
+(make-variable-buffer-local 'ma-skip-copyright)
+
 (defun ma-create-or-update-copyright ()
   "Scans the current buffer for a copyright string.
 If one exists, it is updated to the correct formatting, if necessary.  If
 not, a copyright comment is inserted at the start of the file."
-  (when (string= major-mode "c++-mode")
+  (when (and (string= major-mode "c++-mode") (not ma-skip-copyright))
     (save-excursion
       (beginning-of-buffer)
       (let ((pos (re-search-forward "Copyright " 1000 t)))

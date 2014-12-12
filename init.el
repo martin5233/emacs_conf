@@ -193,7 +193,7 @@
    (quote
     (emacs-lisp-mode lisp-mode lisp-interaction-mode slime-repl-mode go-mode java-mode malabar-mode clojure-mode clojurescript-mode scala-mode scheme-mode ocaml-mode tuareg-mode coq-mode haskell-mode agda-mode agda2-mode perl-mode cperl-mode python-mode ruby-mode lua-mode tcl-mode ecmascript-mode javascript-mode js-mode js2-mode php-mode css-mode makefile-mode sh-mode fortran-mode f90-mode ada-mode xml-mode sgml-mode ts-mode sclang-mode verilog-mode qml-mode)))
  '(auth-sources (quote ("~/.authinfo.gpg")))
- '(auto-revert-check-vc-info t)
+ '(auto-revert-check-vc-info nil)
  '(auto-revert-remote-files t)
  '(auto-revert-verbose nil)
  '(blink-matching-paren-on-screen nil)
@@ -369,20 +369,20 @@
  '(compilation-skip-threshold 2)
  '(compilation-skip-visited t)
  '(confirm-kill-emacs (quote yes-or-no-p))
- '(copyright-limit 10000)
- '(copyright-regexp
-   "\\(Copyright (c) \\)\\([-0-9, ';/*%#\\n\\t]*[0-9]+\\), \\(?:INTEC GmbH\\|\\SIMPACK AG\\|Simpack AG\\)")
  '(cperl-continued-statement-offset 0)
  '(cperl-indent-level 3)
  '(dabbrev-case-fold-search nil)
  '(default-input-method "german-postfix")
+ '(desktop-globals-to-save
+   (quote
+    (desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history)))
  '(desktop-restore-eager 20)
  '(desktop-save (quote ask-if-new))
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^apel@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(display-buffer-alist
    (quote
-    (("\\*compilation\\*" display-buffer-pop-up-window
+    (("\\*compilation\\*" display-buffer-use-some-window
       (window-width . 1.0)))))
  '(ediff-keep-variants nil)
  '(ediff-split-window-function (quote split-window-horizontally))
@@ -461,7 +461,9 @@
  '(require-final-newline t)
  '(safe-local-variable-values
    (quote
-    ((tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS")
+    ((tags-table-list quote
+                      ("/scratch/apel/new_arch/.tags"))
+     (tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS")
      (tags-file-name . "/scratch2/apel/llvm-3.0.src/TAGS")
      (tags-file-name . "/scratch/apel/new_arch/.tags")
      (tags-file-name "/scratch2/apel/llvm-3.0.src/TAGS")
