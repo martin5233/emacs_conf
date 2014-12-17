@@ -46,6 +46,11 @@
                         (setq etags-select-use-short-name-completion t)))
         (:name org-mode
                :branch "maint")
+        (:name org-drill
+               :after (progn
+                        (setq org-drill-maximum-duration 5)
+                        (setq org-drill-maximum-items-per-session 10)
+                        (setq org-drill-scope 'agenda)))
         (:name http-post-simple
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
@@ -423,7 +428,6 @@
    (quote
     (("arabella32.intec.dom" base "dc=intec,dc=dom" binddn "simbuild@intec.dom" passwd "!simbuild!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
- '(magit-auto-revert-mode nil)
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
@@ -441,6 +445,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
+ '(org-drill-optimal-factor-matrix (quote ((1 (2.6 . 4.14)))))
  '(org-export-backends (quote (ascii html icalendar latex md)))
  '(org-toodledo-inhibit-https t)
  '(org-toodledo-password "uENfYn30UIzJZs5f1h4s")
