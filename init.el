@@ -46,11 +46,11 @@
                         (setq etags-select-use-short-name-completion t)))
         (:name org-mode
                :branch "maint")
-        (:name org-drill
-               :after (progn
-                        (setq org-drill-maximum-duration 5)
-                        (setq org-drill-maximum-items-per-session 10)
-                        (setq org-drill-scope 'agenda)))
+        ;; (:name org-drill
+        ;;        :after (progn
+        ;;                 (setq org-drill-maximum-duration 5)
+        ;;                 (setq org-drill-maximum-items-per-session 10)
+        ;;                 (setq org-drill-scope 'agenda)))
         (:name http-post-simple
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
@@ -484,7 +484,8 @@
      (crontab-host . redhat64)
      (crontab-apply-after-save . t)
      (ma-compile-command . "~/bin/my_compile")
-     (ma-compile-command . "make -C /home/home_dev/apel/llvm_test/obj"))))
+     (ma-compile-command . "make -C /home/home_dev/apel/llvm_test/obj")
+     (after-revert-hook . ma-sync-toodledo-after-revert))))
  '(save-abbrevs nil)
  '(scroll-bar-mode (quote right))
  '(send-mail-function nil)
