@@ -461,7 +461,8 @@
  '(require-final-newline t)
  '(safe-local-variable-values
    (quote
-    ((tags-table-list quote
+    ((tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
+     (tags-table-list quote
                       ("/scratch/apel/new_arch/.tags"))
      (tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS")
      (tags-file-name . "/scratch2/apel/llvm-3.0.src/TAGS")
@@ -603,6 +604,7 @@
   '(lambda ()
      (local-unset-key [?\C-C ?\C-r])
      (idle-highlight-mode)
+     (which-function-mode)
      (imenu-add-to-menubar "Functions")))
 
 (add-hook 'shell-mode-hook

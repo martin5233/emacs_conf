@@ -23,20 +23,25 @@ Authorization: Basic (base64-encode-region username:password
 #
 GET https://jira.intec.dom:8443/rest/api/2/serverInfo
 Content-Type: application/json
-Authorization: Basic 
+Authorization: Basic
 #
 # Retrieve open pull requests
 #
-GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/SIMPACK_Src/pull-requests
+GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/pull-requests/424
 Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 #
 # Retrieve open pull requests
 #
-POST https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/SIMPACK_Src/pull-requests/44/comments
+GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/pull-requests/424/activities
 Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
-{ "text":"Testkommentar"}
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+#
+# Retrieve user autotest
+#
+GET https://stash.intec.dom:7990/rest/api/1.0/users?filter=autotest
+Content-Type: application/json
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 #
 # Retrieve open pull requests. Provided by stash-inbox plugin, which is part of stash, but REST API not documented
 #
@@ -79,19 +84,19 @@ Authorization: Basic YXBlbDoyb2xkMnImcg==
 #
 GET https://jira.intec.dom:8443/rest/api/2/issue/IM-26203?fields=customfield_10027
 Content-Type: application/json
-Authorization: Basic 
+Authorization: Basic
 #
 # Retrieve current status of a dev issue
 #
-GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203?fields=status
+GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203
 Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 #
 # Update Klocwork ids for a dev issue
 #
 PUT https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203
 Content-Type: application/json
-Authorization: Basic 
+Authorization: Basic
 { "fields": { "customfield_10027": "JuchHu" } }
 #
 # Retrieve issues between development in progress and Integration Test
@@ -111,8 +116,24 @@ Authorization: Basic YXBlbDoyb2xkMnImcg==
 #
 GET https://jira.intec.dom:8443/rest/api/2/project/SPCK/role
 Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 #
 GET https://stash.intec.dom:7990/rest/api/1.0/projects
 Content-Type: application/json
 Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+#
+GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-28418
+Content-Type: application/json
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+#
+GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-28419
+Content-Type: application/json
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+#
+#
+PUT https://jira-staging.intec.dom:8443/rest/api/2/user?username=eichberg
+Content-Type: application/json
+Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+{
+   "name" : "AER3"
+}
