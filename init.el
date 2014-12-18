@@ -143,7 +143,10 @@
                :type http
                :url "http://www.emacswiki.org/cgi-bin/wiki/download/uuid.el")
         (:name helm
-               :after (global-set-key (kbd "C-x b") 'helm-buffers-list))
+               :after
+               (progn
+                 (global-set-key (kbd "C-x b") 'helm-buffers-list)
+                 (global-set-key (kbd "M-y") 'helm-show-kill-ring)))
         (:name helm-ls-git
                :depends helm
                :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
