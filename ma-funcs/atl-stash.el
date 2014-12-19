@@ -411,7 +411,8 @@ is returned.  If the reviewer is not found, the original string is returned."
 (defun stash-create-pull-request()
   "Opens the browser on the page to create a pull request for the current branch"
   (interactive)
-  (let* ((source-branch (concat "refs/heads/" (substring (magit-get-tracked-branch) 7)))
+  (let* ((default-directory (magit-read-top-dir nil))
+         (source-branch (concat "refs/heads/" (substring (magit-get-tracked-branch) 7)))
          (target-branch "refs/heads/master")
          (query-string (url-build-query-string (list (list "sourceBranch" source-branch) (list "targetBranch" target-branch))))
          (url (concat stash-url "/projects/SPCK/repos/spckxxxx/compare/commits?" query-string)))
