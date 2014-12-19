@@ -46,11 +46,6 @@
                         (setq etags-select-use-short-name-completion t)))
         (:name org-mode
                :branch "maint")
-        ;; (:name org-drill
-        ;;        :after (progn
-        ;;                 (setq org-drill-maximum-duration 5)
-        ;;                 (setq org-drill-maximum-items-per-session 10)
-        ;;                 (setq org-drill-scope 'agenda)))
         (:name http-post-simple
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
@@ -72,6 +67,7 @@
         (:name mo-git-blame
                :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
         (:name macrostep)
+        (:name smartscan)
         (:name git-timemachine)
         (:name csv-mode)
         (:name llvm-mode)
@@ -118,6 +114,7 @@
                                 '(lambda ()
                                    (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
         (:name idle-highlight-mode)
+        (:name auto-complete)
         (:name auto-complete-emacs-lisp
                :depends auto-complete)
         (:name json-snatcher)
@@ -186,6 +183,11 @@
 (setq load-path (cons (expand-file-name "~/.emacs.d/org-toodledo-master") load-path))
 (require 'org-toodledo)
 (load "~/.emacs.d/init-org-toodledo")
+
+(require 'org-drill)
+(setq org-drill-maximum-duration 5)
+(setq org-drill-maximum-items-per-session 10)
+(setq org-drill-scope 'agenda)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -601,6 +603,7 @@
             (cwarn-mode)
             (hs-minor-mode)
             (idle-highlight-mode)
+            (smartscan-mode)
             (hs-hide-initial-comment-block)))
 
 
@@ -609,6 +612,7 @@
      (local-unset-key [?\C-C ?\C-r])
      (idle-highlight-mode)
      (which-function-mode)
+     (smartscan-mode)
      (imenu-add-to-menubar "Functions")))
 
 (add-hook 'shell-mode-hook
@@ -622,6 +626,7 @@
 
 (add-hook 'emacs-lisp-mode-hook
           '(lambda ()
+             (smartscan-mode)
              (local-set-key (kbd "M-.") 'find-function-other-window)))
 
 ;; Workaround for a bug in compilation mode

@@ -112,7 +112,7 @@
   (occur (buffer-substring (region-beginning) (region-end)))
   (select-window (get-buffer-window "*Occur*"))
 )
-(global-set-key "\M-p" 'ma-occur-at-point)
+(global-set-key "\M-O" 'ma-occur-at-point)
 
 (defun ma-update-ebrowse-db ()
   "Update the database for Ebrowse"
