@@ -236,7 +236,7 @@ for all open pull requests")
 
 (defun stash-id-to-pr (id)
   "Retrieves the pull request identified by id. Id must have been constructed by a call to stash-pr-to-id."
-  (let* ((start (string-match "\\([A-Za-z0-9\\-]+\\)/\\([A-Za-z0-9\\-]+\\):\\([0-9]+\\)" id))
+  (let* ((start (string-match "\\([A-Za-z0-9\\-]+\\)/\\([A-Za-z0-9\\-_]+\\):\\([0-9]+\\)" id))
          (project (match-string 1 id))
          (repo (match-string 2 id))
          (pr-id (string-to-number (match-string 3 id)))

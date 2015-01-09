@@ -262,7 +262,7 @@
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
 
-(defconst ma-simpack-copyright "Copyright (c) SIMPACK AG")
+(defconst ma-simpack-copyright "Copyright (c) SIMPACK GmbH")
 (defcustom ma-skip-copyright nil "Skip copyright update upon save, if set"
   :type 'boolean)
 (make-variable-buffer-local 'ma-skip-copyright)

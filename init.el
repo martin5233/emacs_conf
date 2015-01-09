@@ -1,5 +1,7 @@
 (setq home (string-match "^martin$" (user-login-name)))
-(setq work (string-match "^apel$" (user-login-name)))
+(setq work-linux (string-match "^apel$" (user-login-name)))
+(setq work-win (string-match "^mal1$" (user-login-name)))
+(setq work (or work-linux work-win))
 
 (if work
     (setq url-proxy-services
@@ -147,6 +149,12 @@
         (:name helm-ls-git
                :depends helm
                :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
+        (:name auto-compile
+               :after (progn
+                        (setq load-prefer-newer t)
+                        (require 'auto-compile)
+                        (auto-compile-on-load-mode 1)
+                        (auto-compile-on-save-mode 1)))
         ))
 
 (if work
@@ -450,7 +458,16 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-drill-optimal-factor-matrix (quote ((1 (2.6 . 4.14)))))
+ '(org-drill-optimal-factor-matrix
+   (quote
+    ((2
+      (2.7 . 2.691)
+      (2.6 . 2.6)
+      (2.46 . 2.509))
+     (1
+      (2.5 . 4.0)
+      (1.7000000000000002 . 3.44)
+      (2.6 . 4.14)))))
  '(org-export-backends (quote (ascii html icalendar latex md)))
  '(org-toodledo-inhibit-https t)
  '(org-toodledo-password "uENfYn30UIzJZs5f1h4s")
@@ -648,7 +665,7 @@
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (electric-pair-mode)
 
-(if work
+(if work-linux
     (progn
       (require 'atl-stash)
       (stash-update-stash-info)
