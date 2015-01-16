@@ -92,7 +92,8 @@
                         (define-auto-insert "\\.h\\'" 'header-skeleton)
                         ))
         (:name smerge-mode
-               :type builtin)
+               :type builtin
+               :after (add-hook 'c-mode-common-hook 'smerge-start-session))
         (:name files
                :type builtin)
         (:name password-cache
