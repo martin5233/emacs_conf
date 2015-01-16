@@ -1,5 +1,6 @@
 (require 'hideshow)
-(require 'uuid)
+(if (featurep 'uuid)
+    (require 'uuid))
 
 (defgroup ma nil
   "Martins customizations"

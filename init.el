@@ -40,6 +40,8 @@
                         (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
                         (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
         (:name etags-select
+               :type http
+               :url "http://www.emacswiki.org/emacs/download/etags-select.el"
                :after (progn
                         (add-hook 'c-mode-common-hook
                                   (lambda()
@@ -65,6 +67,7 @@
                :after
                (progn
                  (advice-add 'magit-wash-branch-line :after #'ma-magit-highlight-own-branches)
+                 (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
                  (global-set-key (kbd "C-c C-z") 'magit-status)))
         (:name mo-git-blame
                :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
@@ -126,12 +129,12 @@
         (:name markdown-mode)
         (:name anchored-transpose
                :type http
-               :url "http://www.emacswiki.org/cgi-bin/wiki/download/anchored-transpose.el"
+               :url "http://www.emacswiki.org/emacs/download/anchored-transpose.el"
                :after (global-set-key (kbd "C-x t") 'anchored-transpose)
                )
         (:name apt-utils
                :type http
-               :url "http://www.emacswiki.org/cgi-bin/wiki/download/apt-utils.el"
+               :url "http://www.emacswiki.org/emacs/download/apt-utils.el"
                )
         (:name visual-regexp
                :after (progn
@@ -139,9 +142,6 @@
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
         (:name guide-key)
-        (:name uuid
-               :type http
-               :url "http://www.emacswiki.org/cgi-bin/wiki/download/uuid.el")
         (:name helm
                :after
                (progn
@@ -163,7 +163,6 @@
      (append el-get-sources
         '((:name filecache
            :type builtin)
-          (:name doxymacs)
           (:name ac-etags
            :type github
            :pkgname "syohex/emacs-ac-etags"
@@ -177,9 +176,18 @@
            :pkgname "pashky/restclient.el")
           (:name php-mode-improved
 		 :type http
-		 :url "http://www.emacswiki.org/cgi-bin/wiki/download/php-mode-improved.el"
+		 :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
 		 :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
           ))))
+
+(if work-linux
+    (setq el-get-sources
+     (append el-get-sources
+        '((:name doxymacs)
+	  (:name uuid
+		 :type http
+		 :url "http://www.emacswiki.org/emacs/download/uuid.el")
+	  ))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
 
@@ -459,6 +467,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
+ '(org-agenda-files nil)
  '(org-drill-optimal-factor-matrix
    (quote
     ((2

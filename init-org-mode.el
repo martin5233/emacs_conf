@@ -5,7 +5,7 @@
     (if (not buf)
       (progn
         (org-agenda-list 1)
-        NIL)
+        nil)
       (if (not (get-buffer-window buf))
           (progn
             (switch-to-buffer buf)
@@ -32,7 +32,7 @@
       (shell-command (concat "~/perl/download_mks_attachments.pl " dev-id))
       (save-excursion
         (while (not (org-at-heading-p))
-          (previous-line))
+          (forward-line -1))
         (beginning-of-line)
         (replace-string dev-id link nil (line-beginning-position) (line-end-position))
         )
@@ -41,10 +41,10 @@
 )
 
 
-(if work
- (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/ownCloud/private.org")))
- (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/ownCloud/private.org")))
-)
+(if work-linux
+    (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/ownCloud/private.org")))
+  (when home
+      (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/ownCloud/private.org")))))
 
 (setq org-agenda-custom-commands
    (quote
