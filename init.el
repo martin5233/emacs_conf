@@ -467,7 +467,6 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil)
  '(org-drill-optimal-factor-matrix
    (quote
     ((2
