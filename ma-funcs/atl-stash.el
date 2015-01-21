@@ -78,6 +78,7 @@ for all open pull requests")
     (define-key map (kbd "c") 'stash-create-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
     (define-key map (kbd "g") 'stash-show-pull-requests)                ;; done
+    (define-key map (kbd "l") 'stash-show-pull-request-log)
     (define-key map (kbd "m") 'stash-merge-pull-request)
     (define-key map (kbd "n") 'stash-next-pull-request)                 ;; done
     (define-key map (kbd "p") 'stash-prev-pull-request)                 ;; done
@@ -130,8 +131,7 @@ for all open pull requests")
                  :sync t
                  :success (function*
                            (lambda (&key data &allow-other-keys)
-                             (let* ((values (assoc-default 'values data))
-                                    (result nil))
+                             (let* ((values (assoc-default 'values data)))
                                (dotimes (i (length values))
                                  (stash-update-repositories (assoc-default 'key (aref values i)))
                                  )
@@ -154,9 +154,8 @@ for all open pull requests")
                        (let ((values (assoc-default 'values data))
                              (result nil))
                          (progn
-                           (dotimes (i (length values) result)
-                             (push (assoc-default 'slug (aref values i)) result)
-                             )
+                           (dotimes (i (length values))
+                             (push (assoc-default 'slug (aref values i)) result))
                            (add-to-list 'stash-repo-list (cons project result)))
                          )))
            )
@@ -236,16 +235,17 @@ for all open pull requests")
 
 (defun stash-id-to-pr (id)
   "Retrieves the pull request identified by id. Id must have been constructed by a call to stash-pr-to-id."
-  (let* ((start (string-match "\\([A-Za-z0-9\\-]+\\)/\\([A-Za-z0-9\\-_]+\\):\\([0-9]+\\)" id))
-         (project (match-string 1 id))
+  (string-match "\\([A-Za-z0-9\\-]+\\)/\\([A-Za-z0-9\\-_]+\\):\\([0-9]+\\)" id)
+  (let* ((project (match-string 1 id))
          (repo (match-string 2 id))
          (pr-id (string-to-number (match-string 3 id)))
          (pr-list (assoc-default (concat project "/" repo) stash-pr-data))
          (result nil))
-    (dotimes (i (length pr-list) result)
+    (dotimes (i (length pr-list))
       (let ((pr (aref pr-list i)))
         (if (eq pr-id (assoc-default 'id pr))
-            (setq result pr))))))
+            (setq result pr))))
+    result))
 
 (defun stash-map-reviewer (reviewer)
   "Map REVIEWER by looking him up in `stash-reviewer-shortcuts'.
@@ -257,12 +257,10 @@ is returned.  If the reviewer is not found, the original string is returned."
 (defun stash-gen-pr-info (pr short)
   "Generate a description string for the given pull request. If short is t, generate a one line description, otherwise a multi-line description."
   (let* ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr))))
-         (project (assoc-default 'key (assoc-default 'project (assoc-default 'repository (assoc-default 'toRef pr)))))
          (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'toRef pr))))
          (title (assoc-default 'title pr))
          (id (assoc-default 'id pr))
          (descr (assoc-default 'description pr))
-         (url (assoc-default 'url (assoc-default 'link pr)))
          (reviewer-list (assoc-default 'reviewers pr))
          (reviewers nil)
          (line "")
@@ -286,13 +284,14 @@ is returned.  If the reviewer is not found, the original string is returned."
   "Returns true, if the current user is listed as a reviewer in the given pull request and he has not approved yet."
   (let ((reviewers (assoc-default 'reviewers pr))
         (saw-myself-in-reviewers nil))
-    (dotimes (i (length reviewers) saw-myself-in-reviewers)
+    (dotimes (i (length reviewers))
       (let* ((reviewer (aref reviewers i))
              (name (assoc-default 'name (assoc-default 'user reviewer)))
              (approved (assoc-default 'approved reviewer)))
         (if (and (string-equal name (user-login-name)) (eq approved :json-false))
             (setq saw-myself-in-reviewers t))
-        ))))
+        ))
+    saw-myself-in-reviewers))
 
 (defun stash-am-i-author (pr)
   "Returns true, if the current user is the author of this pull request."
@@ -332,7 +331,7 @@ is returned.  If the reviewer is not found, the original string is returned."
 
     (insert "\n")
     (stash-mode)
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (stash-next-pull-request)))
 
 (defun stash-get-current-pr()
@@ -456,6 +455,23 @@ is returned.  If the reviewer is not found, the original string is returned."
       (stash-update-stash-info)
       (stash-show-pull-requests)
       )))
+
+(defun stash-show-pull-request-log()
+  "Show log of the branch belonging to the current pull request"
+  (interactive)
+  (let* ((pr (stash-get-current-pr))
+         (from-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'fromRef pr))))
+         (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
+         (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'fromRef pr))))
+         (repo-dir (assoc-default repo stash-repos))
+         (git-dir-opt (concat "--git-dir=" repo-dir "/.git"))
+         (default-directory repo-dir))
+    (magit-call-git git-dir-opt "fetch" "origin")
+    (magit-call-git git-dir-opt "merge-base" from-branch to-branch)
+    (with-current-buffer magit-process-buffer-name
+      (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2)))
+            (default-directory repo-dir))
+        (magit-log (cons merge-base from-branch))))))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
