@@ -78,7 +78,7 @@ for all open pull requests")
     (define-key map (kbd "c") 'stash-create-pull-request)               ;; done
     (define-key map (kbd "d") 'stash-decline-pull-request)
     (define-key map (kbd "g") 'stash-show-pull-requests)                ;; done
-    (define-key map (kbd "l") 'stash-show-pull-request-log)
+    (define-key map (kbd "l") 'stash-show-pull-request-log)             ;; done
     (define-key map (kbd "m") 'stash-merge-pull-request)
     (define-key map (kbd "n") 'stash-next-pull-request)                 ;; done
     (define-key map (kbd "p") 'stash-prev-pull-request)                 ;; done
@@ -298,37 +298,27 @@ is returned.  If the reviewer is not found, the original string is returned."
   (let ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr)))))
     (string-equal author (user-login-name))))
 
+(defun stash-show-section(title predicate)
+  "Display a section of pull-requests passing the predicate function."
+  (insert (concat (propertize title 'face 'stash-section-title) "\n"))
+  (dolist (project-entry stash-pr-data)
+    (let ((prdata-for-repo (cdr project-entry)))
+      (dotimes (i (length prdata-for-repo))
+        (let ((pr (aref prdata-for-repo i)))
+          (if (funcall predicate pr)
+              (insert (concat "\n" (stash-gen-pr-info pr t))))))))
+  )
+
 (defun stash-show-pull-requests-internal()
   "Actually show all currently pending pull requests"
   (switch-to-buffer (set-buffer (get-buffer-create "*Stash*")))
   (let ((buffer-read-only nil))
     (erase-buffer)
-    (insert (concat (propertize "OPEN PULL REQUESTS TO REVIEW:" 'face 'stash-section-title) "\n"))
-    (dolist (project-entry stash-pr-data)
-      (let ((prdata-for-repo (cdr project-entry)))
-        (dotimes (i (length prdata-for-repo))
-          (let ((pr (aref prdata-for-repo i)))
-            (if (stash-am-i-reviewer pr)
-                (insert (concat "\n" (stash-gen-pr-info pr t))))))))
-
+    (stash-show-section "OPEN PULL REQUESTS TO REVIEW" 'stash-am-i-reviewer)
     (insert "\n\n")
-    (insert (concat (propertize "OWN PULL REQUESTS:" 'face 'stash-section-title) "\n"))
-    (dolist (project-entry stash-pr-data)
-      (let ((prdata-for-repo (cdr project-entry)))
-        (dotimes (i (length prdata-for-repo))
-          (let ((pr (aref prdata-for-repo i)))
-            (if (stash-am-i-author pr)
-                (insert (concat "\n" (stash-gen-pr-info pr t))))))))
-
+    (stash-show-section "OWN PULL REQUESTS" 'stash-am-i-author)
     (insert "\n\n")
-    (insert (concat (propertize "OTHER PULL REQUESTS:" 'face 'stash-section-title) "\n"))
-    (dolist (project-entry stash-pr-data)
-      (let ((prdata-for-repo (cdr project-entry)))
-        (dotimes (i (length prdata-for-repo))
-          (let ((pr (aref prdata-for-repo i)))
-            (if (and (not (stash-am-i-author pr)) (not (stash-am-i-reviewer pr)))
-                (insert (concat "\n" (stash-gen-pr-info pr t))))))))
-
+    (stash-show-section "OTHER PULL REQUESTS" '(lambda(pr) (and (not (stash-am-i-author pr)) (not (stash-am-i-reviewer pr)))))
     (insert "\n")
     (stash-mode)
     (goto-char (point-min))

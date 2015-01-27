@@ -156,6 +156,12 @@
                         (require 'auto-compile)
                         (auto-compile-on-load-mode 1)
                         (auto-compile-on-save-mode 1)))
+        (:name diminish
+               :after (progn
+                        (eval-after-load "magit" '(diminish 'magit-auto-revert-mode))
+                        (eval-after-load "cwarn" '(diminish 'cwarn-mode))
+                        (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
+                        (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         ))
 
 (if work
@@ -458,6 +464,7 @@
  '(magit-repo-dirs
    (quote
     ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest")))
+ '(magit-restore-window-configuration t)
  '(magit-rewrite-inclusive nil)
  '(magit-show-child-count t)
  '(make-backup-files nil)
@@ -568,8 +575,9 @@
  '(user-mail-address "martin.apel@simpack.de")
  '(vc-command-messages t)
  '(vc-consult-headers nil)
+ '(vc-display-status t)
  '(vc-git-diff-switches "-w")
- '(vc-handled-backends (quote (Bzr Git Hg)))
+ '(vc-handled-backends (quote (Git)))
  '(w3m-pop-up-windows t)
  '(which-function-mode t nil (which-func)))
 (custom-set-faces
@@ -579,7 +587,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
- '(stash-section-title ((t (:background "light gray"))))
+ '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
 ;; Avoid version-control checks for tramp buffers
@@ -615,13 +623,16 @@
 (add-hook 'c-mode-common-hook
        (lambda ()
             (imenu-add-to-menubar "Functions")
-            (local-set-key [?\C-c ?\C-o] 'ff-find-other-file)
-            (local-set-key [?\C-c ?\C-s] 'hs-show-block)
+            (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+            (local-set-key (kbd "C-c C-s") 'hs-show-block)
             (local-set-key (kbd "C-M-a") 'beginning-of-defun)
             (local-set-key (kbd "C-M-e") 'end-of-defun)
-            (local-set-key [delete] 'c-electric-delete-forward)
-            (local-set-key [?\C-c ?=] 'align-regexp)
+            (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+            (local-set-key (kbd "C-c =") 'align-regexp)
             (local-set-key (kbd "C-M-u") 'ma-insert-random-uuid)
+            (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+            (local-unset-key (kbd "C-c C-n"))
+            (local-unset-key (kbd "C-c C-p"))
 
             (add-hook 'before-save-hook 'ma-create-or-update-copyright)
             (c-toggle-hungry-state 1)
