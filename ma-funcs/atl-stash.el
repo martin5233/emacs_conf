@@ -461,7 +461,7 @@ is returned.  If the reviewer is not found, the original string is returned."
     (with-current-buffer magit-process-buffer-name
       (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2)))
             (default-directory repo-dir))
-        (magit-log (cons merge-base from-branch))))))
+        (magit-log (concat merge-base ".." from-branch))))))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
