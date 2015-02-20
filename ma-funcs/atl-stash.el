@@ -329,6 +329,12 @@ is returned.  If the reviewer is not found, the original string is returned."
   (stash-id-to-pr (get-text-property (point) 'pr))
   )
 
+(defun stash-merge-base(repo-dir from-branch to-branch)
+  "Call git merge-base with the two branches and return the merge base as a string"
+  (let ((git-dir-opt (concat "--git-dir=" repo-dir "/.git")))
+    (magit-call-git git-dir-opt "fetch" "origin")
+    (magit-git-string git-dir-opt "merge-base" from-branch to-branch)))
+
 ;;
 ;; Interactive commands
 ;;
@@ -401,11 +407,57 @@ is returned.  If the reviewer is not found, the original string is returned."
   "Opens the browser on the page to create a pull request for the current branch"
   (interactive)
   (let* ((default-directory (magit-read-top-dir nil))
-         (source-branch (concat "refs/heads/" (substring (magit-get-tracked-branch) 7)))
-         (target-branch "refs/heads/master")
-         (query-string (url-build-query-string (list (list "sourceBranch" source-branch) (list "targetBranch" target-branch))))
-         (url (concat stash-url "/projects/SPCK/repos/spckxxxx/compare/commits?" query-string)))
-    (browse-url (url-encode-url url))))
+         (source-branch (substring (magit-get-tracked-branch) 7))
+         (target-branch "master")
+         (project "SPCK")
+         (repo (car (rassoc default-directory stash-repos)))
+         (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch)))
+         (tmp-file "/tmp/PULLREQ_EDITMSG"))
+    (unless repo
+      (user-error "Directory %s is not registered in stash-repos"))
+    (with-temp-file tmp-file
+      (message (concat "Calling git log " merge-base "..origin/" source-branch))
+      (insert (s-join "\n" (magit-git-lines "log" "--format=format:%B" (concat merge-base "..origin/" source-branch))))
+      (goto-char (point-min))
+      (forward-line 1)
+      (insert "\n"))
+    (find-file tmp-file)
+    (add-hook 'git-commit-commit-hook
+              (apply-partially
+               (lambda (editmsg source-branch target-branch project repo)
+                 (with-current-buffer (find-file-noselect editmsg)
+                   (goto-char (point-min))
+                   (let* ((title (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+                          (descr (buffer-substring-no-properties (line-beginning-position 2) (point-max)))
+                          (url (concat stash-url (format "/rest/api/1.0/projects/%s/repos/%s/pull-requests" project repo)))
+                          (body `(("title" . ,title)
+                                  ("description" . ,descr)
+                                  ("state" . "OPEN")
+                                  ("open" . t)
+                                  ("closed" . ,json-false)
+                                  ("fromRef" .
+                                   (("id" . ,(concat "refs/heads/" source-branch))
+                                   ("repository" .
+                                    (("slug" . ,repo)
+                                     ("name" . ,json-null)
+                                     ("project" . (("key" . ,project)))))))
+                                  ("toRef" .
+                                   (("id" . ,(concat "refs/heads/" target-branch))
+                                   ("repository" .
+                                    (("slug" . ,repo)
+                                     ("name" . ,json-null)
+                                     ("project" . (("key" . ,project)))))))
+                                  ("locked" . ,json-false)))
+                          (body-encoded (json-encode-alist body)))
+                     (request url
+                              :headers stash-access-headers
+                              :type "POST"
+                              :data body-encoded
+                              :parser 'json-read
+                              :sync t)
+                     )))
+               tmp-file source-branch target-branch project repo) nil t)))
+
 
 (defun stash-review-pull-request()
   "Open a magit diff buffer for the current pull request"
@@ -415,15 +467,9 @@ is returned.  If the reviewer is not found, the original string is returned."
         (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
         (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'fromRef pr))))
         (repo-dir (assoc-default repo stash-repos))
-        (git-dir-opt (concat "--git-dir=" repo-dir "/.git"))
         (default-directory repo-dir)
-        )
-    (magit-call-git git-dir-opt "fetch" "origin")
-    (magit-call-git git-dir-opt "merge-base" from-branch to-branch)
-    (with-current-buffer magit-process-buffer-name
-      (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2)))
-            (default-directory repo-dir))
-        (magit-diff (cons merge-base from-branch))))))
+        (merge-base (stash-merge-base repo-dir from-branch to-branch)))
+    (magit-diff (cons merge-base from-branch))))
 
 (defun stash-approve-pull-request()
   "Approve current pull request"
@@ -454,14 +500,10 @@ is returned.  If the reviewer is not found, the original string is returned."
          (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
          (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'fromRef pr))))
          (repo-dir (assoc-default repo stash-repos))
-         (git-dir-opt (concat "--git-dir=" repo-dir "/.git"))
+         (default-directory repo-dir)
+         (merge-base (stash-merge-base repo-dir from-branch to-branch))
          (default-directory repo-dir))
-    (magit-call-git git-dir-opt "fetch" "origin")
-    (magit-call-git git-dir-opt "merge-base" from-branch to-branch)
-    (with-current-buffer magit-process-buffer-name
-      (let ((merge-base (buffer-substring (line-beginning-position 2) (line-end-position 2)))
-            (default-directory repo-dir))
-        (magit-log (concat merge-base ".." from-branch))))))
+    (magit-log (concat merge-base ".." from-branch))))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
