@@ -146,7 +146,11 @@
                :after
                (progn
                  (global-set-key (kbd "C-x b") 'helm-buffers-list)
-                 (global-set-key (kbd "M-y") 'helm-show-kill-ring)))
+                 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+                 (helm-mode t)))
+        (:name ace-window
+               :after
+               (global-set-key (kbd "C-x o") 'ace-window))
         (:name helm-ls-git
                :depends helm
                :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
@@ -161,6 +165,7 @@
                         (eval-after-load "magit" '(diminish 'magit-auto-revert-mode))
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
                         (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
+                        (eval-after-load "helm-mode" '(diminish 'helm-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         ))
 
@@ -441,10 +446,20 @@
  '(guide-key/idle-delay 0.0)
  '(guide-key/popup-window-position (quote bottom))
  '(helm-buffer-max-length 40)
+ '(helm-completing-read-handlers-alist
+   (quote
+    ((describe-function . helm-completing-read-symbols)
+     (describe-variable . helm-completing-read-symbols)
+     (debug-on-entry . helm-completing-read-symbols)
+     (find-function . helm-completing-read-symbols)
+     (find-tag . helm-completing-read-with-cands-in-buffer)
+     (ffap-alternate-file)
+     (tmm-menubar)
+     (find-file))))
  '(helm-ff-transformer-show-only-basename nil)
- '(ido-enable-flex-matching t)
- '(ido-ignore-directories (quote ("\\`CVS/" "\\`\\.\\./" "\\`\\./" "\\`\\.svn/")))
- '(ido-mode (quote buffer) nil (ido))
+ '(helm-for-files-preferred-list
+   (quote
+    (helm-source-file-cache helm-source-files-in-current-dir)))
  '(imenu-sort-function (quote imenu--sort-by-name))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
@@ -552,11 +567,11 @@
      ("kopp" . "PK")
      ("apel" . "MA")
      ("friedrich" . "MF")
-     ("zander" . "RZ")
      ("duke" . "MD")
      ("hippmann" . "GH")
      ("miczek" . "FM")
-     ("mueller" . "DM"))))
+     ("mueller" . "DM")
+     ("weideman" . "ChW"))))
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
  '(tags-add-tables nil)
