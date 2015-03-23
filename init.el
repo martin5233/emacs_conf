@@ -425,7 +425,8 @@
    (quote
     (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
  '(eudc-protocol (quote ldap))
- '(eudc-server "arabella32.intec.dom")
+ '(eudc-query-form-attributes (quote (name firstname email phone Uid)))
+ '(eudc-server "10.29.111.1")
  '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
@@ -465,11 +466,11 @@
  '(inhibit-startup-screen t)
  '(js-indent-level 3)
  '(latex-run-command "pdflatex")
- '(ldap-default-base "dc=intec,dc=dom")
- '(ldap-default-host "arabella32.intec.dom")
+ '(ldap-default-base "ou=dsdeu050,ou=eu,ou=dsone,dc=dsone,dc=3ds,dc=com")
+ '(ldap-default-host "10.29.111.1")
  '(ldap-host-parameters-alist
    (quote
-    (("arabella32.intec.dom" base "dc=intec,dc=dom" binddn "simbuild@intec.dom" passwd "!simbuild!"))))
+    (("10.29.111.1" base "ou=dsdeu050,ou=eu,ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU050,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
