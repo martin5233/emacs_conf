@@ -255,7 +255,7 @@
   (let* ((start (line-beginning-position 0))
          (end (line-end-position 0))
          (line (buffer-substring start end)))
-     (when (string-match "^[0-9a-f]+   origin/SPCK-[0-9]+-MA-" line)
+     (when (string-match "^[0-9a-f]+   origin/SPCK-[0-9]+-MAL1-" line)
        (put-text-property (+ start 10) end 'face 'highlight)
        )))
 
