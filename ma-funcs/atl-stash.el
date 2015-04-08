@@ -37,7 +37,7 @@
   "Stash settings."
   :group 'vc)
 
-(defcustom stash-url "https://stash.intec.dom:7990"
+(defcustom stash-url "https://spck-stash.ux.dsone.3ds.com:7990"
   "URL of Stash server"
   :group 'stash)
 
