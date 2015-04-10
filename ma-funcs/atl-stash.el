@@ -41,7 +41,7 @@
   "URL of Stash server"
   :group 'stash)
 
-(defcustom stash-SIMPACK-ca-cert "/home/home_dev/apel/SIMPACK_CA.cer"
+(defcustom stash-SIMPACK-ca-cert "/home/home_dev/MAL1/SIMPACK_CA.cer"
   "Location of certificate of SIMPACK CA"
   :group 'stash)
 

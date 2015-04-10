@@ -1,6 +1,6 @@
 (setq home (string-match "^martin$" (user-login-name)))
-(setq work-linux (string-match "^apel$" (user-login-name)))
-(setq work-win (string-match "^mal1$" (user-login-name)))
+(setq work-linux (and (string-match "^mal1$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
