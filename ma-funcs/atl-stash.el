@@ -30,6 +30,7 @@
 (require 'auth-source)
 (require 'url-parse)
 (require 'magit)
+(require 'cl)
 
 ;; Custom variables
 
@@ -53,6 +54,11 @@
 (defcustom stash-reviewer-shortcuts nil
   "Mapping from reviewer's name to his shortcut"
   :type 'alist
+  :group 'stash)
+
+(defcustom stash-target-branch-regex "^origin/master$"
+  "A regular expression matching possible target branches to merge to during stash-create-pull-request"
+  :type 'regexp
   :group 'stash)
 
 ;; Local variables belonging to this mode
@@ -335,6 +341,20 @@ is returned.  If the reviewer is not found, the original string is returned."
     (magit-call-git git-dir-opt "fetch" "origin")
     (magit-git-string git-dir-opt "merge-base" from-branch to-branch)))
 
+(defun stash-find-target-branch(repo-dir source-branch)
+  "Determine the branch, from which the target branch was branched off. This will be used as the target branch, where to merge to.
+   In case multiple branches are available, let the user choose."
+  (let* ((git-dir-opt (concat "--git-dir=" repo-dir "/.git"))
+         (filter (lambda(elem) (and (string-match-p stash-target-branch-regex elem) elem)))
+         (remote-branches (mapcar 's-trim (magit-git-lines git-dir-opt "branch" "-r")))
+         (matching-remote-branches (delq nil (mapcar filter remote-branches)))
+         (merge-base (magit-git-string git-dir-opt "merge-base" source-branch matching-remote-branches))
+         (target-candidates (mapcar 's-trim (magit-git-lines git-dir-opt "branch" "-r" "--contains" merge-base)))
+         (matching-target-candidates (delq nil (mapcar filter target-candidates))))
+    (substring
+     (if (eq (length matching-target-candidates) 1)
+         (car matching-target-candidates)
+       (completing-read "Please choose target branch: " matching-target-candidates)) 7)))
 ;;
 ;; Interactive commands
 ;;
@@ -406,11 +426,11 @@ is returned.  If the reviewer is not found, the original string is returned."
 (defun stash-create-pull-request()
   "Opens the browser on the page to create a pull request for the current branch"
   (interactive)
-  (let* ((default-directory (magit-read-top-dir nil))
-         (source-branch (substring (magit-get-tracked-branch) 7))
-         (target-branch "master")
+  (let* ((default-directory (magit-read-repository nil))
          (project "SPCK")
          (repo (car (rassoc default-directory stash-repos)))
+         (source-branch (substring (magit-get-tracked-branch) 7))
+         (target-branch (stash-find-target-branch default-directory (concat "origin/" source-branch)))
          (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch)))
          (tmp-file "/tmp/PULLREQ_EDITMSG"))
     (unless repo
@@ -469,7 +489,7 @@ is returned.  If the reviewer is not found, the original string is returned."
         (repo-dir (assoc-default repo stash-repos))
         (default-directory repo-dir)
         (merge-base (stash-merge-base repo-dir from-branch to-branch)))
-    (magit-diff (cons merge-base from-branch))))
+    (magit-diff (concat merge-base ".." from-branch))))
 
 (defun stash-approve-pull-request()
   "Approve current pull request"
@@ -503,7 +523,7 @@ is returned.  If the reviewer is not found, the original string is returned."
          (default-directory repo-dir)
          (merge-base (stash-merge-base repo-dir from-branch to-branch))
          (default-directory repo-dir))
-    (magit-log (concat merge-base ".." from-branch))))
+    (magit-log (list (concat merge-base ".." from-branch)))))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
