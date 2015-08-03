@@ -22,6 +22,8 @@
                  (const "DoE")
                  (const "Model")
                  (const "_simpack-sfx")
+                 (const "DocSlvScripting")
+                 (const "COMModel")
                   )
   :group 'ma
 )
@@ -34,6 +36,7 @@
                  (const "/scratch/apel/new_arch/obj/opt-g")
                  (const "/scratch/apel/new_arch/obj/gcc-4.8")
                  (const "/scratch/apel/new_arch/obj/gcc-4.9")
+                 (const "/scratch/apel/new_arch/obj/qt5")
                  )
   :group 'ma
 )
@@ -250,15 +253,22 @@
   (jump-to-register 'f)
 )
 
-(defun ma-magit-highlight-own-branches (dummy)
-  "Applies a different face to branch lines, which match a specific regex"
-  (let* ((start (line-beginning-position 0))
-         (end (line-end-position 0))
-         (line (buffer-substring start end)))
-     (when (string-match "^[0-9a-f]+   origin/SPCK-[0-9]+-MAL1-" line)
-       (put-text-property (+ start 10) end 'face 'highlight)
-       )))
+(defface ma-magit-highlight-remote-face
+  '((t :inherit magit-branch-remote
+       :underline t))
+  "Face for highlighting remote branches with specific text in them."
+  :group 'ma)
 
+(defun ma-magit-highlight-own-branch (&rest args)
+  "Highlight branches matching my trigram"
+  (let* ((arglist (car args))
+         (len (length arglist))
+         (arg1 (nth 1 arglist)))
+    (if (and (stringp arg1) (string-match "origin/SPCK-[0-9]+-MAL1-" arg1))
+      (append (butlast arglist (- len 5)) (list 'ma-magit-highlight-remote-face) (last arglist (- len 6)))
+    arglist)))
+
+(advice-add 'magit-insert-branch-1 :filter-args #'ma-magit-highlight-own-branch)
 
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)

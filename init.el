@@ -3,6 +3,13 @@
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
 
+(if work
+    (setq url-proxy-services
+          '(("http" . "192.168.208.216:3128")
+            ("https" . "192.168.208.216:3128")
+            ("no_proxy" . "3ds.com")))
+)
+
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
 
@@ -15,7 +22,7 @@
 
 ;; These two have to be set, before el-get starts
 (setq el-get-emacswiki-base-url "http://www.emacswiki.org/emacs/download/")
-(setq el-get-github-default-url-type (quote git))
+(setq el-get-github-default-url-type (quote https))
 
 (setq el-get-sources
       '((:name tempo
@@ -59,7 +66,6 @@
         (:name magit
                :after
                (progn
-                 (advice-add 'magit-wash-branch-line :after #'ma-magit-highlight-own-branches)
                  (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
                  (global-set-key (kbd "C-c C-z") 'magit-status)))
         (:name mo-git-blame
@@ -109,9 +115,7 @@
                         (desktop-save-mode t)
                         (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
         (:name cmake-mode
-               :after (add-hook 'cmake-mode-hook
-                                '(lambda ()
-                                   (local-set-key [?\C-c ?\C-d] 'cmake-help-command))))
+               :after (setq cmake-tab-width 3))
         (:name idle-highlight-mode)
         (:name auto-complete)
         (:name auto-complete-emacs-lisp
@@ -153,9 +157,10 @@
                         (require 'auto-compile)
                         (auto-compile-on-load-mode 1)
                         (auto-compile-on-save-mode 1)))
+        (:name graphviz-dot-mode)
         (:name diminish
                :after (progn
-                        (eval-after-load "magit" '(diminish 'magit-auto-revert-mode))
+;;                        (eval-after-load "magit" '(diminish 'magit-auto-revert-mode))
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
                         (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
                         (eval-after-load "helm-mode" '(diminish 'helm-mode))
@@ -174,7 +179,7 @@
           (:name org-jira
            :type github
            :pkgname "baohaojun/org-jira"
-           :after (setq jiralib-url "https://jira.intec.dom:8443"))
+           :after (setq jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443"))
           (:name restclient
            :type github
            :pkgname "pashky/restclient.el")
@@ -205,8 +210,8 @@
 (require 'org-toodledo)
 (load "~/.emacs.d/init-org-toodledo")
 
-;; (add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
-;; (require 'excorporate)
+(add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
+(require 'excorporate)
 
 (require 'org-drill)
 (setq org-drill-maximum-duration 5)
@@ -472,14 +477,22 @@
    (quote
     (("10.29.111.1" base "ou=dsdeu050,ou=eu,ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU050,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+ '(magit-cherry-pick-arguments (quote ("--ff -x")))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
+ '(magit-diff-arguments (quote ("--ignore-space-change")))
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
  '(magit-process-popup-time 3)
+ '(magit-refs-sections-hook
+   (quote
+    (magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches)))
  '(magit-repo-dirs
    (quote
     ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation")))
+ '(magit-repository-directories
+   (quote
+    ("/scratch/apel/new_arch" "/scratch/apel/SpckTest" "/scratch/apel/documentation")))
  '(magit-restore-window-configuration t)
  '(magit-rewrite-inclusive nil)
  '(magit-show-child-count t)
@@ -553,8 +566,8 @@
  '(stash-repos
    (quote
     (("spckxxxx" . "/scratch/apel/new_arch/")
-     ("spcktest" . "/scratch2/apel/SpckTest/")
-     ("documentation" . "/scratch2/apel/documentation/"))))
+     ("spcktest" . "/scratch/apel/SpckTest/")
+     ("documentation" . "/scratch/apel/documentation/"))))
  '(stash-reviewer-shortcuts
    (quote
     (("autotest-linux" . "linux")
@@ -602,6 +615,8 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
+ '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
+ '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
  '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
@@ -660,12 +675,12 @@
 
 
 (add-hook 'python-mode-hook
-  '(lambda ()
-     (local-unset-key [?\C-C ?\C-r])
-     (idle-highlight-mode)
-     (which-function-mode)
-     (smartscan-mode)
-     (imenu-add-to-menubar "Functions")))
+          (lambda ()
+            (local-unset-key [?\C-C ?\C-r])
+            (idle-highlight-mode)
+            (which-function-mode)
+            (smartscan-mode)
+            (imenu-add-to-menubar "Functions")))
 
 (add-hook 'shell-mode-hook
           'dirtrack-mode)
@@ -677,15 +692,31 @@
   'executable-make-buffer-file-executable-if-script-p)
 
 (add-hook 'emacs-lisp-mode-hook
-          '(lambda ()
-             (smartscan-mode)
-             (local-set-key (kbd "M-.") 'find-function-other-window)))
+          (lambda ()
+            (smartscan-mode)
+            (local-set-key (kbd "M-.") 'find-function-other-window)))
 
 ;; Workaround for a bug in compilation mode
 (add-hook 'grep-mode-hook
           (lambda()
             (kill-local-variable 'compilation-auto-jump-to-next))
           )
+
+(add-hook 'cmake-mode-hook
+          (lambda ()
+            (local-set-key [?\C-c ?\C-d] 'cmake-help-command)
+            (smartscan-mode)
+            (flyspell-prog-mode)
+            (setq indent-line-function 'indent-relative)
+            (subword-mode t)))
+
+(add-hook 'sh-set-shell-hook
+          (lambda()
+            (when (string-equal sh-shell "tcsh")
+              (progn
+                (require 'csh-mode)
+                (setq-local indent-line-function 'csh-indent-line)
+                (setq-local indent-region-function 'csh-indent-region)))))
 
 (server-start)
 
@@ -701,10 +732,10 @@
 (electric-pair-mode)
 
 (if work-linux
-    (progn
-      (require 'atl-stash)
-      (stash-update-stash-info)
-      (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
-      (run-with-timer 60 60 'stash-update-stash-info)
-      (global-set-key (kbd "C-c p") 'stash-show-pull-requests)
-      ))
+   (progn
+     (require 'atl-stash)
+     (stash-update-stash-info)
+     (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
+     (run-with-timer 60 60 'stash-update-stash-info)
+     (global-set-key (kbd "C-c p") 'stash-show-pull-requests)
+     ))

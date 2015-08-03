@@ -75,6 +75,9 @@ The right hand side is equal to the JSON string returned by Stash for that repos
 for all open pull requests")
 (defvar stash-show-pending nil "t if user initiated a show of all pull requests, while the data was asynchronously retrieved")
 (defvar stash-force-update nil)
+(defvar stash-pull-request-create-finalize-hook nil)
+
+(make-variable-buffer-local 'stash-pull-request-create-finalize-hook)
 
 (defvar stash-mode-map
   (let ((map (make-sparse-keymap)))
@@ -92,6 +95,14 @@ for all open pull requests")
     (define-key map (kbd "TAB") 'stash-pull-request-expand-or-collapse) ;; done
     map)
   "Keymap for Stash mode")
+
+(defvar stash-pull-request-create-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map text-mode-map)
+    (define-key map (kbd "C-c C-c") 'stash-create-pull-request-finalize)
+    (define-key map (kbd "C-c C-k") 'stash-create-pull-request-abort)
+    map)
+  "Keymap for Stash pull request creation mode")
 
 (defface stash-section-title
   '((((class color) (background light))
@@ -127,7 +138,7 @@ for all open pull requests")
 
 (defun stash-update-projects-if-necessary ()
   "Update the list of projects and repositories for stash"
-  (if (or stash-force-update (not (and (floatp stash-last-repo-update) (< (- (float-time) stash-last-repo-update) 3600))))
+  (if (or stash-force-update (not (and (floatp stash-last-repo-update) (< (- (float-time) stash-last-repo-update) 10000))))
       (progn
         (message "Updating Stash project and repository list")
         (setq stash-repo-list nil)
@@ -268,7 +279,8 @@ is returned.  If the reviewer is not found, the original string is returned."
          (id (assoc-default 'id pr))
          (descr (assoc-default 'description pr))
          (reviewer-list (assoc-default 'reviewers pr))
-         (reviewers nil)
+         (reviewers-accepted nil)
+         (reviewers-waiting nil)
          (line "")
          )
     (dotimes (i (length reviewer-list))
@@ -277,11 +289,10 @@ is returned.  If the reviewer is not found, the original string is returned."
                (approved (not (eq (assoc-default 'approved reviewer) :json-false)))
                (text (stash-map-reviewer reviewer-name))
                )
-          (if approved
-              (setq text (concat text "(a)")))
-          (push text reviewers))
-        )
-    (setq line (format "%-13s #%-4d %-9s %-70s  %-s" repo id author title (mapconcat 'identity (sort reviewers 'string<) ",")))
+        (if approved
+            (push text reviewers-accepted)
+          (push text reviewers-waiting))))
+    (setq line (format "%-13s #%-4d %-9s %-70s  Waiting: %-20s  Accepted: %-s" repo id author title (mapconcat 'identity (sort reviewers-waiting 'string<) ",") (mapconcat 'identity (sort reviewers-accepted 'string<) ",")))
     (if (and (not short) descr)
         (setq line (concat line "\n" (replace-regexp-in-string "\r" "" descr) "\n")))
     (propertize line 'pr (stash-pr-to-id pr))))
@@ -431,53 +442,69 @@ is returned.  If the reviewer is not found, the original string is returned."
          (repo (car (rassoc default-directory stash-repos)))
          (source-branch (substring (magit-get-tracked-branch) 7))
          (target-branch (stash-find-target-branch default-directory (concat "origin/" source-branch)))
-         (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch)))
-         (tmp-file "/tmp/PULLREQ_EDITMSG"))
+         (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch))))
     (unless repo
       (user-error "Directory %s is not registered in stash-repos"))
-    (with-temp-file tmp-file
-      (message (concat "Calling git log " merge-base "..origin/" source-branch))
-      (insert (s-join "\n" (magit-git-lines "log" "--format=format:%B" (concat merge-base "..origin/" source-branch))))
-      (goto-char (point-min))
-      (forward-line 1)
-      (insert "\n"))
-    (find-file tmp-file)
-    (add-hook 'git-commit-commit-hook
-              (apply-partially
-               (lambda (editmsg source-branch target-branch project repo)
-                 (with-current-buffer (find-file-noselect editmsg)
-                   (goto-char (point-min))
-                   (let* ((title (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
-                          (descr (buffer-substring-no-properties (line-beginning-position 2) (point-max)))
-                          (url (concat stash-url (format "/rest/api/1.0/projects/%s/repos/%s/pull-requests" project repo)))
-                          (body `(("title" . ,title)
-                                  ("description" . ,descr)
-                                  ("state" . "OPEN")
-                                  ("open" . t)
-                                  ("closed" . ,json-false)
-                                  ("fromRef" .
-                                   (("id" . ,(concat "refs/heads/" source-branch))
-                                   ("repository" .
-                                    (("slug" . ,repo)
-                                     ("name" . ,json-null)
-                                     ("project" . (("key" . ,project)))))))
-                                  ("toRef" .
-                                   (("id" . ,(concat "refs/heads/" target-branch))
-                                   ("repository" .
-                                    (("slug" . ,repo)
-                                     ("name" . ,json-null)
-                                     ("project" . (("key" . ,project)))))))
-                                  ("locked" . ,json-false)))
-                          (body-encoded (json-encode-alist body)))
-                     (request url
-                              :headers stash-access-headers
-                              :type "POST"
-                              :data body-encoded
-                              :parser 'json-read
-                              :sync t)
-                     )))
-               tmp-file source-branch target-branch project repo) nil t)))
+    (set-buffer (get-buffer-create "*Stash Create Pull Request*"))
+    (erase-buffer)
+    (message (concat "Calling git log " merge-base "..origin/" source-branch))
+    (insert (s-join "\n" (magit-git-lines "log" "--format=format:%B" (concat merge-base "..origin/" source-branch))))
+    (goto-char (point-min))
+    (forward-line 1)
+    (insert "\n")
+    (stash-pull-request-create-mode)
+    (add-hook 'stash-pull-request-create-finalize-hook
+              (apply-partially 'stash-post-pull-request
+                               (current-buffer) source-branch target-branch project repo) nil t)
+    (pop-to-buffer (current-buffer))
+    ))
 
+
+(defun stash-post-pull-request(editbuffer source-branch target-branch project repo)
+  (with-current-buffer editbuffer
+    (goto-char (point-min))
+    (let* ((title (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+           (descr (buffer-substring-no-properties (line-beginning-position 2) (point-max)))
+           (url (concat stash-url (format "/rest/api/1.0/projects/%s/repos/%s/pull-requests" project repo)))
+           (body `(("title" . ,title)
+                   ("description" . ,descr)
+                   ("state" . "OPEN")
+                   ("open" . t)
+                   ("closed" . ,json-false)
+                   ("fromRef" .
+                    (("id" . ,(concat "refs/heads/" source-branch))
+                     ("repository" .
+                      (("slug" . ,repo)
+                       ("name" . ,json-null)
+                       ("project" . (("key" . ,project)))))))
+                   ("toRef" .
+                    (("id" . ,(concat "refs/heads/" target-branch))
+                     ("repository" .
+                      (("slug" . ,repo)
+                       ("name" . ,json-null)
+                       ("project" . (("key" . ,project)))))))
+                   ("locked" . ,json-false)))
+           (body-encoded (json-encode-alist body)))
+      (request url
+               :headers stash-access-headers
+               :type "POST"
+               :data body-encoded
+               :parser 'json-read
+               :sync t)
+      )))
+
+(defun stash-create-pull-request-finalize()
+  "Actually create the pull request with the data entered into the current buffer."
+  (interactive)
+  (message "stash-create-pull-request-finalize called")
+  (run-hooks 'stash-pull-request-create-finalize-hook)
+  (kill-buffer (current-buffer)))
+
+(defun stash-create-pull-request-abort()
+  "Abort creating a pull request."
+  (interactive)
+  (message "stash-create-pull-request-abort called")
+  (kill-buffer (current-buffer)))
 
 (defun stash-review-pull-request()
   "Open a magit diff buffer for the current pull request"
@@ -528,6 +555,10 @@ is returned.  If the reviewer is not found, the original string is returned."
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"
   (buffer-disable-undo)
+  )
+
+(define-derived-mode stash-pull-request-create-mode text-mode "Stash Create Pull Request"
+  "Mode to create pull requests in Stash"
   )
 
 (provide 'atl-stash)
