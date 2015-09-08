@@ -27,9 +27,14 @@ Authorization: Basic
 #
 # Retrieve open pull requests
 #
-GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/pull-requests/424
+GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/pull-requests/2534
 Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+Authorization: Basic bWFsMTpXdGhpd3d1Mm4=
+#
+GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/users/MAL1?avatarSize=24
+Content-Type: application/json
+Authorization: Basic bWFsMTpXdGhpd3d1Mm4=
+
 #
 # Retrieve open pull requests
 #
@@ -118,9 +123,9 @@ GET https://jira.intec.dom:8443/rest/api/2/project/SPCK/role
 Content-Type: application/json
 Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 #
-GET https://stash.intec.dom:7990/rest/api/1.0/projects
+GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects
 Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
+Authorization: QmFzaWMgTUFMMTpjYUkxMGV0YQ==
 #
 GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-28418
 Content-Type: application/json
@@ -137,3 +142,9 @@ Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 {
    "name" : "AER3"
 }
+#
+#
+GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/issue/SPCK-40918
+Content-Type: application/json
+Authorization: Basic TUFMMTpEdWt0aWQ0Zw==
+#

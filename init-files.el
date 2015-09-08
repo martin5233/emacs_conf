@@ -32,10 +32,18 @@
  '((python-mode
   (tags-table-list . ("/scratch2/apel/SpckTest/SquishTestSuites/TAGS")))))
 
+(dir-locals-set-class-variables 'runtimetree
+ '((c++-mode
+    (ma-compile-command . "make -C /scratch/apel/runtimetree/obj")
+    (ma-make-target . nil)
+    (ma-build-dir . nil))))
+
+
 
 (dir-locals-set-directory-class  "/scratch/apel/new_arch/develop/" 'new_arch)
 (dir-locals-set-directory-class  "/home/home_dev/apel/llvm_test/" 'llvm_test)
 (dir-locals-set-directory-class  "/scratch2/apel/llvm-3.1.src" 'llvm_src)
 (dir-locals-set-directory-class  "/usr/local/include/llvm" 'llvm_src)
 (dir-locals-set-directory-class  "/home/home_dev/apel/atomic/" 'atomic)
+(dir-locals-set-directory-class  "/scratch/apel/runtimetree/" 'runtimetree)
 (dir-locals-set-directory-class  "/scratch2/apel/SpckTest/SquishTestSuites" 'squish)

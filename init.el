@@ -184,9 +184,10 @@
            :type github
            :pkgname "pashky/restclient.el")
           (:name php-mode-improved
-		 :type http
-		 :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
-		 :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
+                 :type http
+                 :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
+                 :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
+          (:name calfw)
           ))))
 
 (if work-linux
@@ -210,9 +211,6 @@
 (require 'org-toodledo)
 (load "~/.emacs.d/init-org-toodledo")
 
-(add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
-(require 'excorporate)
-
 (require 'org-drill)
 (setq org-drill-maximum-duration 5)
 (setq org-drill-maximum-items-per-session 10)
@@ -226,6 +224,8 @@
  '(ac-modes
    (quote
     (emacs-lisp-mode lisp-mode lisp-interaction-mode slime-repl-mode go-mode java-mode malabar-mode clojure-mode clojurescript-mode scala-mode scheme-mode ocaml-mode tuareg-mode coq-mode haskell-mode agda-mode agda2-mode perl-mode cperl-mode python-mode ruby-mode lua-mode tcl-mode ecmascript-mode javascript-mode js-mode js2-mode php-mode css-mode makefile-mode sh-mode fortran-mode f90-mode ada-mode xml-mode sgml-mode ts-mode sclang-mode verilog-mode qml-mode)))
+ '(appt-audible nil)
+ '(auth-source-debug nil)
  '(auth-sources (quote ("~/.authinfo.gpg")))
  '(auto-revert-check-vc-info nil)
  '(auto-revert-remote-files t)
@@ -359,6 +359,7 @@
                                (float 60))
                             calendar-daylight-time-zone-name))))))
  '(calendar-mark-holidays-flag t)
+ '(calendar-view-diary-initially-flag t)
  '(cc-other-file-alist
    (quote
     (("\\.cc\\'"
@@ -412,6 +413,7 @@
     (desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history)))
  '(desktop-restore-eager 20)
  '(desktop-save (quote ask-if-new))
+ '(diary-file "~/.diary")
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(display-buffer-alist
@@ -432,6 +434,7 @@
  '(eudc-query-form-attributes (quote (name firstname email phone Uid)))
  '(eudc-server "10.29.111.1")
  '(european-calendar-style nil)
+ '(excorporate-configuration "martin.APEL@3ds.com")
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
  '(ff-ignore-include t)
@@ -584,7 +587,9 @@
      ("GHN1" . "GH")
      ("FMK1" . "FM")
      ("MDL2" . "DM")
-     ("CWN1" . "ChW"))))
+     ("CWN1" . "ChW")
+     ("TBN1" . "TB")
+     ("PMK2" . "PM"))))
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
  '(tags-add-tables nil)
@@ -704,7 +709,7 @@
 
 (add-hook 'cmake-mode-hook
           (lambda ()
-            (local-set-key [?\C-c ?\C-d] 'cmake-help-command)
+            (local-set-key [?\C-c ?\C-d] 'cmake-help)
             (smartscan-mode)
             (flyspell-prog-mode)
             (setq indent-line-function 'indent-relative)
@@ -730,6 +735,13 @@
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (electric-pair-mode)
+
+(if work-linux
+    (progn
+      (add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
+      (require 'excorporate)
+      (require 'excorporate-calendar)
+      (excorporate)))
 
 (if work-linux
    (progn

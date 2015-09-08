@@ -24,6 +24,7 @@
                  (const "_simpack-sfx")
                  (const "DocSlvScripting")
                  (const "COMModel")
+                 (const "FortranCoop")
                   )
   :group 'ma
 )
@@ -269,6 +270,14 @@
     arglist)))
 
 (advice-add 'magit-insert-branch-1 :filter-args #'ma-magit-highlight-own-branch)
+
+(defun ma-lowercase-args (&rest args)
+  "Convert all arguments to lowercase"
+  (let ((arg1 (nth 0 args)))
+    (set-text-properties 0 (length arg1) nil arg1)
+    (downcase arg1)))
+
+(advice-add 'cmake-symbol-at-point :filter-return #'ma-lowercase-args)
 
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)

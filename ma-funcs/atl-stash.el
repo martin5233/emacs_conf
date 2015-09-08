@@ -276,6 +276,7 @@ is returned.  If the reviewer is not found, the original string is returned."
   (let* ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr))))
          (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'toRef pr))))
          (title (assoc-default 'title pr))
+         (shortened-title (if (> (length title) 72) (concat (substring title 0 70) "...") title))
          (id (assoc-default 'id pr))
          (descr (assoc-default 'description pr))
          (reviewer-list (assoc-default 'reviewers pr))
@@ -292,7 +293,10 @@ is returned.  If the reviewer is not found, the original string is returned."
         (if approved
             (push text reviewers-accepted)
           (push text reviewers-waiting))))
-    (setq line (format "%-13s #%-4d %-9s %-70s  Waiting: %-20s  Accepted: %-s" repo id author title (mapconcat 'identity (sort reviewers-waiting 'string<) ",") (mapconcat 'identity (sort reviewers-accepted 'string<) ",")))
+    (setq line (format "%-13s #%-4d %-9s %-75s  Waiting: %-20s  Accepted: %-s"
+                       repo id author shortened-title
+                       (mapconcat 'identity (sort reviewers-waiting 'string<) ",")
+                       (mapconcat 'identity (sort reviewers-accepted 'string<) ",")))
     (if (and (not short) descr)
         (setq line (concat line "\n" (replace-regexp-in-string "\r" "" descr) "\n")))
     (propertize line 'pr (stash-pr-to-id pr))))
@@ -496,14 +500,12 @@ is returned.  If the reviewer is not found, the original string is returned."
 (defun stash-create-pull-request-finalize()
   "Actually create the pull request with the data entered into the current buffer."
   (interactive)
-  (message "stash-create-pull-request-finalize called")
   (run-hooks 'stash-pull-request-create-finalize-hook)
   (kill-buffer (current-buffer)))
 
 (defun stash-create-pull-request-abort()
   "Abort creating a pull request."
   (interactive)
-  (message "stash-create-pull-request-abort called")
   (kill-buffer (current-buffer)))
 
 (defun stash-review-pull-request()
