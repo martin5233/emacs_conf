@@ -14,10 +14,11 @@
          (:from-or-to . 30)
          (:subject)))
 (setq mu4e-compose-signature-auto-include nil)
+(setq mu4e-compose-dont-reply-to-self t)
 (setq mu4e-drafts-folder "/Drafts")
 (setq mu4e-get-mail-command "offlineimap")
 (setq mu4e-headers-include-related nil)
-(setq mu4e-html2text-command "w3m -T text/html")
+(setq mu4e-html2text-command "w3m -T text/html -O UTF8")
 (setq mu4e-maildir "/mail")
 (setq mu4e-sent-folder "/Sent")
 (setq mu4e-trash-folder "/Trash")
@@ -41,19 +42,11 @@
   (interactive)
   (unless (mu4e-running-p)
     (mu4e t))
-  (mu4e-headers-search-bookmark (mu4e-get-bookmark-query ?u)))
+  (mu4e-headers-search-bookmark (mu4e-get-bookmark-query ?i)))
 
 (global-set-key [f3] 'ma-switch-to-mu4e)
 
 (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-
-;; (defun ma-mu4e-get-unread-mails-with-bash(old-fn &rest args)
-;;   (let ((old-shell (getenv "SHELL")))
-;;     (setenv "SHELL" "/bin/bash")
-;;     (apply old-fn args)
-;;     (setenv "SHELL" old-shell)))
-
-;; (advice-add 'mu4e-alert--get-mu-unread-mails :around #'ma-mu4e-get-unread-mails-with-bash)
 
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))

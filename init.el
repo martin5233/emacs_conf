@@ -196,7 +196,7 @@
           (:name cmake-ide
                  :after  (progn
                            (require 'rtags)
-                           (setq cmake-ide-dir "/scratch/apel/new_arch/obj/clang")
+                           (setq cmake-ide-dir "/scratch/apel/new_arch/obj/rtags")
                            (add-hook 'kill-emacs-hook 'rtags-quit-rdm t)
                            (cmake-ide-setup)))
           ))))

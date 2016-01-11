@@ -21,16 +21,16 @@
   "mfg"
   "Mit freundlichen Grüßen."
   nil)
-(tempo-define-snippet "mu4e-vg"
+(tempo-define-snippet "mu4e-vgm"
   '("Viele Grüße" n n
       "Martin" n)
-  "vg"
+  "vgm"
   "Viele Grüße."
   nil)
-(tempo-define-snippet "mu4e-hg"
+(tempo-define-snippet "mu4e-hgm"
   '("Herzliche Grüße" n n
       "Martin" n)
-  "hg"
+  "hgm"
   "Herzliche Grüße."
   nil)
 
@@ -44,6 +44,6 @@
             ;; Workaround for bug 14413
             (setq local-abbrev-table message-mode-abbrev-table)
             (tempo-snippets-add-mode-abbrev 'tempo-template-mu4e-mfg "mfg")
-            (tempo-snippets-add-mode-abbrev 'tempo-template-mu4e-vg "vg")
-            (tempo-snippets-add-mode-abbrev 'tempo-template-mu4e-hg "hg")
+            (tempo-snippets-add-mode-abbrev 'tempo-template-mu4e-vgm "vgm")
+            (tempo-snippets-add-mode-abbrev 'tempo-template-mu4e-hgm "hgm")
             ))
