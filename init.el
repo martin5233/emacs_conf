@@ -188,6 +188,17 @@
                  :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
                  :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
           (:name calfw)
+          (:name mu4e
+                 :depends (alert ht))
+          (:name mu4e-alert
+                 :depends (mu4e alert ht s))
+          (:name rtags)
+          (:name cmake-ide
+                 :after  (progn
+                           (require 'rtags)
+                           (setq cmake-ide-dir "/scratch/apel/new_arch/obj/clang")
+                           (add-hook 'kill-emacs-hook 'rtags-quit-rdm t)
+                           (cmake-ide-setup)))
           ))))
 
 (if work-linux
@@ -210,11 +221,6 @@
 (setq load-path (cons (expand-file-name "~/.emacs.d/org-toodledo-master") load-path))
 (require 'org-toodledo)
 (load "~/.emacs.d/init-org-toodledo")
-
-(require 'org-drill)
-(setq org-drill-maximum-duration 5)
-(setq org-drill-maximum-items-per-session 10)
-(setq org-drill-scope 'agenda)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -474,13 +480,13 @@
  '(inhibit-startup-screen t)
  '(js-indent-level 3)
  '(latex-run-command "pdflatex")
- '(ldap-default-base "ou=dsdeu050,ou=eu,ou=dsone,dc=dsone,dc=3ds,dc=com")
+ '(ldap-default-base "ou=dsone,dc=dsone,dc=3ds,dc=com")
  '(ldap-default-host "10.29.111.1")
  '(ldap-host-parameters-alist
    (quote
-    (("10.29.111.1" base "ou=dsdeu050,ou=eu,ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU050,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
+    (("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU050,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
- '(magit-cherry-pick-arguments (quote ("--ff -x")))
+ '(magit-cherry-pick-arguments (quote ("-x")))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
  '(magit-diff-arguments (quote ("--ignore-space-change")))
@@ -500,27 +506,10 @@
  '(magit-rewrite-inclusive nil)
  '(magit-show-child-count t)
  '(make-backup-files nil)
- '(message-from-style (quote default))
- '(message-send-mail-function (quote smtpmail-send-it))
  '(minibuffer-message-timeout 2 t)
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-drill-optimal-factor-matrix
-   (quote
-    ((2
-      (2.7 . 2.691)
-      (2.6 . 2.6)
-      (2.46 . 2.509))
-     (1
-      (2.5 . 4.0)
-      (1.7000000000000002 . 3.44)
-      (2.6 . 4.14)))))
- '(org-export-backends (quote (ascii html icalendar latex md)))
- '(org-toodledo-inhibit-https t)
- '(org-toodledo-password "uENfYn30UIzJZs5f1h4s")
- '(org-toodledo-sync-on-save "yes")
- '(org-toodledo-userid "td50effa7ae84c9")
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
@@ -529,6 +518,9 @@
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
+ '(rtags-enable-unsaved-reparsing nil)
+ '(rtags-reparse-timeout 1000)
+ '(rtags-timeout 1000)
  '(safe-local-variable-values
    (quote
     ((tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
@@ -561,8 +553,6 @@
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote parenthesis))
- '(smtpmail-local-domain "3ds.com")
- '(smtpmail-smtp-server "mailhost.emea.3ds.com")
  '(split-height-threshold 40)
  '(split-width-threshold 200)
  '(standard-indent 3)
@@ -590,6 +580,7 @@
      ("CWN1" . "ChW")
      ("TBN1" . "TB")
      ("PMK2" . "PM"))))
+ '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
  '(tags-add-tables nil)
@@ -736,12 +727,12 @@
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (electric-pair-mode)
 
-(if work-linux
-    (progn
-      (add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
-      (require 'excorporate)
-      (require 'excorporate-calendar)
-      (excorporate)))
+;; (if work-linux
+;;     (progn
+;;       (add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
+;;       (require 'excorporate)
+;;       (require 'excorporate-calendar)
+;;       (excorporate)))
 
 (if work-linux
    (progn

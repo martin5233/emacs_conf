@@ -15,32 +15,6 @@
     )
 )
 
-(defun ma-org-get-attachments ()
-  "Retrieve the attachments of the current entry into a directory named ~/devs/<DevIssue-Id>
-   and insert a link to this directory for the current entry"
-  (interactive)
-  (let* ((headline (nth 4 (org-heading-components)))
-         (matched (string-match "^\\(\\[#[A-C]\\]\\)?\\([0-9]+\\):" headline))
-         (dev-id (match-string 2 headline))
-         (dir (concat "~/devs/" dev-id))
-         (link (format "[[file:%s][%s]]" dir dev-id))
-         )
-    (progn
-      ;; delete directory if it already exists
-      (if (file-directory-p dir)
-          (delete-directory dir t))
-      (shell-command (concat "~/perl/download_mks_attachments.pl " dev-id))
-      (save-excursion
-        (while (not (org-at-heading-p))
-          (forward-line -1))
-        (beginning-of-line)
-        (replace-string dev-id link nil (line-beginning-position) (line-end-position))
-        )
-      )
-    )
-)
-
-
 (if work-linux
     (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/ownCloud/private.org")))
   (when home
@@ -51,7 +25,7 @@
     (("w" "Work agenda only" agenda ""
       ((org-agenda-files
         (quote
-         ("~/org/na.org" "~/org/devs.org")))))
+         ("~/org/na.org")))))
      ("h" "Home agenda only" agenda ""
       ((org-agenda-files
         (quote
@@ -63,34 +37,25 @@
           (quote scheduled)
           (quote nottodo)
           (quote todo))))))
-     ("r" "Activities to report" tags "REPORT"
-      ((org-agenda-remove-tags t)
-       (org-agenda-prefix-format "")
-       (org-agenda-todo-keyword-format "%-17s")
-       (ps-landscape-mode t)
-       (ps-number-of-columns 1))
-      ("~/org/Activities.pdf")))))
+     )))
 
 (setq org-agenda-repeating-timestamp-show-all nil)
 (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
 (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 (setq org-agenda-start-on-weekday nil)
 (setq org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
+(setq org-export-backends (quote (ascii html icalendar latex md)))
 (setq org-capture-templates
    (quote
-    (("d" "DevIssue from MKS" entry
-      (file "~/org/devs.org")
-      "* ASSIGNED %:description  :REPORT:
-%:initial
-" :immediate-finish t)
-     ("g" "General" entry
+    (("g" "General" entry
       (file+olp "~/org/na.org" "Unsorted")
       "** TODO %?")
      ("m" "TODO from Mail" entry
-      (file+olp "~/org/na.org" "Unsorted")
-      "** TODO %a" :immediate-finish t))))
+      (file+headline "~/org/na.org" "Mail")
+      "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
 (setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
 (setq sorg-scheduled-past-days 5)
 (setq org-sort-agenda-notime-is-late nil)
 
 (global-set-key [?\C-c ?a]    'org-agenda)
+(global-set-key [?\C-c ?C]    'org-capture)

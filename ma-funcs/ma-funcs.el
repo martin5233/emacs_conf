@@ -174,6 +174,7 @@
    summary
    body
    '(:array)
+;;   '(:array :signature "{sv}" (:dict-entry "transient" (:variant t)))
    '(:array :signature "{sv}")
    ':int32 timeout))
 
@@ -314,5 +315,21 @@ not, a copyright comment is inserted at the start of the file."
 (defun ma-insert-random-uuid()
   (interactive)
   (insert (uuid)))
+
+(defun ma-offlineimap-get-password (host)
+  (let* ((auth-source-creation-prompts '((user . "Offlineimap user at %h: ")
+                                         (secret . "Offlineimap Password: ")))
+         (found (nth 0 (auth-source-search :max 1
+                                           :host host
+                                           :require '(:user :secret)
+                                           :create t))))
+    (if found
+        (let* ((secret (plist-get found :secret))
+               (password (if (functionp secret) (funcall secret) secret))
+               (save-func (plist-get found :save-function)))
+          (when (functionp save-func)
+            (funcall save-func))
+          password)
+      nil)))
 
 (provide 'ma-funcs)
