@@ -54,11 +54,7 @@
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
                :features http-post-simple)
-        ;; (:name org-toodledo
-        ;;  :type github
-        ;;  :pkgname "christopherjwhite/org-toodledo"
-        ;;  :features org-toodledo
-        ;;  :depends (org-mode http-post-simple))
+        (:name org-toodledo)
         (:name uniquify
                :type builtin
                :features uniquify
@@ -107,10 +103,8 @@
                                   (local-set-key (kbd "M-<left>") 'subword-backward)
                                   (local-set-key (kbd "M-<right>") 'subword-forward)
                                   (subword-mode t))))
-        ;;   (:name ma-funcs
         (:name desktop
                :type builtin
-               ;;    :depends ma-funcs
                :after (progn
                         (desktop-save-mode t)
                         (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
@@ -216,11 +210,6 @@
 
 (add-to-list 'load-path "~/.emacs.d/ma-funcs")
 (require 'ma-funcs)
-
-;; For some strange reason org-toodledo does not play well with el-get
-(setq load-path (cons (expand-file-name "~/.emacs.d/org-toodledo-master") load-path))
-(require 'org-toodledo)
-(load "~/.emacs.d/init-org-toodledo")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -523,31 +512,9 @@
  '(rtags-timeout 1000)
  '(safe-local-variable-values
    (quote
-    ((tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
-     (tags-table-list quote
-                      ("/scratch/apel/new_arch/.tags"))
-     (tags-file-name . "/scratch2/apel/llvm-3.1.src/TAGS")
-     (tags-file-name . "/scratch2/apel/llvm-3.0.src/TAGS")
-     (tags-file-name . "/scratch/apel/new_arch/.tags")
-     (tags-file-name "/scratch2/apel/llvm-3.0.src/TAGS")
-     (tags-file-name "/scratch/apel/new_arch/.tags")
-     (tags-table-list "/scratch2/apel/llvm-3.0.src/TAGS")
-     (tags-table-list "/scratch/apel/new_arch/.tags")
-     (tags-table-list
-      (quote
-       ("/scratch/apel/new_arch/.tags")))
-     (tags-table-list
-      (quote
-       ("/scratch2/apel/llvm-3.0.src/TAGS")))
-     (ma-build-dir)
-     (ma-make-target)
-     (ma-make-target . undef)
-     (crontab-host . build-linux)
-     (crontab-host . redhat64)
-     (crontab-apply-after-save . t)
-     (ma-compile-command . "~/bin/my_compile")
-     (ma-compile-command . "make -C /home/home_dev/MAL1/llvm_test/obj")
-     (after-revert-hook . ma-sync-toodledo-after-revert))))
+    ((tags-table-list "/scratch/apel/new_arch/.tags")
+     (after-revert-hook . ma-sync-toodledo-after-revert)
+     (auto-revert-mode . t))))
  '(save-abbrevs nil)
  '(scroll-bar-mode (quote right))
  '(send-mail-function nil)

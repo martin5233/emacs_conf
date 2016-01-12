@@ -48,5 +48,9 @@
 
 (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 
+(add-hook 'mu4e-compose-mode-hook
+          (lambda()
+            (flyspell-mode 1)))
+
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))
