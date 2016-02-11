@@ -22,7 +22,7 @@
 
 (setq org-agenda-custom-commands
    (quote
-    (("w" "Work agenda only" agenda ""
+    (("w" "Work agenda only" alltodo ""
       ((org-agenda-files
         (quote
          ("~/org/na.org")))))

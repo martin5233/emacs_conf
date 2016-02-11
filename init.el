@@ -1,3 +1,6 @@
+
+(package-initialize)
+
 (setq home (string-match "^martin$" (user-login-name)))
 (setq work-linux (and (string-match "^mal1$" (user-login-name)) (string-equal system-type "gnu/linux")))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
@@ -482,6 +485,7 @@
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
  '(magit-process-popup-time 3)
+ '(magit-pull-arguments (quote ("--rebase")))
  '(magit-refs-sections-hook
    (quote
     (magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches)))
@@ -512,9 +516,23 @@
  '(rtags-timeout 1000)
  '(safe-local-variable-values
    (quote
-    ((tags-table-list "/scratch/apel/new_arch/.tags")
-     (after-revert-hook . ma-sync-toodledo-after-revert)
-     (auto-revert-mode . t))))
+    ((tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
+     (tags-table-list quote
+                      ("/scratch/apel/new_arch/.tags"))
+     (tags-table-list
+      (quote
+       ("/scratch/apel/new_arch/.tags")))
+     (tags-table-list
+      (quote
+       ("/scratch2/apel/llvm-3.0.src/TAGS")))
+     (ma-build-dir)
+     (ma-make-target)
+     (ma-make-target . undef)
+     (crontab-host . build-linux)
+     (crontab-host . redhat64)
+     (crontab-apply-after-save . t)
+     (ma-compile-command . "~/bin/my_compile")
+     (ma-compile-command . "make -C /home/home_dev/MAL1/llvm_test/obj"))))
  '(save-abbrevs nil)
  '(scroll-bar-mode (quote right))
  '(send-mail-function nil)

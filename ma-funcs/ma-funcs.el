@@ -16,15 +16,14 @@
                  (const "ParserTest")
                  (const "RWCmpTest")
                  (const "simpack-post")
-                 (const "fat4fem")
                  (const "_simpack-doe-master")
                  (const "GUIUtils")
                  (const "DoE")
                  (const "Model")
                  (const "_simpack-sfx")
-                 (const "DocSlvScripting")
+                 (const "DocQtScript")
+                 (const "DocCOMInterface")
                  (const "COMModel")
-                 (const "FortranCoop")
                   )
   :group 'ma
 )
@@ -274,7 +273,7 @@
 (add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
 (add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
 
-(defconst ma-simpack-copyright "Copyright (c) SIMPACK GmbH")
+(defconst ma-simpack-copyright "Copyright Dassault Systemes Simulia Corp.")
 (defcustom ma-skip-copyright nil "Skip copyright update upon save, if set"
   :type 'boolean)
 (make-variable-buffer-local 'ma-skip-copyright)
@@ -285,7 +284,7 @@ If one exists, it is updated to the correct formatting, if necessary.  If
 not, a copyright comment is inserted at the start of the file."
   (when (and (string= major-mode "c++-mode") (not ma-skip-copyright))
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (let ((pos (re-search-forward "Copyright " 1000 t)))
         (if pos
             (let* ((copyright-start (- pos 10))
@@ -299,7 +298,7 @@ not, a copyright comment is inserted at the start of the file."
                 (kill-line)
                 (insert ma-simpack-copyright)))
           (progn
-            (beginning-of-buffer)
+            (goto-char (point-min))
             (insert (concat "/*\n * " ma-simpack-copyright "\n */\n"))
             ))))))
 

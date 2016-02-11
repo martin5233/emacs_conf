@@ -18,14 +18,16 @@
 (setq mu4e-drafts-folder "/Drafts")
 (setq mu4e-get-mail-command "offlineimap")
 (setq mu4e-headers-include-related nil)
+(setq mu4e-hide-index-messages t)
 (setq mu4e-html2text-command "w3m -T text/html -O UTF8")
 (setq mu4e-maildir "/mail")
 (setq mu4e-sent-folder "/Sent")
-(setq mu4e-trash-folder "/Trash")
+(setq mu4e-trash-folder "/Deleted Items")
 (setq mu4e-update-interval 120)
 (setq mu4e-use-fancy-chars t)
 (setq mu4e-view-prefer-html t)
 (setq mu4e-view-show-images t)
+(setq mu4e-user-mail-address-list '("martin.apel@3ds.com"))
 (add-to-list 'mu4e-view-actions
              '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
@@ -46,11 +48,39 @@
 
 (global-set-key [f3] 'ma-switch-to-mu4e)
 
+(setq mu4e-alert-email-notification-types '(count))
+(setq mu4e-alert-style 'notifications)
+(setq mu4e-alert-interesting-mail-query "flag:unread AND NOT flag:trashed AND NOT maildir:/Devel.cron")
 (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+(add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+
+(defun ma-mu4e-set-spell-language()
+  "Run from mu4e-compose-mode-hook to set the language dictionary based on the addressee."
+  (require 'eudc)
+  (let ((msg (mu4e-message-at-point 'noerror)))
+  (if mu4e-compose-parent-message
+      (let ((to (mapcar 'cdr (mu4e-message-field mu4e-compose-parent-message :to)))
+            (countries nil))
+        (dolist (i to)
+          (let* ((query-result (eudc-query (list (cons 'email i))))
+                 (country (assoc-default 'c (car query-result))))
+            (setq countries (append countries (list country)))))
+        (delete-dups countries)
+;; If the country could not be determined for one recipient or the list is empty, the user has to manually set the language
+        (if (or (memq nil countries) (null countries) (> (length countries) 1))
+            (ispell-change-dictionary (mu4e-read-option "Choose dictionary: "
+                                                        '(("German" . "de-neu") ("English" . "en_US"))))
+          (if (string-equal (car countries) "DE")
+              (ispell-change-dictionary "de-neu")
+            (ispell-change-dictionary "en_US")))
+        )
+    (ispell-change-dictionary (mu4e-read-option "Choose dictionary: "
+                                                '(("German" . "de-neu") ("English" . "en_US")))))))
 
 (add-hook 'mu4e-compose-mode-hook
           (lambda()
-            (flyspell-mode 1)))
+            (flyspell-mode 1)
+            (ma-mu4e-set-spell-language)))
 
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))
