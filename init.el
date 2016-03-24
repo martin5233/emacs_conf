@@ -1,17 +1,9 @@
-
 (package-initialize)
 
 (setq home (string-match "^martin$" (user-login-name)))
-(setq work-linux (and (string-match "^mal1$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-linux (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
-
-(if work
-    (setq url-proxy-services
-          '(("http" . "192.168.208.216:3128")
-            ("https" . "192.168.208.216:3128")
-            ("no_proxy" . "3ds.com")))
-)
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
@@ -62,7 +54,11 @@
                :type builtin
                :features uniquify
                :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+        (:name with-editor)
+        (:name dash)
         (:name magit
+               :checkout "2.5.0"
+               :depends (with-editor dash)
                :after
                (progn
                  (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
@@ -121,6 +117,10 @@
         (:name json-mode
                :depends json-snatcher)
         (:name markdown-mode)
+        (:name levenshtein
+               :type http
+               :url "http://www.emacswiki.org/emacs/download/levenshtein.el"
+               )
         (:name anchored-transpose
                :type http
                :url "http://www.emacswiki.org/emacs/download/anchored-transpose.el"
@@ -201,11 +201,13 @@
 (if work-linux
     (setq el-get-sources
      (append el-get-sources
-        '((:name doxymacs)
-	  (:name uuid
-		 :type http
-		 :url "http://www.emacswiki.org/emacs/download/uuid.el")
-	  ))))
+             '(
+               (:name doxymacs)
+               (:name uuid
+                      :type http
+                      :url "http://www.emacswiki.org/emacs/download/uuid.el")
+;;                (:name excorporate)
+               ))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
 
@@ -396,6 +398,9 @@
  '(comment-style (quote plain))
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
+ '(compilation-error-regexp-alist
+   (quote
+    (bash java gcc-include gnu perl php perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness)))
  '(compilation-read-command nil)
  '(compilation-scroll-output (quote first-error))
  '(compilation-search-path (quote ("/scratch/apel/new_arch")))
@@ -432,7 +437,6 @@
  '(eudc-query-form-attributes (quote (name firstname email phone Uid)))
  '(eudc-server "10.29.111.1")
  '(european-calendar-style nil)
- '(excorporate-configuration "martin.APEL@3ds.com")
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
  '(ff-ignore-include t)
@@ -512,11 +516,27 @@
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(rtags-enable-unsaved-reparsing nil)
+ '(rtags-jump-to-first-match nil)
  '(rtags-reparse-timeout 1000)
  '(rtags-timeout 1000)
+ '(rtags-use-helm t)
  '(safe-local-variable-values
    (quote
-    ((tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
+    ((eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
+           (add-hook
+            (quote write-contents-functions)
+            (lambda nil
+              (delete-trailing-whitespace)
+              nil))
+           (require
+            (quote whitespace))
+           "Sometimes the mode needs to be toggled off and on."
+           (whitespace-mode 0)
+           (whitespace-mode 1))
+     (whitespace-line-column . 80)
+     (whitespace-style face tabs trailing lines-tail)
+     (tags-table-list "/scratch/apel/new_arch/.tags")
+     (tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
      (tags-table-list quote
                       ("/scratch/apel/new_arch/.tags"))
      (tags-table-list
@@ -538,6 +558,7 @@
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
  '(show-paren-style (quote parenthesis))
+ '(smartscan-symbol-selector "symbol")
  '(split-height-threshold 40)
  '(split-width-threshold 200)
  '(standard-indent 3)
@@ -598,6 +619,9 @@
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
  '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
+ '(rtags-errline ((t (:background "orange red"))))
+ '(rtags-fixitline ((t (:background "goldenrod4
+"))))
  '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
@@ -711,13 +735,6 @@
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (electric-pair-mode)
-
-;; (if work-linux
-;;     (progn
-;;       (add-to-list 'load-path "~/.emacs.d/excorporate-0.6.0")
-;;       (require 'excorporate)
-;;       (require 'excorporate-calendar)
-;;       (excorporate)))
 
 (if work-linux
    (progn

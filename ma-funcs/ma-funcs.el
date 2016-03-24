@@ -100,7 +100,7 @@
   (let ((p (get-process "assistant")))
     (if p
         (process-send-string p (concat "activateKeyword " (current-word) "\n"))
-        (let ((q (start-process "assistant" nil "spckAssistant" "-enableRemoteControl")))
+        (let ((q (start-process "assistant" nil "/home/home_dev/MAL1/bin/Linux/spckAssistant" "-enableRemoteControl")))
           (process-send-string q (concat "activateKeyword " (current-word) "\n")))
         )
     )

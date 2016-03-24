@@ -10,3 +10,4 @@
 (setq safe-local-variable-values (list (cons 'after-revert-hook 'ma-sync-toodledo-after-revert)
                                        (cons 'auto-revert-mode t)))
 (find-file-noselect "~/ownCloud/private.org")
+(org-toodledo-make-lookup-function "context")

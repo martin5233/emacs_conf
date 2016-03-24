@@ -44,7 +44,8 @@
   (interactive)
   (unless (mu4e-running-p)
     (mu4e t))
-  (mu4e-headers-search-bookmark (mu4e-get-bookmark-query ?i)))
+  (mu4e-headers-search-bookmark (mu4e-get-bookmark-query ?i))
+  (mu4e-headers-change-sorting :date 'ascending))
 
 (global-set-key [f3] 'ma-switch-to-mu4e)
 
