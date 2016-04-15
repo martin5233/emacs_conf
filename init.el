@@ -5,6 +5,13 @@
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
 
+(if work-linux
+    (setq url-proxy-services
+          '(("http" . "localhost:3128")
+            ("https" . "localhost:3128")
+            ("no_proxy" . "3ds.com")))
+)
+
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
 
@@ -203,6 +210,7 @@
      (append el-get-sources
              '(
                (:name doxymacs)
+               (:name erc)
                (:name uuid
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
@@ -430,6 +438,11 @@
  '(emacs-lisp-mode-hook
    (quote
     (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
+ '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE")))
+ '(erc-minibuffer-notice t)
+ '(erc-modules
+   (quote
+    (autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring smiley stamp spelling track)))
  '(erc-nick "martin")
  '(erc-server "localhost")
  '(erc-user-full-name "Martin Apel")
@@ -511,6 +524,7 @@
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("marmalade" . "http://marmalade-repo.org/packages/"))))
+ '(package-selected-packages (quote (nil)))
  '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)

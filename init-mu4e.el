@@ -28,6 +28,7 @@
 (setq mu4e-view-prefer-html t)
 (setq mu4e-view-show-images t)
 (setq mu4e-user-mail-address-list '("martin.apel@3ds.com"))
+(setq mu4e-attachment-dir "/tmp")
 (add-to-list 'mu4e-view-actions
              '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
