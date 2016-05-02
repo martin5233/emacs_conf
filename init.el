@@ -192,23 +192,23 @@
                  :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
                  :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
           (:name calfw)
-          (:name mu4e
-                 :depends (alert ht))
-          (:name mu4e-alert
-                 :depends (mu4e alert ht s))
-          (:name rtags)
-          (:name cmake-ide
-                 :after  (progn
-                           (require 'rtags)
-                           (setq cmake-ide-dir "/scratch/apel/new_arch/obj/rtags")
-                           (add-hook 'kill-emacs-hook 'rtags-quit-rdm t)
-                           (cmake-ide-setup)))
           ))))
 
 (if work-linux
     (setq el-get-sources
      (append el-get-sources
              '(
+               (:name mu4e
+                      :depends (alert ht))
+               (:name mu4e-alert
+                      :depends (mu4e alert ht s))
+               (:name rtags)
+               (:name cmake-ide
+                      :after  (progn
+                                (require 'rtags)
+                                (setq cmake-ide-dir "/scratch/apel/new_arch/obj/rtags")
+                                (add-hook 'kill-emacs-hook 'rtags-quit-rdm t)
+                                (cmake-ide-setup)))
                (:name doxymacs)
                (:name erc)
                (:name uuid
@@ -408,7 +408,7 @@
  '(compilation-auto-jump-to-first-error t)
  '(compilation-error-regexp-alist
    (quote
-    (bash java gcc-include gnu perl php perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness)))
+    (bash java gcc-include gnu perl php perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness maven)))
  '(compilation-read-command nil)
  '(compilation-scroll-output (quote first-error))
  '(compilation-search-path (quote ("/scratch/apel/new_arch")))
@@ -501,6 +501,7 @@
  '(magit-diff-arguments (quote ("--ignore-space-change")))
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
+ '(magit-log-arguments (quote ("-n20")))
  '(magit-process-popup-time 3)
  '(magit-pull-arguments (quote ("--rebase")))
  '(magit-refs-sections-hook

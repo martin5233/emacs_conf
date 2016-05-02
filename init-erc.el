@@ -28,6 +28,6 @@
 (add-hook 'erc-join-hook 'ma-bitlbee-identify)
 
 (erc :server "localhost" :nick "martin" :password "")
-(setq erc-autoaway-idle-seconds 900)
+(setq erc-autoaway-idle-seconds 1800)
 (setq erc-minibuffer-notice nil)
 (setq erc-autoaway-message "Away")

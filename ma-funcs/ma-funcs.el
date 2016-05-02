@@ -148,16 +148,33 @@
   (compile comp-command)
 )
 
+(defun ma-run-atlas-package ()
+  "Run atlassian-package on top-level directory the current buffer belongs to"
+  (interactive)
+  (let ((cur-dir default-directory))
+    (while (and (not (string-equal cur-dir "/")) (not (file-exists-p (concat cur-dir "pom.xml"))))
+      (setq cur-dir (file-name-directory (directory-file-name cur-dir))))
+    (let ((default-directory cur-dir))
+      (compile "atlas-package"))))
+
 (add-hook 'cmake-mode-hook
 	  (lambda ()
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
 
-(add-hook 'c-mode-common-hook
+(add-hook 'c-mode-hook
 	  (lambda ()
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
 
+(add-hook 'c++-mode-hook
+	  (lambda ()
+	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
+
+(add-hook 'java-mode-hook
+          (lambda()
+            (local-set-key [?\C-c ?\C-c] 'ma-run-atlas-package)))
 
 (require 'notifications)
 (defun ma-send-desktop-notification (summary body timeout)
