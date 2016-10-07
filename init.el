@@ -5,12 +5,12 @@
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
 
-(if work-linux
-    (setq url-proxy-services
-          '(("http" . "localhost:3128")
-            ("https" . "localhost:3128")
-            ("no_proxy" . "3ds.com")))
-)
+;; (if work-linux
+;;     (setq url-proxy-services
+;;           '(("http" . "localhost:3128")
+;;             ("https" . "localhost:3128")
+;;             ("no_proxy" . "3ds.com")))
+;; )
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
@@ -117,9 +117,9 @@
         (:name cmake-mode
                :after (setq cmake-tab-width 3))
         (:name idle-highlight-mode)
-        (:name auto-complete)
-        (:name auto-complete-emacs-lisp
-               :depends auto-complete)
+;;         (:name auto-complete)
+;;         (:name auto-complete-emacs-lisp
+;;                :depends auto-complete)
         (:name json-snatcher)
         (:name json-mode
                :depends json-snatcher)
@@ -176,10 +176,11 @@
      (append el-get-sources
         '((:name filecache
            :type builtin)
-          (:name ac-etags
-           :type github
-           :pkgname "syohex/emacs-ac-etags"
-           :after (ac-etags-setup))
+;;           (:name ac-etags
+;;            :type github
+;;            :pkgname "syohex/emacs-ac-etags"
+;;            :after (ac-etags-setup))
+          (:name company-mode)
           (:name org-jira
            :type github
            :pkgname "baohaojun/org-jira"
@@ -202,15 +203,20 @@
                       :depends (alert ht))
                (:name mu4e-alert
                       :depends (mu4e alert ht s))
-               (:name rtags)
+               (:name rtags
+                      :after (progn
+                               (setq rtags-autostart-diagnostics t)
+                               (rtags-diagnostics)
+                               (setq rtags-completions-enabled t)))
+               (:name popup)
                (:name cmake-ide
                       :after  (progn
                                 (require 'rtags)
                                 (setq cmake-ide-dir "/scratch/apel/new_arch/obj/rtags")
-                                (add-hook 'kill-emacs-hook 'rtags-quit-rdm t)
                                 (cmake-ide-setup)))
                (:name doxymacs)
-               (:name erc)
+               (:name erc
+                      :type builtin)
                (:name uuid
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
@@ -223,6 +229,10 @@
 
 (add-to-list 'load-path "~/.emacs.d/ma-funcs")
 (require 'ma-funcs)
+
+(add-to-list 'load-path "~/.emacs.d/ttl-mode")
+(autoload 'ttl-mode "ttl-mode")
+(add-to-list 'auto-mode-alist '("\\.\\(n3\\|ttl\\|trig\\)\\'" . ttl-mode))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -403,6 +413,8 @@
  '(cc-search-directories
    (quote
     ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa")))
+ '(cmake-ide-rc-executable "/usr/local/bin/rc")
+ '(cmake-ide-rdm-executable "/usr/local/bin/rdm")
  '(comment-style (quote plain))
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
@@ -442,8 +454,9 @@
  '(erc-minibuffer-notice t)
  '(erc-modules
    (quote
-    (autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands readonly ring smiley stamp spelling track)))
+    (autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands notifications readonly ring smiley stamp spelling track)))
  '(erc-nick "martin")
+ '(erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
  '(erc-server "localhost")
  '(erc-user-full-name "Martin Apel")
  '(eudc-protocol (quote ldap))
@@ -463,6 +476,9 @@
  '(gdb-show-main t)
  '(git-commit-summary-max-length 72)
  '(global-auto-revert-mode t)
+ '(gnutls-trustfiles
+   (quote
+    ("/etc/ssl/certs/ca-certificates.crt" "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/ca-bundle.pem" "/usr/ssl/certs/ca-bundle.crt" "/usr/local/share/certs/ca-root-nss.crt" "/home/home_dev/MAL1/SIMPACK_CA.cer")))
  '(gud-tooltip-mode t)
  '(guide-key-mode t)
  '(guide-key/guide-key-sequence (quote ("C-x r")))
@@ -493,7 +509,7 @@
  '(ldap-default-host "10.29.111.1")
  '(ldap-host-parameters-alist
    (quote
-    (("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU050,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
+    (("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU057,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
  '(magit-cherry-pick-arguments (quote ("-x")))
  '(magit-commit-extend-override-date t)
@@ -501,7 +517,7 @@
  '(magit-diff-arguments (quote ("--ignore-space-change")))
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
- '(magit-log-arguments (quote ("-n20")))
+ '(magit-log-arguments (quote ("--decorate" "-n20")))
  '(magit-process-popup-time 3)
  '(magit-pull-arguments (quote ("--rebase")))
  '(magit-refs-sections-hook
@@ -530,8 +546,11 @@
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
+ '(rtags-autostart-diagnostics t)
  '(rtags-enable-unsaved-reparsing nil)
  '(rtags-jump-to-first-match nil)
+ '(rtags-path "/usr/local/bin")
+ '(rtags-rc-log-enabled t)
  '(rtags-reparse-timeout 1000)
  '(rtags-timeout 1000)
  '(rtags-use-helm t)
@@ -634,9 +653,10 @@
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
  '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
- '(rtags-errline ((t (:background "orange red"))))
+ '(rtags-errline ((t (:background "dark orange"))))
  '(rtags-fixitline ((t (:background "goldenrod4
 "))))
+ '(rtags-skippedline ((t (:background "white smoke"))))
  '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
@@ -737,6 +757,11 @@
                 (require 'csh-mode)
                 (setq-local indent-line-function 'csh-indent-line)
                 (setq-local indent-region-function 'csh-indent-region)))))
+
+(add-hook 'prog-mode-hook
+          (lambda()
+            (if (tramp-tramp-file-p (buffer-file-name (current-buffer)))
+                (set (make-local-variable 'rtags-enabled) nil))))
 
 (server-start)
 

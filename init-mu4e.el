@@ -22,7 +22,12 @@
 (setq mu4e-html2text-command "w3m -T text/html -O UTF8")
 (setq mu4e-maildir "/mail")
 (setq mu4e-sent-folder "/Sent")
-(setq mu4e-trash-folder "/Deleted Items")
+(setq mu4e-trash-folder
+      (lambda (msg)
+        (if (and msg
+                 (string-prefix-p "[JIRA]" (mu4e-message-field msg :subject)))
+            "/Devel.JIRA"
+          "/Deleted Items")))
 (setq mu4e-update-interval 120)
 (setq mu4e-use-fancy-chars t)
 (setq mu4e-view-prefer-html t)
@@ -52,7 +57,7 @@
 
 (setq mu4e-alert-email-notification-types '(count))
 (setq mu4e-alert-style 'notifications)
-(setq mu4e-alert-interesting-mail-query "flag:unread AND NOT flag:trashed AND NOT maildir:/Devel.cron")
+(setq mu4e-alert-interesting-mail-query "flag:unread AND NOT flag:trashed AND NOT maildir:/Devel.cron AND NOT maildir:\"/Deleted Items\"")
 (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
 

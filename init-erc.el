@@ -29,5 +29,6 @@
 
 (erc :server "localhost" :nick "martin" :password "")
 (setq erc-autoaway-idle-seconds 1800)
-(setq erc-minibuffer-notice nil)
 (setq erc-autoaway-message "Away")
+(setq erc-notifications-mode t)
+(setq erc-track-showcount t)

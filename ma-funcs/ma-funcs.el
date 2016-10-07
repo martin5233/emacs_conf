@@ -10,33 +10,29 @@
   "Make target for SIMPACK builds"
   :type '(choice (const "world")
                  (const "simpack-gui")
+                 (const "simpack-gui-runtime")
                  (const "simpack-slv")
+                 (const "simpack-slv-runtime")
                  (const "solver")
                  (const "DoRunTests")
                  (const "ParserTest")
                  (const "RWCmpTest")
-                 (const "simpack-post")
-                 (const "_simpack-doe-master")
-                 (const "GUIUtils")
-                 (const "DoE")
-                 (const "Model")
-                 (const "_simpack-sfx")
                  (const "DocQtScript")
                  (const "DocCOMInterface")
                  (const "COMModel")
+                 (const "CppAPIHeader")
                   )
   :group 'ma
 )
 
-(defcustom ma-build-dir "/scratch/apel/new_arch/obj/32"
+(defcustom ma-build-dir "/scratch/apel/new_arch/obj/64"
   "Build directory for SIMPACK builds"
-  :type '(choice (const "/scratch/apel/new_arch/obj/32")
+  :type '(choice (const "/scratch/apel/new_arch/obj/64")
+                 (const "/scratch/apel/new_arch/obj/dbg64")
+                 (const "/scratch/apel/new_arch/obj/opt-g64")
+                 (const "/scratch/apel/new_arch/obj/32")
                  (const "/scratch/apel/new_arch/obj/dbg32")
-                 (const "/scratch/apel/new_arch/obj/64")
                  (const "/scratch/apel/new_arch/obj/opt-g")
-                 (const "/scratch/apel/new_arch/obj/gcc-4.8")
-                 (const "/scratch/apel/new_arch/obj/gcc-4.9")
-                 (const "/scratch/apel/new_arch/obj/qt5")
                  )
   :group 'ma
 )
@@ -148,6 +144,24 @@
   (compile comp-command)
 )
 
+(defun ma-compile-file ()
+  "Run compilation of current file"
+  (interactive)
+  (if (boundp 'ma-compile-command)
+      (setq comp-command ma-compile-command)
+    (setq comp-command "~/bin/my_compile"))
+  (when (not (boundp 'ma-build-dir))
+    (error "Build directory is not set"))
+  (let* ((rel-name (file-relative-name (buffer-file-name) "/scratch/apel/new_arch/develop"))
+         (filename-in-build-dir (concat ma-build-dir "/" rel-name))
+         (obj-dir (file-name-directory filename-in-build-dir)))
+    (while (not (file-exists-p (concat obj-dir "CMakeFiles")))
+      (setq obj-dir (file-name-directory (directory-file-name obj-dir))))
+    (setq rel-name (concat (file-name-sans-extension (file-relative-name filename-in-build-dir obj-dir)) ".o"))
+      (setq comp-command (concat comp-command " " obj-dir " " rel-name))
+      (print comp-command)
+      (compile comp-command)))
+
 (defun ma-run-atlas-package ()
   "Run atlassian-package on top-level directory the current buffer belongs to"
   (interactive)
@@ -170,7 +184,8 @@
 (add-hook 'c++-mode-hook
 	  (lambda ()
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
+	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
+	    (local-set-key [?\C-c ?\C-f] 'ma-compile-file)))
 
 (add-hook 'java-mode-hook
           (lambda()
