@@ -412,7 +412,7 @@
       (".cxx")))))
  '(cc-search-directories
    (quote
-    ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa")))
+    ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa" "../LocalInterfaces" "../../ProtectedInterfaces" "../src" "../../src")))
  '(cmake-ide-rc-executable "/usr/local/bin/rc")
  '(cmake-ide-rdm-executable "/usr/local/bin/rdm")
  '(comment-style (quote plain))
@@ -439,10 +439,6 @@
  '(diary-file "~/.diary")
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
  '(dirtrack-list (quote ("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
- '(display-buffer-alist
-   (quote
-    (("\\*compilation\\*" display-buffer-use-some-window
-      (window-width . 1.0)))))
  '(ediff-keep-variants nil)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(ediff-window-setup-function (quote ediff-setup-windows-plain))
@@ -458,6 +454,7 @@
  '(erc-nick "martin")
  '(erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
  '(erc-server "localhost")
+ '(erc-track-showcount nil)
  '(erc-user-full-name "Martin Apel")
  '(eudc-protocol (quote ldap))
  '(eudc-query-form-attributes (quote (name firstname email phone Uid)))
@@ -556,7 +553,10 @@
  '(rtags-use-helm t)
  '(safe-local-variable-values
    (quote
-    ((eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
+    ((tags-table-list "/scratch/apel/new_arch/.tags")
+     (tags-table-list "/scratch/apel/SCM/TAGS")
+     (tags-table-list "/scratch/apel/SpckTest/SquishTestSuites/TAGS")
+     (eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
            (add-hook
             (quote write-contents-functions)
             (lambda nil
@@ -569,16 +569,13 @@
            (whitespace-mode 1))
      (whitespace-line-column . 80)
      (whitespace-style face tabs trailing lines-tail)
-     (tags-table-list "/scratch/apel/new_arch/.tags")
      (tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
-     (tags-table-list quote
-                      ("/scratch/apel/new_arch/.tags"))
      (tags-table-list
       (quote
        ("/scratch/apel/new_arch/.tags")))
      (tags-table-list
       (quote
-       ("/scratch2/apel/llvm-3.0.src/TAGS")))
+       ("/scratch/apel/SCM/TAGS")))
      (ma-build-dir)
      (ma-make-target)
      (ma-make-target . undef)
@@ -586,7 +583,7 @@
      (crontab-host . redhat64)
      (crontab-apply-after-save . t)
      (ma-compile-command . "~/bin/my_compile")
-     (ma-compile-command . "make -C /home/home_dev/MAL1/llvm_test/obj"))))
+     (ma-compile-command . "/home/home_dev/MAL1/bin/ds/my_mkmk"))))
  '(save-abbrevs nil)
  '(scroll-bar-mode (quote right))
  '(send-mail-function nil)

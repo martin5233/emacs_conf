@@ -19,7 +19,13 @@
                                 '((c++-mode
                                    (tags-table-list . ("/scratch/apel/boost_1_60_0/TAGS")))))
 
+(dir-locals-set-class-variables 'SCM
+                                '((c++-mode
+                                   (ma-compile-command . "/home/home_dev/MAL1/bin/ds/my_mkmk")
+                                   (tags-table-list . ("/scratch/apel/SCM/TAGS")))))
+
 (dir-locals-set-directory-class  "/scratch/apel/new_arch/develop/" 'new_arch)
 (dir-locals-set-directory-class  "/scratch/apel/SpckTest/SquishTestSuites" 'squish)
 (dir-locals-set-directory-class  "/scratch/apel/qt-everywhere-enterprise-src-4.8.6" 'qt-4.8)
 (dir-locals-set-directory-class  "/scratch/apel/boost_1_60_0" 'boost-1.60)
+(dir-locals-set-directory-class  "/scratch/apel/SCM" 'SCM)

@@ -31,6 +31,12 @@ GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects/SPCK/repos/sp
 Content-Type: application/json
 Authorization: Basic bWFsMTpXdGhpd3d1Mm4=
 #
+#
+#
+GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/commits
+Content-Type: application/json
+Authorization: Basic TUFMMTpFbWFjczRFdmVy
+#
 GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/users/MAL1?avatarSize=24
 Content-Type: application/json
 Authorization: Basic bWFsMTpXdGhpd3d1Mm4=
@@ -146,5 +152,24 @@ Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
 #
 GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/issue/SPCK-40918
 Content-Type: application/json
+Authorization: Basic TUFMMTpFbWFjczRFdmVy
+#
+GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/project/SPCK/components
+Content-Type: application/json
 Authorization: Basic TUFMMTpEdWt0aWQ0Zw==
 #
+GET https://dsxdev-online-ppd.dsone.3ds.com/enovia/rest/irs;jsessionid=D936D80E6B1ED84AB389DD232982DE5E;jsessionid=9960214115EBC5179DADDD57A13B6042?Owner=LWT
+Content-Type: application/json
+#
+GET https://dsxdev-online-ppd.dsone.3ds.com/enovia/rest/irs/63199.28987.25072.47814;jsessionid=D936D80E6B1ED84AB389DD232982DE5E;jsessionid=9960214115EBC5179DADDD57A13B6042?Owner=LWT
+Content-Type: application/json
+#
+GET https://spck-stash.ux.dsone.3ds.com:7990/rest/jira/1.0/SPCK-44012/commits
+Content-Type: application/json
+Authorization: Basic TUFMMTptdmVtSnN1bjk=
+#
+GET http://lw5-mal1-cem.dsone.3ds.com:8080/3DRDF/service/rdfQL?query=count
+#
+GET http://lw5-mal1-cem.dsone.3ds.com:8080/3DRDF/service/rdfQL?query=import%20sample.ttl%20%2dprefixes
+#
+GET http://lw5-mal1-cem.dsone.3ds.com:8080/3DRDF/v0/resources/sample:A?$mask=dskern:Mask.Bounded
