@@ -1,8 +1,8 @@
 (define-skeleton header-skeleton
   "Define a C++ header file skeleton"
   ""
-"#ifndef __" (upcase (file-name-sans-extension (file-name-nondirectory buffer-file-name))) "_H__\n"
-"#define __" (upcase (file-name-sans-extension (file-name-nondirectory buffer-file-name))) "_H__\n\n"
+"#ifndef " (upcase (file-name-sans-extension (file-name-nondirectory buffer-file-name))) "_H\n"
+"#define " (upcase (file-name-sans-extension (file-name-nondirectory buffer-file-name))) "_H\n\n"
 "// Copyright Dassault Systemes Simulia Corp.\n\n"
 "#include \"base/WinExportDefs.h\"\n\n"
 "namespace " (skeleton-read "Namespace name?") "\n"
@@ -14,5 +14,5 @@
 "   " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "& operator=(const " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "&) = delete;\n"
 "};\n"
 "}\n"
-"#endif // __" (upcase (file-name-sans-extension (file-name-nondirectory buffer-file-name))) "_H__\n"
+"#endif // " (upcase (file-name-sans-extension (file-name-nondirectory buffer-file-name))) "_H\n"
 )

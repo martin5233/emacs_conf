@@ -20,7 +20,7 @@
                  (const "DocQtScript")
                  (const "DocCOMInterface")
                  (const "COMModel")
-                 (const "CppAPIHeader")
+                 (const "_simpack-script-runner")
                   )
   :group 'ma
 )
@@ -96,9 +96,11 @@
   (let ((p (get-process "assistant")))
     (if p
         (process-send-string p (concat "activateKeyword " (current-word) "\n"))
-        (let ((q (start-process "assistant" nil "/home/home_dev/MAL1/bin/Linux/spckAssistant" "-enableRemoteControl")))
+      (progn
+        (setenv "QT_SELECT" "5")
+        (let ((q (start-process "assistant" nil "/usr/bin/assistant" "-enableRemoteControl")))
           (process-send-string q (concat "activateKeyword " (current-word) "\n")))
-        )
+        ))
     )
 )
 (global-set-key [f11] 'ma-assistant)
@@ -353,5 +355,18 @@ not, a copyright comment is inserted at the start of the file."
             (funcall save-func))
           password)
       nil)))
+
+(defun ma-grep-setup-erase-date()
+  "Remove date from start of grep buffers to avoid matching the current date by grep-regexp-alist"
+  (save-excursion
+    (make-variable-buffer-local 'compilation-auto-jump-to-first-error)
+    (setq compilation-auto-jump-to-first-error nil)
+    (let ((inhibit-read-only t))
+      (goto-char (point-min))
+      (if (re-search-forward "^Grep started at " nil t)
+          (delete-region (line-beginning-position) (line-end-position)))
+      )))
+
+(add-hook 'grep-setup-hook 'ma-grep-setup-erase-date)
 
 (provide 'ma-funcs)

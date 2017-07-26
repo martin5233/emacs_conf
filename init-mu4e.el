@@ -15,6 +15,7 @@
          (:subject)))
 (setq mu4e-compose-signature-auto-include nil)
 (setq mu4e-compose-dont-reply-to-self t)
+(setq mu4e-compose-complete-only-after "2014-01-01")
 (setq mu4e-drafts-folder "/Drafts")
 (setq mu4e-get-mail-command "offlineimap")
 (setq mu4e-headers-include-related nil)
@@ -87,6 +88,7 @@
 (add-hook 'mu4e-compose-mode-hook
           (lambda()
             (flyspell-mode 1)
+            (set-fill-column 120)
             (ma-mu4e-set-spell-language)))
 
 (when (fboundp 'imagemagick-register-types)

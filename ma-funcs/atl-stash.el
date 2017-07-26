@@ -42,10 +42,6 @@
   "URL of Stash server"
   :group 'stash)
 
-(defcustom stash-SIMPACK-ca-cert "/home/home_dev/MAL1/SIMPACK_CA.cer"
-  "Location of certificate of SIMPACK CA"
-  :group 'stash)
-
 (defcustom stash-repos nil
   "Mapping from repository name to location, where it is available"
   :type 'alist
@@ -220,8 +216,6 @@ for all open pull requests")
 (defun stash-update-stash-info ()
   "Provide information about the current state of Stash pull requests"
   (stash-init-headers)
-  (if stash-SIMPACK-ca-cert
-      (setenv "CURL_CA_BUNDLE" stash-SIMPACK-ca-cert))
   (stash-update-projects-if-necessary)
   (setq stash-open-pr-count 0)
   (setq stash-own-pr-count 0)
@@ -252,7 +246,7 @@ for all open pull requests")
 
 (defun stash-id-to-pr (id)
   "Retrieves the pull request identified by id. Id must have been constructed by a call to stash-pr-to-id."
-  (string-match "\\([A-Za-z0-9\\-]+\\)/\\([A-Za-z0-9\\-_]+\\):\\([0-9]+\\)" id)
+  (string-match "\\([A-Za-z0-9\\-]+\\)/\\([A-Za-z0-9\-_]+\\):\\([0-9]+\\)" id)
   (let* ((project (match-string 1 id))
          (repo (match-string 2 id))
          (pr-id (string-to-number (match-string 3 id)))

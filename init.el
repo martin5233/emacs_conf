@@ -86,8 +86,6 @@
         (:name skeleton
                :type builtin)
         (:name request)
-        (:name smex
-               :after (global-set-key (kbd "M-x") 'smex))
         (:name auto-insert
                :type builtin
                :depends skeleton
@@ -146,9 +144,8 @@
         (:name helm
                :after
                (progn
-                 (global-set-key (kbd "C-x b") 'helm-buffers-list)
-                 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-                 (helm-mode t)))
+                 (helm-mode t)
+                 (setq helm-follow-mode-persistent t)))
         (:name ace-window
                :after
                (global-set-key (kbd "C-x o") 'ace-window))
@@ -180,7 +177,8 @@
 ;;            :type github
 ;;            :pkgname "syohex/emacs-ac-etags"
 ;;            :after (ac-etags-setup))
-          (:name company-mode)
+          (:name company-mode
+                 :after (global-company-mode))
           (:name org-jira
            :type github
            :pkgname "baohaojun/org-jira"
@@ -207,7 +205,13 @@
                       :after (progn
                                (setq rtags-autostart-diagnostics t)
                                (rtags-diagnostics)
-                               (setq rtags-completions-enabled t)))
+                               (setq rtags-completions-enabled t)
+                               (setq rtags-suspend-during-compilation t)
+                               (require 'rtags-helm)
+                               (setq rtags-use-helm t)
+                               (push 'company-rtags company-backends)
+                               (add-hook 'kill-emacs-hook
+                                         'rtags-quit-rdm)))
                (:name popup)
                (:name cmake-ide
                       :after  (progn
@@ -438,6 +442,7 @@
  '(desktop-save (quote ask-if-new))
  '(diary-file "~/.diary")
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
+ '(dired-omit-files "^\\.?#\\|^\\.")
  '(dirtrack-list (quote ("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(ediff-keep-variants nil)
  '(ediff-split-window-function (quote split-window-horizontally))
@@ -478,7 +483,7 @@
     ("/etc/ssl/certs/ca-certificates.crt" "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/ca-bundle.pem" "/usr/ssl/certs/ca-bundle.crt" "/usr/local/share/certs/ca-root-nss.crt" "/home/home_dev/MAL1/SIMPACK_CA.cer")))
  '(gud-tooltip-mode t)
  '(guide-key-mode t)
- '(guide-key/guide-key-sequence (quote ("C-x r")))
+ '(guide-key/guide-key-sequence (quote ("C-x r" "C-c r")))
  '(guide-key/idle-delay 0.0)
  '(guide-key/popup-window-position (quote bottom))
  '(helm-buffer-max-length 40)
@@ -596,8 +601,7 @@
  '(stash-repos
    (quote
     (("spckxxxx" . "/scratch/apel/new_arch/")
-     ("spcktest" . "/scratch/apel/SpckTest/")
-     ("documentation" . "/scratch/apel/documentation/"))))
+     ("spcktest" . "/scratch/apel/SpckTest/"))))
  '(stash-reviewer-shortcuts
    (quote
     (("autotest-linux" . "linux")
@@ -682,10 +686,13 @@
 (global-set-key (kbd "C-.") 'goto-last-change)
 (global-set-key (kbd "<kp-end>") 'shell)
 (global-set-key (kbd "<kp-next>") '(lambda () "Open init.el" (interactive) (find-file "~/.emacs.d/init.el")))
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+(global-set-key (kbd "M-x") 'helm-M-x)
 
 (windmove-default-keybindings)
 
-(browse-kill-ring-default-keybindings)
+;; (browse-kill-ring-default-keybindings)
 
 (add-hook 'c-mode-common-hook
        (lambda ()
@@ -708,6 +715,7 @@
             (hs-minor-mode)
             (idle-highlight-mode)
             (smartscan-mode)
+            (rtags-enable-standard-keybindings)
             (hs-hide-initial-comment-block)))
 
 
@@ -732,12 +740,6 @@
           (lambda ()
             (smartscan-mode)
             (local-set-key (kbd "M-.") 'find-function-other-window)))
-
-;; Workaround for a bug in compilation mode
-(add-hook 'grep-mode-hook
-          (lambda()
-            (kill-local-variable 'compilation-auto-jump-to-next))
-          )
 
 (add-hook 'cmake-mode-hook
           (lambda ()
