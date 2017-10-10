@@ -64,7 +64,8 @@
         (:name with-editor)
         (:name dash)
         (:name magit
-               :checkout "2.5.0"
+               :checkout "2.11.0"
+;;               :checkout "2.5.0"   Known working
                :depends (with-editor dash)
                :after
                (progn
@@ -516,6 +517,7 @@
  '(magit-cherry-pick-arguments (quote ("-x")))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
+ '(magit-completing-read-function (quote helm--completing-read-default))
  '(magit-diff-arguments (quote ("--ignore-space-change")))
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
@@ -524,7 +526,7 @@
  '(magit-pull-arguments (quote ("--rebase")))
  '(magit-refs-sections-hook
    (quote
-    (magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches)))
+    (magit-insert-error-header magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches)))
  '(magit-repo-dirs
    (quote
     ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation")))
