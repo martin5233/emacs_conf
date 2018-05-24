@@ -184,13 +184,13 @@ for all open pull requests")
                (reviewers (assoc-default 'reviewers value))
                (saw-myself-in-reviewers nil))
           (progn
-            (if (string-equal author (user-login-name))
+            (if (string-equal author (upcase (user-login-name)))
                 (setq stash-own-pr-count (1+ stash-own-pr-count)))
             (dotimes (j (length reviewers))
               (let* ((reviewer (aref reviewers j))
                      (name (assoc-default 'name (assoc-default 'user reviewer)))
                      (approved (assoc-default 'approved reviewer)))
-                (if (and (string-equal name (user-login-name)) (eq approved :json-false))
+                (if (and (string-equal name (upcase (user-login-name))) (eq approved :json-false))
                     (setq saw-myself-in-reviewers t))
                 ))
             (if saw-myself-in-reviewers
@@ -303,7 +303,7 @@ is returned.  If the reviewer is not found, the original string is returned."
       (let* ((reviewer (aref reviewers i))
              (name (assoc-default 'name (assoc-default 'user reviewer)))
              (approved (assoc-default 'approved reviewer)))
-        (if (and (string-equal name (user-login-name)) (eq approved :json-false))
+        (if (and (string-equal name (upcase (user-login-name))) (eq approved :json-false))
             (setq saw-myself-in-reviewers t))
         ))
     saw-myself-in-reviewers))
@@ -311,7 +311,7 @@ is returned.  If the reviewer is not found, the original string is returned."
 (defun stash-am-i-author (pr)
   "Returns true, if the current user is the author of this pull request."
   (let ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr)))))
-    (string-equal author (user-login-name))))
+    (string-equal author (upcase (user-login-name)))))
 
 (defun stash-show-section(title predicate)
   "Display a section of pull-requests passing the predicate function."
