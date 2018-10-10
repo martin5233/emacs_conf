@@ -63,6 +63,12 @@
                :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
         (:name with-editor)
         (:name dash)
+        (:name swiper
+               :after (progn
+                        (ivy-mode 1)
+                        (setq ivy-set-virtual-buffers t)
+                        (setq ivy-count-format "(%d/%d)")
+                        (add-to-list 'ivy-completing-read-handlers-alist '(find-file . completing-read-default))))
         (:name magit
                :checkout "2.11.0"
 ;;               :checkout "2.5.0"   Known working
@@ -132,17 +138,17 @@
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
         (:name guide-key)
-        (:name helm
-               :after
-               (progn
-                 (helm-mode t)
-                 (setq helm-follow-mode-persistent t)))
+;;         (:name helm
+;;                :after
+;;                (progn
+;;                  (helm-mode t)
+;;                  (setq helm-follow-mode-persistent t)))
         (:name ace-window
                :after
                (global-set-key (kbd "C-x o") 'ace-window))
-        (:name helm-ls-git
-               :depends helm
-               :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
+;;         (:name helm-ls-git
+;;                :depends helm
+;;                :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
         (:name auto-compile
                :after (progn
                         (setq load-prefer-newer t)
@@ -485,22 +491,22 @@
  '(guide-key/guide-key-sequence (quote ("C-x r" "C-c r")))
  '(guide-key/idle-delay 0.0)
  '(guide-key/popup-window-position (quote bottom))
- '(helm-buffer-max-length 40)
- '(helm-completing-read-handlers-alist
-   (quote
-    ((describe-function . helm-completing-read-symbols)
-     (describe-variable . helm-completing-read-symbols)
-     (debug-on-entry . helm-completing-read-symbols)
-     (find-function . helm-completing-read-symbols)
-     (find-tag . helm-completing-read-with-cands-in-buffer)
-     (ffap-alternate-file)
-     (tmm-menubar)
-     (find-file)
-     (compilation-next-error-function))))
- '(helm-ff-transformer-show-only-basename nil)
- '(helm-for-files-preferred-list
-   (quote
-    (helm-source-file-cache helm-source-files-in-current-dir)))
+;;  '(helm-buffer-max-length 40)
+;;  '(helm-completing-read-handlers-alist
+;;    (quote
+;;     ((describe-function . helm-completing-read-symbols)
+;;      (describe-variable . helm-completing-read-symbols)
+;;      (debug-on-entry . helm-completing-read-symbols)
+;;      (find-function . helm-completing-read-symbols)
+;;      (find-tag . helm-completing-read-with-cands-in-buffer)
+;;      (ffap-alternate-file)
+;;      (tmm-menubar)
+;;      (find-file)
+;;      (compilation-next-error-function))))
+;;  '(helm-ff-transformer-show-only-basename nil)
+;;  '(helm-for-files-preferred-list
+;;    (quote
+;;     (helm-source-file-cache helm-source-files-in-current-dir)))
  '(imenu-sort-function (quote imenu--sort-by-name))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
@@ -517,7 +523,7 @@
  '(magit-cherry-pick-arguments (quote ("-x")))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
- '(magit-completing-read-function (quote helm--completing-read-default))
+ '(magit-completing-read-function (quote ivy-completing-read))
  '(magit-diff-arguments (quote ("--ignore-space-change")))
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
@@ -686,9 +692,16 @@
 (global-set-key (kbd "C-.") 'goto-last-change)
 (global-set-key (kbd "<kp-end>") 'shell)
 (global-set-key (kbd "<kp-next>") '(lambda () "Open init.el" (interactive) (find-file "~/.emacs.d/init.el")))
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "M-x") 'helm-M-x)
+;; (global-set-key (kbd "C-x b") 'helm-buffers-list)
+;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;; (global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-x r b") 'counsel-bookmark)
+(global-set-key (kbd "C-h b") 'counsel-descbind)
+(global-set-key (kbd "C-h f") 'counsel-describe-function)
+(global-set-key (kbd "C-h v") 'counsel-describe-variable)
+(global-set-key (kbd "M-y") 'counsel-yank-pop)
 
 (windmove-default-keybindings)
 
