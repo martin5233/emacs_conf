@@ -19,7 +19,7 @@
 (defun ma-fill-file-cache-with-testmodels ()
   "Fill the file cache with testmodels"
   (interactive)
-  (let ((basedir (if work-win "E:/users/apel/spcktest/" "/TESTDATA/NA-Test/")))
+  (let ((basedir (if work-win "E:/users/apel/spcktest/" "/scratch/apel/SpckTest/")))
     (file-cache-add-file-list (find-lisp-find-files (concat basedir "TestModels") "\.sys$"))
     (file-cache-add-file-list (find-lisp-find-files (concat basedir "TestModels") "\.spck$"))))
 

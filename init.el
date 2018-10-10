@@ -76,6 +76,8 @@
         (:name macrostep)
         (:name smartscan)
         (:name git-timemachine)
+        (:name git-gutter
+               :after (global-git-gutter-mode 1))
         (:name csv-mode)
         (:name llvm-mode)
         (:name ascii-table)
@@ -116,9 +118,6 @@
         (:name cmake-mode
                :after (setq cmake-tab-width 3))
         (:name idle-highlight-mode)
-;;         (:name auto-complete)
-;;         (:name auto-complete-emacs-lisp
-;;                :depends auto-complete)
         (:name json-snatcher)
         (:name json-mode
                :depends json-snatcher)
@@ -126,15 +125,6 @@
         (:name levenshtein
                :type http
                :url "http://www.emacswiki.org/emacs/download/levenshtein.el"
-               )
-        (:name anchored-transpose
-               :type http
-               :url "http://www.emacswiki.org/emacs/download/anchored-transpose.el"
-               :after (global-set-key (kbd "C-x t") 'anchored-transpose)
-               )
-        (:name apt-utils
-               :type http
-               :url "http://www.emacswiki.org/emacs/download/apt-utils.el"
                )
         (:name visual-regexp
                :after (progn
@@ -166,6 +156,7 @@
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
                         (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
                         (eval-after-load "helm-mode" '(diminish 'helm-mode))
+                        (eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         ))
 
@@ -174,12 +165,6 @@
      (append el-get-sources
         '((:name filecache
            :type builtin)
-;;           (:name ac-etags
-;;            :type github
-;;            :pkgname "syohex/emacs-ac-etags"
-;;            :after (ac-etags-setup))
-          (:name company-mode
-                 :after (global-company-mode))
           (:name org-jira
            :type github
            :pkgname "baohaojun/org-jira"
@@ -191,7 +176,11 @@
                  :type http
                  :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
                  :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
+          (:name ox-jira
+                 :type github
+                 :pkgname "stig/ox-jira.el")
           (:name calfw)
+          (:name emacs-w3m)
           ))))
 
 (if work-linux
@@ -208,17 +197,21 @@
                                (rtags-diagnostics)
                                (setq rtags-completions-enabled t)
                                (setq rtags-suspend-during-compilation t)
-                               (require 'rtags-helm)
+                               (require 'helm-rtags)
                                (setq rtags-use-helm t)
-                               (push 'company-rtags company-backends)
                                (add-hook 'kill-emacs-hook
-                                         'rtags-quit-rdm)))
+                                         'rtags-quit-rdm))
+                      :depends helm)
                (:name popup)
                (:name cmake-ide
                       :after  (progn
                                 (require 'rtags)
                                 (setq cmake-ide-dir "/scratch/apel/new_arch/obj/rtags")
                                 (cmake-ide-setup)))
+               (:name auto-complete
+                      :depends popup)
+               (:name ac-python
+                      :depends auto-complete)
                (:name doxymacs)
                (:name erc
                       :type builtin)
@@ -244,9 +237,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ac-modes
-   (quote
-    (emacs-lisp-mode lisp-mode lisp-interaction-mode slime-repl-mode go-mode java-mode malabar-mode clojure-mode clojurescript-mode scala-mode scheme-mode ocaml-mode tuareg-mode coq-mode haskell-mode agda-mode agda2-mode perl-mode cperl-mode python-mode ruby-mode lua-mode tcl-mode ecmascript-mode javascript-mode js-mode js2-mode php-mode css-mode makefile-mode sh-mode fortran-mode f90-mode ada-mode xml-mode sgml-mode ts-mode sclang-mode verilog-mode qml-mode)))
  '(appt-audible nil)
  '(auth-source-debug nil)
  '(auth-sources (quote ("~/.authinfo.gpg")))
@@ -417,7 +407,7 @@
       (".cxx")))))
  '(cc-search-directories
    (quote
-    ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa" "../LocalInterfaces" "../../ProtectedInterfaces" "../src" "../../src")))
+    ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa" "../LocalInterfaces" "../../ProtectedInterfaces" "../src" "../../src" "/scratch/apel/new_arch/develop/src/postproc/include" "/scratch/apel/new_arch/develop/src/postproc/include/*")))
  '(cmake-ide-rc-executable "/usr/local/bin/rc")
  '(cmake-ide-rdm-executable "/usr/local/bin/rdm")
  '(comment-style (quote plain))
@@ -482,6 +472,14 @@
  '(gnutls-trustfiles
    (quote
     ("/etc/ssl/certs/ca-certificates.crt" "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/ca-bundle.pem" "/usr/ssl/certs/ca-bundle.crt" "/usr/local/share/certs/ca-root-nss.crt" "/home/home_dev/MAL1/SIMPACK_CA.cer")))
+ '(grep-command "grep --color -nH -e ")
+ '(grep-find-command
+   (quote
+    ("find . -type f -exec grep --color -nH -e  \\{\\} +" . 49)))
+ '(grep-find-template
+   "find <D> <X> -type f <F> -exec grep <C> -nH -e <R> \\{\\} +")
+ '(grep-template "grep <X> <C> -nH -e <R> <F>")
+ '(grep-use-null-filename-separator nil)
  '(gud-tooltip-mode t)
  '(guide-key-mode t)
  '(guide-key/guide-key-sequence (quote ("C-x r" "C-c r")))
@@ -507,6 +505,7 @@
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 3)
+ '(large-file-warning-threshold 20000000)
  '(latex-run-command "pdflatex")
  '(ldap-default-base "ou=dsone,dc=dsone,dc=3ds,dc=com")
  '(ldap-default-host "10.29.111.1")
@@ -514,6 +513,7 @@
    (quote
     (("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU057,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
  '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+ '(magit-auto-revert-mode nil)
  '(magit-cherry-pick-arguments (quote ("-x")))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
@@ -521,6 +521,7 @@
  '(magit-diff-arguments (quote ("--ignore-space-change")))
  '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
+ '(magit-diff-section-arguments (quote ("--ignore-space-change" "--no-ext-diff")))
  '(magit-log-arguments (quote ("--decorate" "-n20")))
  '(magit-process-popup-time 3)
  '(magit-pull-arguments (quote ("--rebase")))
@@ -560,8 +561,10 @@
  '(rtags-use-helm t)
  '(safe-local-variable-values
    (quote
-    ((tags-table-list "/scratch/apel/new_arch/.tags")
-     (tags-table-list "/scratch/apel/SCM/TAGS")
+    ((ma-build-target)
+     (ma-compile-command . "~/bin/ds/my_mkmk")
+     (tags-table-list "/scratch/apel/new_arch/.tags")
+     (tags-table-list "/scratch/apel/MotionPlatform/TAGS")
      (tags-table-list "/scratch/apel/SpckTest/SquishTestSuites/TAGS")
      (eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
            (add-hook
@@ -576,13 +579,6 @@
            (whitespace-mode 1))
      (whitespace-line-column . 80)
      (whitespace-style face tabs trailing lines-tail)
-     (tags-table-list "/scratch2/apel/SpckTest/SquishTestSuites/TAGS")
-     (tags-table-list
-      (quote
-       ("/scratch/apel/new_arch/.tags")))
-     (tags-table-list
-      (quote
-       ("/scratch/apel/SCM/TAGS")))
      (ma-build-dir)
      (ma-make-target)
      (ma-make-target . undef)
@@ -634,8 +630,9 @@
  '(texinfo-close-quote "''")
  '(texinfo-open-quote "``")
  '(tool-bar-mode nil)
- '(tramp-default-method "ssh")
- '(tramp-default-proxies-alist nil)
+ '(tramp-default-method "ssh" nil (tramp))
+ '(tramp-default-proxies-alist nil nil (tramp))
+ '(tramp-smb-conf "/home/home_dev/MAL1/.smbclient.conf" nil (tramp))
  '(truncate-lines t)
  '(use-file-dialog nil)
  '(user-full-name "Martin Apel")
@@ -655,6 +652,7 @@
  '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
  '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
+ '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
  '(rtags-errline ((t (:background "dark orange"))))
  '(rtags-fixitline ((t (:background "goldenrod4
@@ -694,8 +692,6 @@
 
 (windmove-default-keybindings)
 
-;; (browse-kill-ring-default-keybindings)
-
 (add-hook 'c-mode-common-hook
        (lambda ()
             (imenu-add-to-menubar "Functions")
@@ -709,6 +705,7 @@
             (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
             (local-unset-key (kbd "C-c C-n"))
             (local-unset-key (kbd "C-c C-p"))
+            (local-unset-key (kbd "C-c C-z"))                       ;; Free keybinding for magit-status
 
             (add-hook 'before-save-hook 'ma-create-or-update-copyright)
             (c-toggle-hungry-state 1)
