@@ -61,22 +61,29 @@
                :type builtin
                :features uniquify
                :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
-        (:name with-editor)
         (:name dash)
+        (:name ghub)
+        (:name graphql)
+        (:name magit-popup)
+        (:name treepy)
+        (:name with-editor)
+        (:name magit
+               :checkout "2.13.0"
+               :checkout "2.11.0"   ;; known working
+               :depends (dash ghub graphql magit-popup treepy with-editor)
+               :after
+               (progn
+                 (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
+                 (global-set-key (kbd "C-c C-z") 'magit-status)))
         (:name swiper
                :after (progn
                         (ivy-mode 1)
                         (setq ivy-set-virtual-buffers t)
                         (setq ivy-count-format "(%d/%d)")
-                        (add-to-list 'ivy-completing-read-handlers-alist '(find-file . completing-read-default))))
-        (:name magit
-               :checkout "2.11.0"
-;;               :checkout "2.5.0"   Known working
-               :depends (with-editor dash)
-               :after
-               (progn
-                 (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
-                 (global-set-key (kbd "C-c C-z") 'magit-status)))
+                        (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+                        (add-to-list 'ivy-completing-read-handlers-alist '(find-file . completing-read-default))
+                        (add-to-list 'ivy-completing-read-handlers-alist '(grep-read-files . completing-read-default))
+                        ))
         (:name mo-git-blame
                :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
         (:name macrostep)
@@ -138,17 +145,9 @@
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
         (:name guide-key)
-;;         (:name helm
-;;                :after
-;;                (progn
-;;                  (helm-mode t)
-;;                  (setq helm-follow-mode-persistent t)))
         (:name ace-window
                :after
                (global-set-key (kbd "C-x o") 'ace-window))
-;;         (:name helm-ls-git
-;;                :depends helm
-;;                :after (global-set-key (kbd "C-x g") 'helm-ls-git-ls))
         (:name auto-compile
                :after (progn
                         (setq load-prefer-newer t)
@@ -158,10 +157,8 @@
         (:name graphviz-dot-mode)
         (:name diminish
                :after (progn
-;;                        (eval-after-load "magit" '(diminish 'magit-auto-revert-mode))
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
                         (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
-                        (eval-after-load "helm-mode" '(diminish 'helm-mode))
                         (eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         ))
@@ -172,7 +169,7 @@
         '((:name filecache
            :type builtin)
           (:name org-jira
-           :type github
+           :type githubx
            :pkgname "baohaojun/org-jira"
            :after (setq jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443"))
           (:name restclient
@@ -203,11 +200,8 @@
                                (rtags-diagnostics)
                                (setq rtags-completions-enabled t)
                                (setq rtags-suspend-during-compilation t)
-                               (require 'helm-rtags)
-                               (setq rtags-use-helm t)
                                (add-hook 'kill-emacs-hook
-                                         'rtags-quit-rdm))
-                      :depends helm)
+                                         'rtags-quit-rdm)))
                (:name popup)
                (:name cmake-ide
                       :after  (progn
@@ -448,7 +442,7 @@
  '(emacs-lisp-mode-hook
    (quote
     (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
- '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE")))
+ '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE" "MODE-nick")))
  '(erc-minibuffer-notice t)
  '(erc-modules
    (quote
@@ -491,22 +485,6 @@
  '(guide-key/guide-key-sequence (quote ("C-x r" "C-c r")))
  '(guide-key/idle-delay 0.0)
  '(guide-key/popup-window-position (quote bottom))
-;;  '(helm-buffer-max-length 40)
-;;  '(helm-completing-read-handlers-alist
-;;    (quote
-;;     ((describe-function . helm-completing-read-symbols)
-;;      (describe-variable . helm-completing-read-symbols)
-;;      (debug-on-entry . helm-completing-read-symbols)
-;;      (find-function . helm-completing-read-symbols)
-;;      (find-tag . helm-completing-read-with-cands-in-buffer)
-;;      (ffap-alternate-file)
-;;      (tmm-menubar)
-;;      (find-file)
-;;      (compilation-next-error-function))))
-;;  '(helm-ff-transformer-show-only-basename nil)
-;;  '(helm-for-files-preferred-list
-;;    (quote
-;;     (helm-source-file-cache helm-source-files-in-current-dir)))
  '(imenu-sort-function (quote imenu--sort-by-name))
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
@@ -558,13 +536,13 @@
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(rtags-autostart-diagnostics t)
+ '(rtags-display-result-backend (quote ivy))
  '(rtags-enable-unsaved-reparsing nil)
  '(rtags-jump-to-first-match nil)
  '(rtags-path "/usr/local/bin")
  '(rtags-rc-log-enabled t)
  '(rtags-reparse-timeout 1000)
  '(rtags-timeout 1000)
- '(rtags-use-helm t)
  '(safe-local-variable-values
    (quote
     ((ma-build-target)
@@ -605,7 +583,8 @@
  '(stash-repos
    (quote
     (("spckxxxx" . "/scratch/apel/new_arch/")
-     ("spcktest" . "/scratch/apel/SpckTest/"))))
+     ("spcktest" . "/scratch/apel/SpckTest/")
+     ("motionplatformloader" . "/scratch/apel/MotionPlatform/"))))
  '(stash-reviewer-shortcuts
    (quote
     (("autotest-linux" . "linux")
@@ -692,16 +671,14 @@
 (global-set-key (kbd "C-.") 'goto-last-change)
 (global-set-key (kbd "<kp-end>") 'shell)
 (global-set-key (kbd "<kp-next>") '(lambda () "Open init.el" (interactive) (find-file "~/.emacs.d/init.el")))
-;; (global-set-key (kbd "C-x b") 'helm-buffers-list)
-;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-;; (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "M-x") 'counsel-M-x)
 (global-set-key (kbd "C-s") 'swiper)
 (global-set-key (kbd "C-x r b") 'counsel-bookmark)
-(global-set-key (kbd "C-h b") 'counsel-descbind)
+(global-set-key (kbd "C-h b") 'counsel-descbinds)
 (global-set-key (kbd "C-h f") 'counsel-describe-function)
 (global-set-key (kbd "C-h v") 'counsel-describe-variable)
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
+(global-set-key (kbd "C-x b") 'counsel-ibuffer)
 
 (windmove-default-keybindings)
 
@@ -715,6 +692,7 @@
             (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
             (local-set-key (kbd "C-c =") 'align-regexp)
             (local-set-key (kbd "C-M-u") 'ma-insert-random-uuid)
+            (local-set-key (kbd "C-c i") 'imenu)
             (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
             (local-unset-key (kbd "C-c C-n"))
             (local-unset-key (kbd "C-c C-p"))

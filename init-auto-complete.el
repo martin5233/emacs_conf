@@ -26,7 +26,7 @@
 
 (add-hook 'c-mode-common-hook
           (lambda()
-            (make-variable-buffer-local ac-auto-start)
+            (make-variable-buffer-local 'ac-auto-start)
             (setq ac-auto-start nil)
             (setq ac-sources '(ac-source-rtags))))
 

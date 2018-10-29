@@ -36,6 +36,15 @@
   :group 'ma
 )
 
+(defcustom ma-doc-sites
+  '(("Boost Filesystem" . "file:///scratch/apel/boost_1_67_0/libs/filesystem/doc/reference.html")
+    ("CPP Reference" . "https://en.cppreference.com/mwiki/index.php?search=%s")
+    ("Qt 5.7" . "http://doc.qt.io/archives/qt-5.7/%s.html"))
+  "An alist of documentation sites. The key is a keyword offered for choosing, which one to use.
+The value is a URL containing a %s placeholder for the search term."
+  :type '(alist :key-type string :value-type string)
+  :group 'ma)
+
 (defun show-frame (&optional frame)
   "Show the current Emacs frame or the FRAME given as argument.
    And make sure that it really shows up!"
@@ -172,6 +181,16 @@
     (let ((default-directory cur-dir))
       (compile "atlas-package"))))
 
+(defun ma-lookup-doc (&optional word)
+  "Look up a word in documentation. This uses the alist ma-doc-sites to offer choices to the user, where the search term should be looked up"
+  (interactive)
+  (let* ((term (if word word (thing-at-point 'symbol t)))
+         (sites (mapcar 'car ma-doc-sites))
+         (doc-site-alias (completing-read "Please choose doc site: " sites))
+         (doc-site (cdr (assoc doc-site-alias ma-doc-sites)))
+         (url (format doc-site term)))
+    (browse-url url)))
+
 (add-hook 'cmake-mode-hook
 	  (lambda ()
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
@@ -180,13 +199,15 @@
 (add-hook 'c-mode-hook
 	  (lambda ()
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
+	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
+       (local-set-key [f1]  'ma-lookup-doc)))
 
 (add-hook 'c++-mode-hook
 	  (lambda ()
 	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
-	    (local-set-key [?\C-c ?\C-f] 'ma-compile-file)))
+	    (local-set-key [?\C-c ?\C-f] 'ma-compile-file)
+       (local-set-key [f1]  'ma-lookup-doc)))
 
 (add-hook 'java-mode-hook
           (lambda()
@@ -367,5 +388,15 @@ not, a copyright comment is inserted at the start of the file."
       )))
 
 (add-hook 'grep-setup-hook 'ma-grep-setup-erase-date)
+
+(defun ma-turn-off-ivy-for-grep-read-files(orig-fun &rest args)
+  (ivy-mode 0)
+  (message "ma-turn-off-ivy-for-grep-read-files called")
+  (let ((res (apply orig-fun args)))
+    (ivy-mode 1)
+    res))
+
+(advice-add 'grep-read-files :around #'ma-turn-off-ivy-for-grep-read-files)
+
 
 (provide 'ma-funcs)
