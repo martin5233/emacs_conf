@@ -287,7 +287,7 @@ is returned.  If the reviewer is not found, the original string is returned."
         (if approved
             (push text reviewers-accepted)
           (push text reviewers-waiting))))
-    (setq line (format "%-13s #%-4d %-9s %-75s  Waiting: %-20s  Accepted: %-s"
+    (setq line (format "%-13s #%-5d %-8s %-75s  Waiting: %-20s  Accepted: %-s"
                        repo id author shortened-title
                        (mapconcat 'identity (sort reviewers-waiting 'string<) ",")
                        (mapconcat 'identity (sort reviewers-accepted 'string<) ",")))
@@ -438,7 +438,7 @@ is returned.  If the reviewer is not found, the original string is returned."
   (let* ((default-directory (magit-read-repository nil))
          (project "SPCK")
          (repo (car (rassoc default-directory stash-repos)))
-         (source-branch (substring (magit-get-tracked-branch) 7))
+         (source-branch (substring (magit-get-upstream-branch) 7))
          (target-branch (stash-find-target-branch default-directory (concat "origin/" source-branch)))
          (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch))))
     (unless repo

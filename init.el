@@ -68,8 +68,7 @@
         (:name treepy)
         (:name with-editor)
         (:name magit
-               :checkout "2.13.0"
-               :checkout "2.11.0"   ;; known working
+;;                :checkout "2.13.0"
                :depends (dash ghub graphql magit-popup treepy with-editor)
                :after
                (progn
@@ -86,6 +85,22 @@
                         ))
         (:name mo-git-blame
                :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
+        (:name hydra)
+        (:name emacs-gdb
+               :type github
+               :pkgname "weirdNox/emacs-gdb"
+               :depends hydra
+               :autoloads gdb-mi.el
+               :after (progn
+                        (fmakunbound 'gdb)
+                        (fmakunbound 'gdb-enable-debug)
+                        (setq gdb-ignore-gdbinit nil)
+                        (defhydra hydra-gdb ()
+                          "gdb"
+                          ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
+                          ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
+                        (global-set-key (kbd "<f4>") 'hydra-gdb/body)
+                        ))
         (:name macrostep)
         (:name smartscan)
         (:name git-timemachine)
@@ -168,10 +183,6 @@
      (append el-get-sources
         '((:name filecache
            :type builtin)
-          (:name org-jira
-           :type githubx
-           :pkgname "baohaojun/org-jira"
-           :after (setq jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443"))
           (:name restclient
            :type github
            :pkgname "pashky/restclient.el")
@@ -182,8 +193,30 @@
           (:name ox-jira
                  :type github
                  :pkgname "stig/ox-jira.el")
+          (:name language-detection
+                 :type github
+                 :pkgname "andreasjansson/language-detection.el")
+          (:name ejira
+                 :type github
+                 :pkgname "nyyManni/ejira"
+                 :depends (ox-jira language-detection)
+                 :after
+                 (setq jiralib2-url "https://spck-jira.ux.dsone.3ds.com:8443"
+                       jiralib2user-login-name "MAL1"
+                       ejira-projects '("SIMPACK")
+                   ejira-main-project "SIMPACK"
+                   ejira-my-org-directory "/home/home_dev/MAL1/org"
+                   ejira-done-states '("COMPLETED")
+                   ejira-in-progress-states '("IN PROGRESS" "READY" "INTEGRATION TEST")
+                   ))
           (:name calfw)
           (:name emacs-w3m)
+          (:name dockerfile-mode
+                 :type github
+                 :pkgname "spotify/dockerfile-mode"
+                 :after
+                 (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+          (:name groovy-emacs-mode)
           ))))
 
 (if work-linux
@@ -415,7 +448,7 @@
  '(compilation-auto-jump-to-first-error t)
  '(compilation-error-regexp-alist
    (quote
-    (bash java gcc-include gnu perl php perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness maven)))
+    (bash cmake cmake-info gcc-include gnu perl)))
  '(compilation-read-command nil)
  '(compilation-scroll-output (quote first-error))
  '(compilation-search-path (quote ("/scratch/apel/new_arch")))
@@ -433,6 +466,7 @@
  '(desktop-save (quote ask-if-new))
  '(diary-file "~/.diary")
  '(dired-auto-revert-buffer (quote dired-directory-changed-p))
+ '(dired-dwim-target t)
  '(dired-omit-files "^\\.?#\\|^\\.")
  '(dirtrack-list (quote ("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
  '(ediff-keep-variants nil)
@@ -509,15 +543,14 @@
  '(magit-log-arguments (quote ("--decorate" "-n20")))
  '(magit-process-popup-time 3)
  '(magit-pull-arguments (quote ("--rebase")))
+ '(magit-refs-primary-column-width (quote (16 . 60)))
  '(magit-refs-sections-hook
    (quote
     (magit-insert-error-header magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches)))
  '(magit-repo-dirs
    (quote
     ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation")))
- '(magit-repository-directories
-   (quote
-    ("/scratch/apel/new_arch" "/scratch/apel/SpckTest" "/scratch/apel/documentation")))
+ '(magit-repository-directories (quote (("/scratch/apel" . 1) ("~/.emacs.d" . 2))))
  '(magit-restore-window-configuration t)
  '(magit-rewrite-inclusive nil)
  '(magit-show-child-count t)
@@ -526,6 +559,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
+ '(org-agenda-files (quote ("~/org/na.org")))
  '(package-archives
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
@@ -536,7 +570,6 @@
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(rtags-autostart-diagnostics t)
- '(rtags-display-result-backend (quote ivy))
  '(rtags-enable-unsaved-reparsing nil)
  '(rtags-jump-to-first-match nil)
  '(rtags-path "/usr/local/bin")
@@ -545,7 +578,9 @@
  '(rtags-timeout 1000)
  '(safe-local-variable-values
    (quote
-    ((ma-build-target)
+    ((ma-make-target . "")
+     (ma-build-dir . "")
+     (ma-build-target)
      (ma-compile-command . "~/bin/ds/my_mkmk")
      (tags-table-list "/scratch/apel/new_arch/.tags")
      (tags-table-list "/scratch/apel/MotionPlatform/TAGS")
@@ -584,7 +619,8 @@
    (quote
     (("spckxxxx" . "/scratch/apel/new_arch/")
      ("spcktest" . "/scratch/apel/SpckTest/")
-     ("motionplatformloader" . "/scratch/apel/MotionPlatform/"))))
+     ("motionplatformloader" . "/scratch/apel/MotionPlatform/")
+     ("devscripts" . "/scratch/apel/devscripts"))))
  '(stash-reviewer-shortcuts
    (quote
     (("autotest-linux" . "linux")

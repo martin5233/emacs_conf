@@ -305,16 +305,9 @@ The value is a URL containing a %s placeholder for the search term."
   "Face for highlighting remote branches with specific text in them."
   :group 'ma)
 
-(defun ma-magit-highlight-own-branch (&rest args)
-  "Highlight branches matching my trigram"
-  (let* ((arglist (car args))
-         (len (length arglist))
-         (arg1 (nth 1 arglist)))
-    (if (and (stringp arg1) (string-match "origin/SPCK-[0-9]+-MAL1-" arg1))
-      (append (butlast arglist (- len 5)) (list 'ma-magit-highlight-remote-face) (last arglist (- len 6)))
-    arglist)))
-
-(advice-add 'magit-insert-branch-1 :filter-args #'ma-magit-highlight-own-branch)
+(add-hook 'magit-refs-mode-hook
+          (lambda ()
+            (add-to-list 'magit-ref-namespaces '("\\`refs/remotes/origin/\\(SPCK-[0-9]+-MAL1-.*\\)" . ma-magit-highlight-remote-face))))
 
 (defun ma-lowercase-args (&rest args)
   "Convert all arguments to lowercase"

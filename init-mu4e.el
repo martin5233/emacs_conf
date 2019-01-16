@@ -18,6 +18,7 @@
 (setq mu4e-compose-complete-only-after "2014-01-01")
 (setq mu4e-drafts-folder "/Drafts")
 (setq mu4e-get-mail-command "offlineimap")
+(setq mu4e-completing-read-function 'completing-read)
 (setq mu4e-headers-include-related nil)
 (setq mu4e-hide-index-messages t)
 (setq mu4e-html2text-command "w3m -T text/html -O UTF8")
@@ -90,6 +91,18 @@
             (flyspell-mode 1)
             (set-fill-column 120)
             (ma-mu4e-set-spell-language)))
+
+(defun ma-mu4e-browse-jira-issue()
+  "Scans for the JIRA issue in the current mail and opens the corresponding issue in a browser."
+  (interactive)
+  (let* ((msg (mu4e-message-at-point 'noerror))
+         (subject (mu4e-message-field msg :subject)))
+    (when (string-match "^\\[JIRA\\] (\\(SPCK-[0-9]+\\))" subject)
+      (browse-url (concat "https://spck-jira.ux.dsone.3ds.com:8443/browse/" (match-string 1 subject))))))
+
+(add-hook 'mu4e-headers-mode-hook
+          (lambda()
+            (local-set-key (kbd "C-b") 'ma-mu4e-browse-jira-issue)))
 
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))
