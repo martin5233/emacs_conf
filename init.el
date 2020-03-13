@@ -5,13 +5,6 @@
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
 
-;; (if work-linux
-;;     (setq url-proxy-services
-;;           '(("http" . "localhost:3128")
-;;             ("https" . "localhost:3128")
-;;             ("no_proxy" . "3ds.com")))
-;; )
-
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
 
@@ -102,7 +95,8 @@
                         (global-set-key (kbd "<f4>") 'hydra-gdb/body)
                         ))
         (:name macrostep)
-        (:name smartscan)
+        (:name smartscan
+               :after (global-smartscan-mode 1))
         (:name git-timemachine)
         (:name git-gutter
                :after (global-git-gutter-mode 1))
@@ -133,7 +127,7 @@
                :type builtin)
         (:name subword
                :type builtin
-               :after (add-hook 'c-mode-common-hook
+               :after (add-hook 'prog-mode-hook
                                 (lambda()
                                   (local-set-key (kbd "M-<left>") 'subword-backward)
                                   (local-set-key (kbd "M-<right>") 'subword-forward)
@@ -186,30 +180,12 @@
           (:name restclient
            :type github
            :pkgname "pashky/restclient.el")
-          (:name php-mode-improved
-                 :type http
-                 :url "http://www.emacswiki.org/emacs/download/php-mode-improved.el"
-                 :after (add-to-list 'auto-mode-alist '("\\.php$" . php-mode)))
-          (:name ox-jira
-                 :type github
-                 :pkgname "stig/ox-jira.el")
+          (:name ox-pandoc
+                 :type builtin)
           (:name language-detection
                  :type github
                  :pkgname "andreasjansson/language-detection.el")
-          (:name ejira
-                 :type github
-                 :pkgname "nyyManni/ejira"
-                 :depends (ox-jira language-detection)
-                 :after
-                 (setq jiralib2-url "https://spck-jira.ux.dsone.3ds.com:8443"
-                       jiralib2user-login-name "MAL1"
-                       ejira-projects '("SIMPACK")
-                   ejira-main-project "SIMPACK"
-                   ejira-my-org-directory "/home/home_dev/MAL1/org"
-                   ejira-done-states '("COMPLETED")
-                   ejira-in-progress-states '("IN PROGRESS" "READY" "INTEGRATION TEST")
-                   ))
-          (:name calfw)
+;;           (:name calfw)
           (:name emacs-w3m)
           (:name dockerfile-mode
                  :type github
@@ -224,23 +200,27 @@
      (append el-get-sources
              '(
                (:name mu4e
+                      :checkout "v1.0"
                       :depends (alert ht))
                (:name mu4e-alert
                       :depends (mu4e alert ht s))
                (:name rtags
                       :after (progn
                                (setq rtags-autostart-diagnostics t)
+                               (setq rtags-enable-unsaved-reparsing nil)
+                               (setq rtags-jump-to-first-match nil)
+                               (setq rtags-path "/usr/local/bin")
+                               (setq rtags-process-flags "--rp-daemon 1")
+                               (setq rtags-rc-log-enabled t)
+                               (setq rtags-reparse-timeout 1000)
+                               (setq rtags-timeout 2000)
                                (rtags-diagnostics)
                                (setq rtags-completions-enabled t)
                                (setq rtags-suspend-during-compilation t)
+                               (rtags-start-process-unless-running)
                                (add-hook 'kill-emacs-hook
                                          'rtags-quit-rdm)))
                (:name popup)
-               (:name cmake-ide
-                      :after  (progn
-                                (require 'rtags)
-                                (setq cmake-ide-dir "/scratch/apel/new_arch/obj/rtags")
-                                (cmake-ide-setup)))
                (:name auto-complete
                       :depends popup)
                (:name ac-python
@@ -251,7 +231,11 @@
                (:name uuid
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
-;;                (:name excorporate)
+;;                (:name excorporate
+;;                       :after (progn
+;;                                (setq excorporate-configuration "martin.apel@3ds.com")
+;;                                (excorporate)
+;;                                (setq excorporate-calendar-show-day-function 'exco-calfw-show-day)))
                ))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
@@ -274,7 +258,7 @@
  '(auth-source-debug nil)
  '(auth-sources (quote ("~/.authinfo.gpg")))
  '(auto-revert-check-vc-info nil)
- '(auto-revert-remote-files t)
+ '(auto-revert-remote-files nil)
  '(auto-revert-verbose nil)
  '(blink-matching-paren-on-screen nil)
  '(browse-kill-ring-no-duplicates t)
@@ -446,9 +430,7 @@
  '(comment-style (quote plain))
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
- '(compilation-error-regexp-alist
-   (quote
-    (bash cmake cmake-info gcc-include gnu perl)))
+ '(compilation-error-regexp-alist (quote (bash cmake cmake-info gcc-include gnu perl)))
  '(compilation-read-command nil)
  '(compilation-scroll-output (quote first-error))
  '(compilation-search-path (quote ("/scratch/apel/new_arch")))
@@ -477,13 +459,13 @@
    (quote
     (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
  '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE" "MODE-nick")))
- '(erc-minibuffer-notice t)
  '(erc-modules
    (quote
     (autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands notifications readonly ring smiley stamp spelling track)))
  '(erc-nick "martin")
  '(erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
  '(erc-server "localhost")
+ '(erc-track-exclude-types (quote ("JOIN" "NICK" "PART" "333" "353")))
  '(erc-track-showcount nil)
  '(erc-user-full-name "Martin Apel")
  '(eudc-protocol (quote ldap))
@@ -536,13 +518,12 @@
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
  '(magit-completing-read-function (quote ivy-completing-read))
- '(magit-diff-arguments (quote ("--ignore-space-change")))
- '(magit-diff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-diff-refine-hunk t)
- '(magit-diff-section-arguments (quote ("--ignore-space-change" "--no-ext-diff")))
- '(magit-log-arguments (quote ("--decorate" "-n20")))
+ '(magit-log-arguments (quote ("-n20")))
+ '(magit-log-section-arguments (quote ("-n256" "--decorate")))
  '(magit-process-popup-time 3)
  '(magit-pull-arguments (quote ("--rebase")))
+ '(magit-qdiff-options (quote ("--ignore-space-change" "--ignore-all-space")))
  '(magit-refs-primary-column-width (quote (16 . 60)))
  '(magit-refs-sections-hook
    (quote
@@ -569,16 +550,29 @@
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
- '(rtags-autostart-diagnostics t)
- '(rtags-enable-unsaved-reparsing nil)
- '(rtags-jump-to-first-match nil)
- '(rtags-path "/usr/local/bin")
- '(rtags-rc-log-enabled t)
- '(rtags-reparse-timeout 1000)
- '(rtags-timeout 1000)
  '(safe-local-variable-values
    (quote
-    ((ma-make-target . "")
+    ((c-file-offsets
+      (block-close . 0)
+      (brace-list-close . 0)
+      (brace-list-entry . 0)
+      (brace-list-intro . +)
+      (case-label . 0)
+      (class-close . 0)
+      (defun-block-intro . +)
+      (defun-close . 0)
+      (defun-open . 0)
+      (else-clause . 0)
+      (inclass . +)
+      (label . 0)
+      (statement . 0)
+      (statement-block-intro . +)
+      (statement-case-intro . +)
+      (statement-cont . +)
+      (substatement . +)
+      (topmost-intro . 0))
+     (dockerfile-image-name . "test")
+     (ma-make-target . "")
      (ma-build-dir . "")
      (ma-build-target)
      (ma-compile-command . "~/bin/ds/my_mkmk")
@@ -620,7 +614,7 @@
     (("spckxxxx" . "/scratch/apel/new_arch/")
      ("spcktest" . "/scratch/apel/SpckTest/")
      ("motionplatformloader" . "/scratch/apel/MotionPlatform/")
-     ("devscripts" . "/scratch/apel/devscripts"))))
+     ("devscripts" . "/scratch/apel/devscripts/"))))
  '(stash-reviewer-shortcuts
    (quote
     (("autotest-linux" . "linux")
@@ -715,6 +709,8 @@
 (global-set-key (kbd "C-h v") 'counsel-describe-variable)
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 (global-set-key (kbd "C-x b") 'counsel-ibuffer)
+;; (global-set-key (kbd "SPC") 'just-one-space)
+;; (global-set-key (kbd "S-SPC") '(lambda () (interactive) (insert-char #x20)))
 
 (windmove-default-keybindings)
 
@@ -740,7 +736,6 @@
             (cwarn-mode)
             (hs-minor-mode)
             (idle-highlight-mode)
-            (smartscan-mode)
             (rtags-enable-standard-keybindings)
             (hs-hide-initial-comment-block)))
 
@@ -750,7 +745,6 @@
             (local-unset-key [?\C-C ?\C-r])
             (idle-highlight-mode)
             (which-function-mode)
-            (smartscan-mode)
             (imenu-add-to-menubar "Functions")))
 
 (add-hook 'shell-mode-hook
@@ -764,13 +758,11 @@
 
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
-            (smartscan-mode)
             (local-set-key (kbd "M-.") 'find-function-other-window)))
 
 (add-hook 'cmake-mode-hook
           (lambda ()
             (local-set-key [?\C-c ?\C-d] 'cmake-help)
-            (smartscan-mode)
             (flyspell-prog-mode)
             (setq indent-line-function 'indent-relative)
             (subword-mode t)))

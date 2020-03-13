@@ -20,9 +20,10 @@
 (setq mu4e-get-mail-command "offlineimap")
 (setq mu4e-completing-read-function 'completing-read)
 (setq mu4e-headers-include-related nil)
+(setq mu4e-index-update-error-warning nil)
 (setq mu4e-hide-index-messages t)
 (setq mu4e-html2text-command "w3m -T text/html -O UTF8")
-(setq mu4e-maildir "/mail")
+(setq mu4e-maildir "/mail/offlineimap")
 (setq mu4e-sent-folder "/Sent")
 (setq mu4e-trash-folder
       (lambda (msg)
@@ -38,6 +39,8 @@
 (setq mu4e-attachment-dir "/tmp")
 (add-to-list 'mu4e-view-actions
              '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+(add-to-list 'mu4e-view-actions
+             '("View In JIRA" . ma-mu4e-browse-jira-issue) t)
 
 (setq message-send-mail-function (quote smtpmail-send-it))
 
@@ -92,17 +95,19 @@
             (set-fill-column 120)
             (ma-mu4e-set-spell-language)))
 
-(defun ma-mu4e-browse-jira-issue()
+(defun ma-mu4e-browse-jira-issue(msg)
   "Scans for the JIRA issue in the current mail and opens the corresponding issue in a browser."
-  (interactive)
-  (let* ((msg (mu4e-message-at-point 'noerror))
-         (subject (mu4e-message-field msg :subject)))
-    (when (string-match "^\\[JIRA\\] (\\(SPCK-[0-9]+\\))" subject)
+  (let* ((subject (mu4e-message-field msg :subject)))
+    (when (string-match "^\\[JIRA\\].*\\(SPCK-[0-9]+\\)" subject)
       (browse-url (concat "https://spck-jira.ux.dsone.3ds.com:8443/browse/" (match-string 1 subject))))))
 
-(add-hook 'mu4e-headers-mode-hook
-          (lambda()
-            (local-set-key (kbd "C-b") 'ma-mu4e-browse-jira-issue)))
+(add-to-list 'mu4e-view-actions
+             '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+(add-to-list 'mu4e-view-actions
+             '("View In JIRA" . ma-mu4e-browse-jira-issue) t)
+(add-to-list 'mu4e-headers-actions
+             '("View In JIRA" . ma-mu4e-browse-jira-issue) t)
+
 
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))

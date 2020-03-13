@@ -44,7 +44,7 @@
 (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 (setq org-agenda-start-on-weekday nil)
 (setq org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
-(setq org-export-backends (quote (ascii html icalendar latex md)))
+(setq org-export-backends (quote (ascii html icalendar latex md pandoc)))
 (setq org-capture-templates
    (quote
     (("g" "General" entry

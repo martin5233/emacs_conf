@@ -14,7 +14,7 @@
                              (funcall secret)
                            secret)))
           (erc-message "PRIVMSG" (concat (erc-default-target) " account add sipe martin.apel@3ds.com,dsone\\\\" user " " password))
-          (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe set useragent \"UCCAPI/15.0.4771.1000 OC/15.0.4771.1001 (Skype for Business)\""))
+          (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe set useragent \"UCCAPI/16.0.6001.1073 OC/16.0.6001.1073 (Skype for Business)\""))
           (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe on"))
           (erc-log-mode 1)
           )

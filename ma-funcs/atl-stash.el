@@ -442,7 +442,7 @@ is returned.  If the reviewer is not found, the original string is returned."
          (target-branch (stash-find-target-branch default-directory (concat "origin/" source-branch)))
          (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch))))
     (unless repo
-      (user-error "Directory %s is not registered in stash-repos"))
+      (user-error "Directory %s is not registered in stash-repos" default-directory))
     (set-buffer (get-buffer-create "*Stash Create Pull Request*"))
     (erase-buffer)
     (message (concat "Calling git log " merge-base "..origin/" source-branch))

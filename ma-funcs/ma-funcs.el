@@ -1,4 +1,5 @@
 (require 'hideshow)
+(require 'cl-seq)
 (if (featurep 'uuid)
     (require 'uuid))
 
@@ -17,7 +18,6 @@
                  (const "DoRunTests")
                  (const "ParserTest")
                  (const "RWCmpTest")
-                 (const "PerfTest")
                  (const "COMModel")
                  (const "_simpack-script-runner")
                   )
@@ -28,10 +28,9 @@
   "Build directory for SIMPACK builds"
   :type '(choice (const "/scratch/apel/new_arch/obj/64")
                  (const "/scratch/apel/new_arch/obj/dbg64")
-                 (const "/scratch/apel/new_arch/obj/opt-g64")
-                 (const "/scratch/apel/new_arch/obj/32")
-                 (const "/scratch/apel/new_arch/obj/dbg32")
                  (const "/scratch/apel/new_arch/obj/opt-g")
+                 (const "/scratch/apel/new_arch/obj/gcc8")
+                 (const "/scratch/apel/new_arch/obj/gcc8-opt-g")
                  )
   :group 'ma
 )
@@ -225,7 +224,7 @@ The value is a URL containing a %s placeholder for the search term."
 (defun ma-compile-notify (buffer message)
   (ma-send-desktop-notification "emacs compile" message 2000))
 
-(setq compilation-finish-function 'ma-compile-notify)
+(push 'ma-compile-notify compilation-finish-functions)
 
 (defun ma-rm-namespaces ()
   "Remove common namespace prefixes in marked region"
@@ -391,5 +390,53 @@ not, a copyright comment is inserted at the start of the file."
 
 (advice-add 'grep-read-files :around #'ma-turn-off-ivy-for-grep-read-files)
 
+(defconst ma-src-trees
+  '(("master" . "/scratch/apel/new_arch/")
+    ("2020" . "/scratch/apel/new_arch_2020.Y/")
+    ("2020x" . "/scratch/apel/new_arch_2020x.Y/")
+    ("Windows" . "/win/d/users/apel/new_arch/")))
+
+
+(defun ma-choose-file-in-other-tree()
+  "Takes the file displayed in the current buffer and choose the same file in another tree.
+   This uses trees defined via ma-src-trees and offers each one of them to the user.
+   Returns the filename in the other tree."
+  (let* ((cur-file (buffer-file-name))
+         (entry (cl-find-if (lambda(item)
+                              (let* ((len (length (cdr item)))
+                                     (to (if (> len (length cur-file)) nil len)))
+                                (equal (cdr item) (substring cur-file 0 to))))
+                            ma-src-trees)))
+         (when entry
+           (let* ((old-prefix (cdr entry))
+                  (reduced-list (remove entry ma-src-trees))
+                  (collection (mapcar 'car reduced-list))
+                  (choice (completing-read "Choose alternate tree: " collection))
+                  (new-filename (concat (cdr (assoc choice ma-src-trees)) (substring cur-file (length old-prefix)))))
+             new-filename
+           )
+        )
+  ))
+
+(defun ma-find-file-in-other-tree()
+  "Takes the file displayed in the current buffer and opens the same file in another tree.
+   This uses trees defined via ma-src-trees and offers each one of them to the user."
+  (interactive)
+  (let ((other-file (ma-choose-file-in-other-tree)))
+    (if other-file
+        (find-file-other-window other-file)
+      (message "Current file not found in any tree")
+      )))
+
+(defun ma-diff-file-in-other-tree()
+  "Takes the file displayed in the current buffer and diffs it against the same file in another tree."
+  (interactive)
+  (let ((other-file (ma-choose-file-in-other-tree))
+        (this-buffer (current-buffer)))
+    (if other-file
+        (ediff-buffers (find-file-other-window other-file) this-buffer)
+      (message "Current file not found in any tree")
+      ))
+  )
 
 (provide 'ma-funcs)
