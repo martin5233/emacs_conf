@@ -158,7 +158,7 @@ for all open pull requests")
 
 (defun stash-update-repositories (project)
   "Returns the list of repositories for the given project"
-  (request (concat stash-url (format "/rest/api/1.0/projects/%s/repos" project))
+  (request (concat stash-url (format "/rest/api/1.0/projects/%s/repos?limit=100" project))
            :headers stash-access-headers
            :parser 'json-read
            :sync t
