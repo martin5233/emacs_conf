@@ -4,6 +4,7 @@
 (setq work-linux (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
+(setq home-office (and work-linux (string-equal (getenv "DISPLAY") ":1.0")))
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
@@ -20,13 +21,7 @@
 (setq el-get-github-default-url-type (quote https))
 
 (setq el-get-sources
-      '((:name tempo
-               :type builtin
-               :features tempo)
-        (:name tempo-snippets
-               :type http
-               :url "http://nschum.de/src/emacs/tempo-snippets/tempo-snippets.el")
-        (:name expand-region
+      '((:name expand-region
                :after (global-set-key "\M-o" 'er/expand-region))
         (:name multiple-cursors
                :after (progn
@@ -49,7 +44,6 @@
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
                :features http-post-simple)
-        (:name org-toodledo)
         (:name uniquify
                :type builtin
                :features uniquify
@@ -61,7 +55,6 @@
         (:name treepy)
         (:name with-editor)
         (:name magit
-;;                :checkout "2.13.0"
                :depends (dash ghub graphql magit-popup treepy with-editor)
                :after
                (progn
@@ -94,7 +87,6 @@
                           ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
                         (global-set-key (kbd "<f4>") 'hydra-gdb/body)
                         ))
-        (:name macrostep)
         (:name smartscan
                :after (global-smartscan-mode 1))
         (:name git-timemachine)
@@ -180,13 +172,9 @@
           (:name restclient
            :type github
            :pkgname "pashky/restclient.el")
-          (:name ox-pandoc
-                 :type builtin)
           (:name language-detection
                  :type github
                  :pkgname "andreasjansson/language-detection.el")
-;;           (:name calfw)
-          (:name emacs-w3m)
           (:name dockerfile-mode
                  :type github
                  :pkgname "spotify/dockerfile-mode"
@@ -231,11 +219,6 @@
                (:name uuid
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
-;;                (:name excorporate
-;;                       :after (progn
-;;                                (setq excorporate-configuration "martin.apel@3ds.com")
-;;                                (excorporate)
-;;                                (setq excorporate-calendar-show-day-function 'exco-calfw-show-day)))
                ))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
@@ -244,10 +227,6 @@
 
 (add-to-list 'load-path "~/.emacs.d/ma-funcs")
 (require 'ma-funcs)
-
-(add-to-list 'load-path "~/.emacs.d/ttl-mode")
-(autoload 'ttl-mode "ttl-mode")
-(add-to-list 'auto-mode-alist '("\\.\\(n3\\|ttl\\|trig\\)\\'" . ttl-mode))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

@@ -11,13 +11,5 @@
  '((python-mode
   (tags-table-list . ("/scratch/apel/SpckTest/SquishTestSuites/TAGS")))))
 
-(dir-locals-set-class-variables 'motion
- '((c++-mode
-    (ma-compile-command . "~/bin/ds/my_mkmk -a")
-    (ma-build-dir . "")
-    (ma-make-target . "")
-    )))
-
 (dir-locals-set-directory-class  "/scratch/apel/new_arch/develop/" 'new_arch)
 (dir-locals-set-directory-class  "/scratch/apel/SpckTest/SquishTestSuites" 'squish)
-(dir-locals-set-directory-class  "/scratch/apel/Motion/src" 'motion)
