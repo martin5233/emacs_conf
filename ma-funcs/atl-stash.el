@@ -512,7 +512,7 @@ is returned.  If the reviewer is not found, the original string is returned."
         (repo-dir (assoc-default repo stash-repos))
         (default-directory repo-dir)
         (merge-base (stash-merge-base repo-dir from-branch to-branch)))
-    (magit-diff (concat merge-base ".." from-branch))))
+    (magit-diff-range (concat merge-base ".." from-branch))))
 
 (defun stash-approve-pull-request()
   "Approve current pull request"
@@ -546,7 +546,7 @@ is returned.  If the reviewer is not found, the original string is returned."
          (default-directory repo-dir)
          (merge-base (stash-merge-base repo-dir from-branch to-branch))
          (default-directory repo-dir))
-    (magit-log (list (concat merge-base ".." from-branch)))))
+    (magit-log-setup-buffer (list (concat merge-base ".." from-branch)) nil nil)))
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"

@@ -8,6 +8,7 @@
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
+(setq Info-directory-list '("/usr/local/share/info/" "/usr/share/info/"))
 
 (unless (require 'el-get nil 'noerror)
   (with-current-buffer
@@ -54,8 +55,9 @@
         (:name magit-popup)
         (:name treepy)
         (:name with-editor)
+        (:name transient)
         (:name magit
-               :depends (dash ghub graphql magit-popup treepy with-editor)
+               :depends (dash ghub graphql magit-popup treepy with-editor transient)
                :after
                (progn
                  (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
@@ -69,30 +71,28 @@
                         (add-to-list 'ivy-completing-read-handlers-alist '(find-file . completing-read-default))
                         (add-to-list 'ivy-completing-read-handlers-alist '(grep-read-files . completing-read-default))
                         ))
-        (:name mo-git-blame
-               :after (global-set-key (kbd "C-x v g") 'mo-git-blame-current))
         (:name hydra)
-        (:name emacs-gdb
-               :type github
-               :pkgname "weirdNox/emacs-gdb"
-               :depends hydra
-               :autoloads gdb-mi.el
-               :after (progn
-                        (fmakunbound 'gdb)
-                        (fmakunbound 'gdb-enable-debug)
-                        (setq gdb-ignore-gdbinit nil)
-                        (defhydra hydra-gdb ()
-                          "gdb"
-                          ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
-                          ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
-                        (global-set-key (kbd "<f4>") 'hydra-gdb/body)
-                        ))
+;;         (:name emacs-gdb
+;;                :type github
+;;                :pkgname "weirdNox/emacs-gdb"
+;;                :depends hydra
+;;                :autoloads gdb-mi.el
+;;                :after (progn
+;;                         (fmakunbound 'gdb)
+;;                         (fmakunbound 'gdb-enable-debug)
+;;                         (setq gdb-ignore-gdbinit nil)
+;;                         (defhydra hydra-gdb ()
+;;                           "gdb"
+;;                           ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
+;;                           ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
+;;                         (global-set-key (kbd "<f4>") 'hydra-gdb/body)
+;;                         ))
         (:name smartscan
                :after (global-smartscan-mode 1))
         (:name git-timemachine)
         (:name git-gutter
                :after (global-git-gutter-mode 1))
-        (:name csv-mode)
+;;        (:name csv-mode)
         (:name llvm-mode)
         (:name ascii-table)
         (:name crontab-mode)
@@ -136,16 +136,19 @@
         (:name json-mode
                :depends json-snatcher)
         (:name markdown-mode)
-        (:name levenshtein
-               :type http
-               :url "http://www.emacswiki.org/emacs/download/levenshtein.el"
-               )
+;;         (:name levenshtein
+;;                :type http
+;;                :url "http://www.emacswiki.org/emacs/download/levenshtein.el"
+;;                )
         (:name visual-regexp
                :after (progn
                         (global-set-key (kbd "M-%") 'vr/query-replace)
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
-        (:name guide-key)
+        ;;         (:name guide-key)
+        (:name which-key
+               :after (which-key-mode))
+        (:name yasnippet)
         (:name ace-window
                :after
                (global-set-key (kbd "C-x o") 'ace-window))
@@ -161,6 +164,10 @@
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
                         (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
                         (eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
+                        (eval-after-load "flymake" '(diminish 'flymake-mode))
+                        (eval-after-load "flycheck" '(diminish 'flycheck-mode))
+                        (eval-after-load "company" '(diminish 'company-mode))
+                        (eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         ))
 
@@ -187,35 +194,20 @@
     (setq el-get-sources
      (append el-get-sources
              '(
-               (:name mu4e
-                      :checkout "v1.0"
-                      :depends (alert ht))
-               (:name mu4e-alert
-                      :depends (mu4e alert ht s))
-               (:name rtags
-                      :after (progn
-                               (setq rtags-autostart-diagnostics t)
-                               (setq rtags-enable-unsaved-reparsing nil)
-                               (setq rtags-jump-to-first-match nil)
-                               (setq rtags-path "/usr/local/bin")
-                               (setq rtags-process-flags "--rp-daemon 1")
-                               (setq rtags-rc-log-enabled t)
-                               (setq rtags-reparse-timeout 1000)
-                               (setq rtags-timeout 2000)
-                               (rtags-diagnostics)
-                               (setq rtags-completions-enabled t)
-                               (setq rtags-suspend-during-compilation t)
-                               (rtags-start-process-unless-running)
-                               (add-hook 'kill-emacs-hook
-                                         'rtags-quit-rdm)))
                (:name popup)
-               (:name auto-complete
-                      :depends popup)
-               (:name ac-python
-                      :depends auto-complete)
-               (:name doxymacs)
+;;               (:name doxymacs)
                (:name erc
                       :type builtin)
+               (:name lsp-mode)
+               (:name lsp-ui
+                      :depends (lsp-mode))
+               (:name company-mode
+                      :after (global-company-mode))
+               (:name lsp-ivy
+                      :type github
+                      :pkgname "emacs-lsp/lsp-ivy"
+                      :depends lsp-mode)
+               (:name flycheck)
                (:name uuid
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
@@ -235,25 +227,23 @@
  ;; If there is more than one, they won't work right.
  '(appt-audible nil)
  '(auth-source-debug nil)
- '(auth-sources (quote ("~/.authinfo.gpg")))
+ '(auth-sources '("~/.authinfo.gpg"))
  '(auto-revert-check-vc-info nil)
  '(auto-revert-remote-files nil)
  '(auto-revert-verbose nil)
  '(blink-matching-paren-on-screen nil)
  '(browse-kill-ring-no-duplicates t)
- '(browse-url-browser-function (quote ((".*" . browse-url-firefox))))
+ '(browse-url-browser-function '((".*" . browse-url-firefox)))
  '(browse-url-firefox-program "/home/home_dev/MAL1/tools/firefox/firefox")
  '(c-basic-offset 3)
- '(c-cleanup-list (quote (scope-operator compact-empty-funcall)))
+ '(c-cleanup-list '(scope-operator compact-empty-funcall))
  '(c-default-style
-   (quote
-    ((c-mode . "cc-mode")
+   '((c-mode . "cc-mode")
      (c++-mode . "cc-mode")
      (java-mode . "java")
-     (other . "gnu"))))
+     (other . "gnu")))
  '(c-offsets-alist
-   (quote
-    ((incomposition . +)
+   '((incomposition . +)
      (inmodule . +)
      (composition-close . 0)
      (module-close . 0)
@@ -324,11 +314,10 @@
      (lambda-intro-cont . +)
      (inexpr-statement . 0)
      (inexpr-class . +)
-     (inline-open . 0))))
+     (inline-open . 0)))
  '(c-style-variables-are-local-p nil)
  '(calendar-holidays
-   (quote
-    ((holiday-fixed 1 1 "New Year's Day")
+   '((holiday-fixed 1 1 "New Year's Day")
      (holiday-float 1 1 3 "Martin Luther King Day")
      (holiday-fixed 2 2 "Groundhog Day")
      (holiday-fixed 2 14 "Valentine's Day")
@@ -366,12 +355,11 @@
                            (solar-time-string
                             (/ calendar-daylight-savings-ends-time
                                (float 60))
-                            calendar-daylight-time-zone-name))))))
+                            calendar-daylight-time-zone-name)))))
  '(calendar-mark-holidays-flag t)
  '(calendar-view-diary-initially-flag t)
  '(cc-other-file-alist
-   (quote
-    (("\\.cc\\'"
+   '(("\\.cc\\'"
       (".hh" ".h"))
      ("\\.hh\\'"
       (".cc" ".C"))
@@ -400,63 +388,55 @@
      ("\\.cxx\\'"
       (".hxx" ".hh" ".h"))
      ("\\.hxx\\'"
-      (".cxx")))))
+      (".cxx"))))
  '(cc-search-directories
-   (quote
-    ("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa" "../LocalInterfaces" "../../ProtectedInterfaces" "../src" "../../src" "/scratch/apel/new_arch/develop/src/postproc/include" "/scratch/apel/new_arch/develop/src/postproc/include/*")))
- '(cmake-ide-rc-executable "/usr/local/bin/rc")
- '(cmake-ide-rdm-executable "/usr/local/bin/rdm")
- '(comment-style (quote plain))
+   '("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa" "../LocalInterfaces" "../../ProtectedInterfaces" "../src" "../../src" "/scratch/apel/new_arch/develop/src/postproc/include" "/scratch/apel/new_arch/develop/src/postproc/include/*"))
+ '(comment-style 'plain)
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
- '(compilation-error-regexp-alist (quote (bash cmake cmake-info gcc-include gnu perl)))
+ '(compilation-error-regexp-alist '(bash cmake cmake-info gcc-include gnu perl))
  '(compilation-read-command nil)
- '(compilation-scroll-output (quote first-error))
- '(compilation-search-path (quote ("/scratch/apel/new_arch")))
+ '(compilation-scroll-output 'first-error)
+ '(compilation-search-path '("/scratch/apel/new_arch"))
  '(compilation-skip-threshold 2)
  '(compilation-skip-visited t)
- '(confirm-kill-emacs (quote yes-or-no-p))
+ '(confirm-kill-emacs 'yes-or-no-p)
  '(cperl-continued-statement-offset 0)
  '(cperl-indent-level 3)
  '(dabbrev-case-fold-search nil)
  '(default-input-method "german-postfix")
  '(desktop-globals-to-save
-   (quote
-    (desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history)))
+   '(desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history))
  '(desktop-restore-eager 20)
- '(desktop-save (quote ask-if-new))
+ '(desktop-save 'ask-if-new)
  '(diary-file "~/.diary")
- '(dired-auto-revert-buffer (quote dired-directory-changed-p))
+ '(dired-auto-revert-buffer 'dired-directory-changed-p)
  '(dired-dwim-target t)
  '(dired-omit-files "^\\.?#\\|^\\.")
- '(dirtrack-list (quote ("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1)))
+ '(dirtrack-list '("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1))
  '(ediff-keep-variants nil)
- '(ediff-split-window-function (quote split-window-horizontally))
- '(ediff-window-setup-function (quote ediff-setup-windows-plain))
+ '(ediff-split-window-function 'split-window-horizontally)
+ '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(el-get-byte-compile-at-init t)
- '(emacs-lisp-mode-hook
-   (quote
-    (eldoc-mode imenu-add-menubar-index checkdoc-minor-mode)))
- '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE" "MODE-nick")))
+ '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode))
+ '(erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
  '(erc-modules
-   (quote
-    (autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands notifications readonly ring smiley stamp spelling track)))
+   '(autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands notifications readonly ring smiley stamp spelling track))
  '(erc-nick "martin")
  '(erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
  '(erc-server "localhost")
- '(erc-track-exclude-types (quote ("JOIN" "NICK" "PART" "333" "353")))
- '(erc-track-showcount nil)
+ '(erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
+ '(erc-track-showcount nil t)
  '(erc-user-full-name "Martin Apel")
- '(eudc-protocol (quote ldap))
- '(eudc-query-form-attributes (quote (name firstname email phone Uid)))
+ '(eudc-protocol 'ldap)
+ '(eudc-query-form-attributes '(name firstname email phone Uid))
  '(eudc-server "10.29.111.1")
  '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
  '(ff-ignore-include t)
  '(file-cache-filter-regexps
-   (quote
-    ("~$" "\\.o$" "\\.rpo$" "\\.exe$" "\\.a$" "\\.elc$" ",v$" "\\.output$" "\\.$" "#$" "\\.class$" "\\.bak$" "\\.svn-base$" "\\.html$" "\\.svn" "\\.so$" "\\.dll$" "CMakeFiles" "extern/share" "extern/linux" "extern/win" "partners" "/obj/" "^project\\.pj$" "\\.sbr$" "\\.tes$" "\\.intinfo$" "\\.dim$")))
+   '("~$" "\\.o$" "\\.rpo$" "\\.exe$" "\\.a$" "\\.elc$" ",v$" "\\.output$" "\\.$" "#$" "\\.class$" "\\.bak$" "\\.svn-base$" "\\.html$" "\\.svn" "\\.so$" "\\.dll$" "CMakeFiles" "extern/share" "extern/linux" "extern/win" "partners" "/obj/" "^project\\.pj$" "\\.sbr$" "\\.tes$" "\\.intinfo$" "\\.dim$"))
  '(fill-column 120)
  '(focus-follows-mouse t)
  '(gdb-find-source-frame t)
@@ -465,22 +445,16 @@
  '(git-commit-summary-max-length 72)
  '(global-auto-revert-mode t)
  '(gnutls-trustfiles
-   (quote
-    ("/etc/ssl/certs/ca-certificates.crt" "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/ca-bundle.pem" "/usr/ssl/certs/ca-bundle.crt" "/usr/local/share/certs/ca-root-nss.crt" "/home/home_dev/MAL1/SIMPACK_CA.cer")))
+   '("/etc/ssl/certs/ca-certificates.crt" "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/ca-bundle.pem" "/usr/ssl/certs/ca-bundle.crt" "/usr/local/share/certs/ca-root-nss.crt" "/home/home_dev/MAL1/SIMPACK_CA.cer"))
  '(grep-command "grep --color -nH -e ")
  '(grep-find-command
-   (quote
-    ("find . -type f -exec grep --color -nH -e  \\{\\} +" . 49)))
+   '("find . -type f -exec grep --color -nH -e  \\{\\} +" . 49))
  '(grep-find-template
    "find <D> <X> -type f <F> -exec grep <C> -nH -e <R> \\{\\} +")
  '(grep-template "grep <X> <C> -nH -e <R> <F>")
  '(grep-use-null-filename-separator nil)
  '(gud-tooltip-mode t)
- '(guide-key-mode t)
- '(guide-key/guide-key-sequence (quote ("C-x r" "C-c r")))
- '(guide-key/idle-delay 0.0)
- '(guide-key/popup-window-position (quote bottom))
- '(imenu-sort-function (quote imenu--sort-by-name))
+ '(imenu-sort-function 'imenu--sort-by-name)
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 3)
@@ -489,28 +463,33 @@
  '(ldap-default-base "ou=dsone,dc=dsone,dc=3ds,dc=com")
  '(ldap-default-host "10.29.111.1")
  '(ldap-host-parameters-alist
-   (quote
-    (("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU057,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!"))))
- '(log-edit-hook (quote (log-edit-insert-cvs-template log-edit-show-files)))
+   '(("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU057,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!")))
+ '(log-edit-hook '(log-edit-insert-cvs-template log-edit-show-files))
+ '(lsp-client-packages
+   '(lsp-bash lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
+ '(lsp-restart 'auto-restart)
+ '(lsp-ui-doc-border "deep sky blue")
+ '(lsp-ui-doc-enable t)
+ '(lsp-ui-doc-include-signature t)
+ '(lsp-ui-doc-position 'bottom)
+ '(lsp-ui-sideline-show-hover t)
  '(magit-auto-revert-mode nil)
- '(magit-cherry-pick-arguments (quote ("-x")))
+ '(magit-cherry-pick-arguments '("-x"))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
- '(magit-completing-read-function (quote ivy-completing-read))
+ '(magit-completing-read-function 'ivy-completing-read)
  '(magit-diff-refine-hunk t)
- '(magit-log-arguments (quote ("-n20")))
- '(magit-log-section-arguments (quote ("-n256" "--decorate")))
+ '(magit-log-arguments '("-n20"))
+ '(magit-log-section-arguments '("-n256" "--decorate"))
  '(magit-process-popup-time 3)
- '(magit-pull-arguments (quote ("--rebase")))
- '(magit-qdiff-options (quote ("--ignore-space-change" "--ignore-all-space")))
- '(magit-refs-primary-column-width (quote (16 . 60)))
+ '(magit-pull-arguments '("--rebase"))
+ '(magit-qdiff-options '("--ignore-space-change" "--ignore-all-space"))
+ '(magit-refs-primary-column-width '(16 . 60))
  '(magit-refs-sections-hook
-   (quote
-    (magit-insert-error-header magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches)))
+   '(magit-insert-error-header magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches))
  '(magit-repo-dirs
-   (quote
-    ("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation")))
- '(magit-repository-directories (quote (("/scratch/apel" . 1) ("~/.emacs.d" . 2))))
+   '("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation"))
+ '(magit-repository-directories '(("/scratch/apel" . 1) ("~/.emacs.d" . 2)))
  '(magit-restore-window-configuration t)
  '(magit-rewrite-inclusive nil)
  '(magit-show-child-count t)
@@ -519,19 +498,431 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files (quote ("~/org/na.org")))
- '(package-archives
-   (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("marmalade" . "http://marmalade-repo.org/packages/"))))
- '(package-selected-packages (quote (nil)))
+ '(org-agenda-files '("~/org/na.org"))
+ '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
+ '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(safe-local-variable-values
-   (quote
-    ((c-file-offsets
+   '((project-vc-merge-submodules)
+     (lsp--override-calculate-lisp-indent\? . t)
+     (eval progn
+           (let
+               ((dirloc-lsp-defun-regexp
+                 (concat
+                  (concat "^\\s-*(" "lsp-defun" "\\s-+\\(")
+                  (or
+                   (bound-and-true-p lisp-mode-symbol-regexp)
+                   "\\(?:\\sw\\|\\s_\\|\\\\.\\)+")
+                  "\\)")))
+             (add-to-list 'imenu-generic-expression
+                          (list "Functions" dirloc-lsp-defun-regexp 1)))
+           (defvar lsp--override-calculate-lisp-indent\? nil "Whether to override `lisp-indent-function' with
+              the updated `calculate-lisp-indent' definition from
+              Emacs 28.")
+           (defun wrap-calculate-lisp-indent
+               (func &optional parse-start)
+             "Return appropriate indentation for current line as Lisp code.
+In usual case returns an integer: the column to indent to.
+If the value is nil, that means don't change the indentation
+because the line starts inside a string.
+
+PARSE-START may be a buffer position to start parsing from, or a
+parse state as returned by calling `parse-partial-sexp' up to the
+beginning of the current line.
+
+The value can also be a list of the form (COLUMN CONTAINING-SEXP-START).
+This means that following lines at the same level of indentation
+should not necessarily be indented the same as this line.
+Then COLUMN is the column to indent to, and CONTAINING-SEXP-START
+is the buffer position of the start of the containing expression."
+             (if
+                 (not lsp--override-calculate-lisp-indent\?)
+                 (funcall func parse-start)
+               (save-excursion
+                 (beginning-of-line)
+                 (let
+                     ((indent-point
+                       (point))
+                      state
+                      (desired-indent nil)
+                      (retry t)
+                      whitespace-after-open-paren calculate-lisp-indent-last-sexp containing-sexp)
+                   (cond
+                    ((or
+                      (markerp parse-start)
+                      (integerp parse-start))
+                     (goto-char parse-start))
+                    ((null parse-start)
+                     (beginning-of-defun))
+                    (t
+                     (setq state parse-start)))
+                   (unless state
+                     (while
+                         (<
+                          (point)
+                          indent-point)
+                       (setq state
+                             (parse-partial-sexp
+                              (point)
+                              indent-point 0))))
+                   (while
+                       (and retry state
+                            (>
+                             (elt state 0)
+                             0))
+                     (setq retry nil)
+                     (setq calculate-lisp-indent-last-sexp
+                           (elt state 2))
+                     (setq containing-sexp
+                           (elt state 1))
+                     (goto-char
+                      (1+ containing-sexp))
+                     (if
+                         (and calculate-lisp-indent-last-sexp
+                              (> calculate-lisp-indent-last-sexp
+                                 (point)))
+                         (let
+                             ((peek
+                               (parse-partial-sexp calculate-lisp-indent-last-sexp indent-point 0)))
+                           (if
+                               (setq retry
+                                     (car
+                                      (cdr peek)))
+                               (setq state peek)))))
+                   (if retry nil
+                     (goto-char
+                      (1+ containing-sexp))
+                     (setq whitespace-after-open-paren
+                           (looking-at
+                            (rx whitespace)))
+                     (if
+                         (not calculate-lisp-indent-last-sexp)
+                         (setq desired-indent
+                               (current-column))
+                       (parse-partial-sexp
+                        (point)
+                        calculate-lisp-indent-last-sexp 0 t)
+                       (cond
+                        ((looking-at "\\s("))
+                        ((>
+                          (save-excursion
+                            (forward-line 1)
+                            (point))
+                          calculate-lisp-indent-last-sexp)
+                         (if
+                             (or
+                              (=
+                               (point)
+                               calculate-lisp-indent-last-sexp)
+                              whitespace-after-open-paren)
+                             nil
+                           (progn
+                             (forward-sexp 1)
+                             (parse-partial-sexp
+                              (point)
+                              calculate-lisp-indent-last-sexp 0 t)))
+                         (backward-prefix-chars))
+                        (t
+                         (goto-char calculate-lisp-indent-last-sexp)
+                         (beginning-of-line)
+                         (parse-partial-sexp
+                          (point)
+                          calculate-lisp-indent-last-sexp 0 t)
+                         (backward-prefix-chars)))))
+                   (let
+                       ((normal-indent
+                         (current-column)))
+                     (cond
+                      ((elt state 3)
+                       nil)
+                      ((and
+                        (integerp lisp-indent-offset)
+                        containing-sexp)
+                       (goto-char containing-sexp)
+                       (+
+                        (current-column)
+                        lisp-indent-offset))
+                      (calculate-lisp-indent-last-sexp
+                       (or
+                        (and lisp-indent-function
+                             (not retry)
+                             (funcall lisp-indent-function indent-point state))
+                        (and
+                         (save-excursion
+                           (goto-char indent-point)
+                           (skip-chars-forward " 	")
+                           (looking-at ":"))
+                         (save-excursion
+                           (goto-char calculate-lisp-indent-last-sexp)
+                           (backward-prefix-chars)
+                           (while
+                               (not
+                                (or
+                                 (looking-back "^[ 	]*\\|([ 	]+"
+                                               (line-beginning-position))
+                                 (and containing-sexp
+                                      (>=
+                                       (1+ containing-sexp)
+                                       (point)))))
+                             (forward-sexp -1)
+                             (backward-prefix-chars))
+                           (setq calculate-lisp-indent-last-sexp
+                                 (point)))
+                         (> calculate-lisp-indent-last-sexp
+                            (save-excursion
+                              (goto-char
+                               (1+ containing-sexp))
+                              (parse-partial-sexp
+                               (point)
+                               calculate-lisp-indent-last-sexp 0 t)
+                              (point)))
+                         (let
+                             ((parse-sexp-ignore-comments t)
+                              indent)
+                           (goto-char calculate-lisp-indent-last-sexp)
+                           (or
+                            (and
+                             (looking-at ":")
+                             (setq indent
+                                   (current-column)))
+                            (and
+                             (<
+                              (line-beginning-position)
+                              (prog2
+                                  (backward-sexp)
+                                  (point)))
+                             (looking-at ":")
+                             (setq indent
+                                   (current-column))))
+                           indent))
+                        normal-indent))
+                      (desired-indent)
+                      (t normal-indent)))))))
+           (when
+               (< emacs-major-version 28)
+             (advice-add #'calculate-lisp-indent :around #'wrap-calculate-lisp-indent)))
+     (flycheck-disabled-checkers quote
+                                 (emacs-lisp-checkdoc))
+     (eval progn
+           (let
+               ((dirloc-lsp-defun-regexp
+                 (concat
+                  (concat "^\\s-*(" "lsp-defun" "\\s-+\\(")
+                  (or
+                   (bound-and-true-p lisp-mode-symbol-regexp)
+                   "\\(?:\\sw\\|\\s_\\|\\\\.\\)+")
+                  "\\)")))
+             (add-to-list 'imenu-generic-expression
+                          (list "Functions" dirloc-lsp-defun-regexp 1)))
+           (defvar lsp--override-calculate-lisp-indent\? nil "Whether to override the default
+              `calculate-lisp-indent'.")
+           (setq-local lsp--override-calculate-lisp-indent\? t)
+           (defun wrap~calculate-lisp-indent
+               (fn &optional parse-start)
+             "Add better indentation for quoted and backquoted lists."
+             (if
+                 (not lsp--override-calculate-lisp-indent\?)
+                 (funcall fn parse-start)
+               (defvar calculate-lisp-indent-last-sexp)
+               (save-excursion
+                 (beginning-of-line)
+                 (let
+                     ((indent-point
+                       (point))
+                      state
+                      (desired-indent nil)
+                      (retry t)
+                      calculate-lisp-indent-last-sexp containing-sexp)
+                   (cond
+                    ((or
+                      (markerp parse-start)
+                      (integerp parse-start))
+                     (goto-char parse-start))
+                    ((null parse-start)
+                     (beginning-of-defun))
+                    (t
+                     (setq state parse-start)))
+                   (unless state
+                     (while
+                         (<
+                          (point)
+                          indent-point)
+                       (setq state
+                             (parse-partial-sexp
+                              (point)
+                              indent-point 0))))
+                   (while
+                       (and retry state
+                            (>
+                             (elt state 0)
+                             0))
+                     (setq retry nil)
+                     (setq calculate-lisp-indent-last-sexp
+                           (elt state 2))
+                     (setq containing-sexp
+                           (elt state 1))
+                     (goto-char
+                      (1+ containing-sexp))
+                     (if
+                         (and calculate-lisp-indent-last-sexp
+                              (> calculate-lisp-indent-last-sexp
+                                 (point)))
+                         (let
+                             ((peek
+                               (parse-partial-sexp calculate-lisp-indent-last-sexp indent-point 0)))
+                           (if
+                               (setq retry
+                                     (car
+                                      (cdr peek)))
+                               (setq state peek)))))
+                   (if retry nil
+                     (goto-char
+                      (1+ containing-sexp))
+                     (if
+                         (not calculate-lisp-indent-last-sexp)
+                         (setq desired-indent
+                               (current-column))
+                       (parse-partial-sexp
+                        (point)
+                        calculate-lisp-indent-last-sexp 0 t)
+                       (cond
+                        ((looking-at "\\s("))
+                        ((>
+                          (save-excursion
+                            (forward-line 1)
+                            (point))
+                          calculate-lisp-indent-last-sexp)
+                         (if
+                             (or
+                              (=
+                               (point)
+                               calculate-lisp-indent-last-sexp)
+                              (let*
+                                  ((positions
+                                    (elt state 9))
+                                   (last
+                                    (car
+                                     (last positions)))
+                                   (rest
+                                    (reverse
+                                     (butlast positions)))
+                                   (any-quoted-p nil)
+                                   (point nil))
+                                (or
+                                 (when-let
+                                     ((char
+                                       (char-before last)))
+                                   (or
+                                    (char-equal char 39)
+                                    (char-equal char 96)))
+                                 (progn
+                                   (while
+                                       (and rest
+                                            (not any-quoted-p))
+                                     (setq point
+                                           (pop rest))
+                                     (setq any-quoted-p
+                                           (or
+                                            (when-let
+                                                ((char
+                                                  (char-before point)))
+                                              (or
+                                               (char-equal char 39)
+                                               (char-equal char 96)))
+                                            (save-excursion
+                                              (goto-char
+                                               (1+ point))
+                                              (looking-at-p "\\(?:back\\)?quote[
+ ]+(")))))
+                                   any-quoted-p))))
+                             nil
+                           (progn
+                             (forward-sexp 1)
+                             (parse-partial-sexp
+                              (point)
+                              calculate-lisp-indent-last-sexp 0 t)))
+                         (backward-prefix-chars))
+                        (t
+                         (goto-char calculate-lisp-indent-last-sexp)
+                         (beginning-of-line)
+                         (parse-partial-sexp
+                          (point)
+                          calculate-lisp-indent-last-sexp 0 t)
+                         (backward-prefix-chars)))))
+                   (let
+                       ((normal-indent
+                         (current-column)))
+                     (cond
+                      ((elt state 3)
+                       nil)
+                      ((and
+                        (integerp lisp-indent-offset)
+                        containing-sexp)
+                       (goto-char containing-sexp)
+                       (+
+                        (current-column)
+                        lisp-indent-offset))
+                      (calculate-lisp-indent-last-sexp
+                       (or
+                        (and lisp-indent-function
+                             (not retry)
+                             (funcall lisp-indent-function indent-point state))
+                        (and
+                         (save-excursion
+                           (goto-char indent-point)
+                           (skip-chars-forward " 	")
+                           (looking-at ":"))
+                         (save-excursion
+                           (goto-char calculate-lisp-indent-last-sexp)
+                           (backward-prefix-chars)
+                           (while
+                               (not
+                                (or
+                                 (looking-back "^[ 	]*\\|([ 	]+"
+                                               (line-beginning-position))
+                                 (and containing-sexp
+                                      (>=
+                                       (1+ containing-sexp)
+                                       (point)))))
+                             (forward-sexp -1)
+                             (backward-prefix-chars))
+                           (setq calculate-lisp-indent-last-sexp
+                                 (point)))
+                         (> calculate-lisp-indent-last-sexp
+                            (save-excursion
+                              (goto-char
+                               (1+ containing-sexp))
+                              (parse-partial-sexp
+                               (point)
+                               calculate-lisp-indent-last-sexp 0 t)
+                              (point)))
+                         (let
+                             ((parse-sexp-ignore-comments t)
+                              indent)
+                           (goto-char calculate-lisp-indent-last-sexp)
+                           (or
+                            (and
+                             (looking-at ":")
+                             (setq indent
+                                   (current-column)))
+                            (and
+                             (<
+                              (line-beginning-position)
+                              (prog2
+                                  (backward-sexp)
+                                  (point)))
+                             (looking-at ":")
+                             (setq indent
+                                   (current-column))))
+                           indent))
+                        normal-indent))
+                      (desired-indent)
+                      (t normal-indent)))))))
+           (advice-add #'calculate-lisp-indent :around #'wrap~calculate-lisp-indent))
+     (c-file-offsets
       (block-close . 0)
       (brace-list-close . 0)
       (brace-list-entry . 0)
@@ -559,13 +950,11 @@
      (tags-table-list "/scratch/apel/MotionPlatform/TAGS")
      (tags-table-list "/scratch/apel/SpckTest/SquishTestSuites/TAGS")
      (eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
-           (add-hook
-            (quote write-contents-functions)
-            (lambda nil
-              (delete-trailing-whitespace)
-              nil))
-           (require
-            (quote whitespace))
+           (add-hook 'write-contents-functions
+                     (lambda nil
+                       (delete-trailing-whitespace)
+                       nil))
+           (require 'whitespace)
            "Sometimes the mode needs to be toggled off and on."
            (whitespace-mode 0)
            (whitespace-mode 1))
@@ -578,25 +967,23 @@
      (crontab-host . redhat64)
      (crontab-apply-after-save . t)
      (ma-compile-command . "~/bin/my_compile")
-     (ma-compile-command . "/home/home_dev/MAL1/bin/ds/my_mkmk"))))
+     (ma-compile-command . "/home/home_dev/MAL1/bin/ds/my_mkmk")))
  '(save-abbrevs nil)
- '(scroll-bar-mode (quote right))
+ '(scroll-bar-mode 'right)
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
- '(show-paren-style (quote parenthesis))
+ '(show-paren-style 'parenthesis)
  '(smartscan-symbol-selector "symbol")
  '(split-height-threshold 40)
  '(split-width-threshold 200)
  '(standard-indent 3)
  '(stash-repos
-   (quote
-    (("spckxxxx" . "/scratch/apel/new_arch/")
+   '(("spckxxxx" . "/scratch/apel/new_arch/")
      ("spcktest" . "/scratch/apel/SpckTest/")
      ("motionplatformloader" . "/scratch/apel/MotionPlatform/")
-     ("devscripts" . "/scratch/apel/devscripts/"))))
+     ("devscripts" . "/scratch/apel/devscripts/")))
  '(stash-reviewer-shortcuts
-   (quote
-    (("autotest-linux" . "linux")
+   '(("autotest-linux" . "linux")
      ("autotest-windows" . "win")
      ("autotest-fortran" . "fort")
      ("PKR3" . "PKl")
@@ -612,7 +999,7 @@
      ("MDL2" . "DM")
      ("CWN1" . "ChW")
      ("TBN1" . "TB")
-     ("PMK2" . "PM"))))
+     ("PMK2" . "PM")))
  '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
@@ -624,8 +1011,8 @@
  '(texinfo-close-quote "''")
  '(texinfo-open-quote "``")
  '(tool-bar-mode nil)
- '(tramp-default-method "ssh" nil (tramp))
- '(tramp-default-proxies-alist nil nil (tramp))
+ '(tramp-default-method "ssh")
+ '(tramp-default-proxies-alist nil)
  '(tramp-smb-conf "/home/home_dev/MAL1/.smbclient.conf" nil (tramp))
  '(truncate-lines t)
  '(use-file-dialog nil)
@@ -635,9 +1022,8 @@
  '(vc-consult-headers nil)
  '(vc-display-status t)
  '(vc-git-diff-switches "-w")
- '(vc-handled-backends (quote (Git)))
- '(w3m-pop-up-windows t)
- '(which-function-mode t nil (which-func)))
+ '(vc-handled-backends '(Git))
+ '(w3m-pop-up-windows t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -647,11 +1033,9 @@
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
  '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
+ '(lsp-ui-doc-background ((t (:background "OliveDrab2"))))
+ '(lsp-ui-sideline-code-action ((t (:foreground "red" :slant italic))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
- '(rtags-errline ((t (:background "dark orange"))))
- '(rtags-fixitline ((t (:background "goldenrod4
-"))))
- '(rtags-skippedline ((t (:background "white smoke"))))
  '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5))))
  '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
 
@@ -715,7 +1099,6 @@
             (cwarn-mode)
             (hs-minor-mode)
             (idle-highlight-mode)
-            (rtags-enable-standard-keybindings)
             (hs-hide-initial-comment-block)))
 
 
@@ -753,11 +1136,6 @@
                 (require 'csh-mode)
                 (setq-local indent-line-function 'csh-indent-line)
                 (setq-local indent-region-function 'csh-indent-region)))))
-
-(add-hook 'prog-mode-hook
-          (lambda()
-            (if (tramp-tramp-file-p (buffer-file-name (current-buffer)))
-                (set (make-local-variable 'rtags-enabled) nil))))
 
 (server-start)
 
