@@ -38,7 +38,7 @@
 (defcustom ma-doc-sites
   '(("Boost Filesystem" . "file:///scratch/apel/boost_1_67_0/libs/filesystem/doc/reference.html")
     ("CPP Reference" . "https://en.cppreference.com/mwiki/index.php?search=%s")
-    ("Qt 5.7" . "http://doc.qt.io/archives/qt-5.7/%s.html"))
+    ("Qt 5.12" . "http://doc.qt.io/qt-5.12/%s.html"))
   "An alist of documentation sites. The key is a keyword offered for choosing, which one to use.
 The value is a URL containing a %s placeholder for the search term."
   :type '(alist :key-type string :value-type string)

@@ -92,7 +92,8 @@
         (:name git-timemachine)
         (:name git-gutter
                :after (global-git-gutter-mode 1))
-;;        (:name csv-mode)
+        (:name csv-mode
+               :type elpa)
         (:name llvm-mode)
         (:name ascii-table)
         (:name crontab-mode)
@@ -136,10 +137,6 @@
         (:name json-mode
                :depends json-snatcher)
         (:name markdown-mode)
-;;         (:name levenshtein
-;;                :type http
-;;                :url "http://www.emacswiki.org/emacs/download/levenshtein.el"
-;;                )
         (:name visual-regexp
                :after (progn
                         (global-set-key (kbd "M-%") 'vr/query-replace)
@@ -167,7 +164,9 @@
                         (eval-after-load "flymake" '(diminish 'flymake-mode))
                         (eval-after-load "flycheck" '(diminish 'flycheck-mode))
                         (eval-after-load "company" '(diminish 'company-mode))
+                        (eval-after-load "company-box" '(diminish 'company-box-mode))
                         (eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
+                        (eval-after-load "which-key" '(diminish 'which-key-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         ))
 
@@ -195,7 +194,6 @@
      (append el-get-sources
              '(
                (:name popup)
-;;               (:name doxymacs)
                (:name erc
                       :type builtin)
                (:name lsp-mode)
@@ -203,6 +201,11 @@
                       :depends (lsp-mode))
                (:name company-mode
                       :after (global-company-mode))
+               (:name company-box-mode
+		                :type github
+		                :pkgname "sebastiencs/company-box"
+                      :after (add-hook 'company-mode-hook 'company-box-mode)
+                      :depends (company-mode))
                (:name lsp-ivy
                       :type github
                       :pkgname "emacs-lsp/lsp-ivy"
@@ -400,6 +403,7 @@
  '(compilation-search-path '("/scratch/apel/new_arch"))
  '(compilation-skip-threshold 2)
  '(compilation-skip-visited t)
+ '(completion-category-overrides '((file (styles emacs22))))
  '(confirm-kill-emacs 'yes-or-no-p)
  '(cperl-continued-statement-offset 0)
  '(cperl-indent-level 3)
@@ -418,6 +422,8 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(el-get-byte-compile-at-init t)
+ '(eldoc-minor-mode-string nil)
+ '(electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
  '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode))
  '(erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
  '(erc-modules
@@ -467,11 +473,16 @@
  '(log-edit-hook '(log-edit-insert-cvs-template log-edit-show-files))
  '(lsp-client-packages
    '(lsp-bash lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
+ '(lsp-completion-no-cache t)
+ '(lsp-modeline-code-actions-enable nil)
+ '(lsp-modeline-diagnostics-scope :file)
  '(lsp-restart 'auto-restart)
  '(lsp-ui-doc-border "deep sky blue")
  '(lsp-ui-doc-enable t)
  '(lsp-ui-doc-include-signature t)
+ '(lsp-ui-doc-max-height 10)
  '(lsp-ui-doc-position 'bottom)
+ '(lsp-ui-sideline-diagnostic-max-line-length 30)
  '(lsp-ui-sideline-show-hover t)
  '(magit-auto-revert-mode nil)
  '(magit-cherry-pick-arguments '("-x"))
@@ -1034,10 +1045,12 @@ is the buffer position of the start of the containing expression."
  '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
  '(lsp-ui-doc-background ((t (:background "OliveDrab2"))))
- '(lsp-ui-sideline-code-action ((t (:foreground "red" :slant italic))))
+ '(lsp-ui-sideline-code-action ((t (:background "cyan" :foreground "red" :box (:line-width 2 :color "grey75" :style released-button) :slant italic))))
+ '(lsp-ui-sideline-current-symbol ((t (:background "pale turquoise" :foreground "white" :box (:line-width -1 :color "white") :weight ultra-bold :height 0.99))))
+ '(lsp-ui-sideline-symbol ((t (:background "pale turquoise" :foreground "grey" :box (:line-width -1 :color "grey") :height 0.99))))
+ '(lsp-ui-sideline-symbol-info ((t (:background "pale turquoise" :slant italic :height 0.99))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
- '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5))))
- '(tempo-snippets-editable-face ((((background light)) (:background "light cyan" :underline t)))))
+ '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5)))))
 
 ;; Avoid version-control checks for tramp buffers
 (setq vc-ignore-dir-regexp
@@ -1087,7 +1100,6 @@ is the buffer position of the start of the containing expression."
             (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
             (local-set-key (kbd "C-c =") 'align-regexp)
             (local-set-key (kbd "C-M-u") 'ma-insert-random-uuid)
-            (local-set-key (kbd "C-c i") 'imenu)
             (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
             (local-unset-key (kbd "C-c C-n"))
             (local-unset-key (kbd "C-c C-p"))

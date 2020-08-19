@@ -12,7 +12,16 @@
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)))
 
 ;; clangd
-(add-hook 'c++-mode-hook #'lsp)
+(add-hook 'c++-mode-hook
+          (lambda()
+            (lsp)
+            (yas-minor-mode)
+            (local-set-key (kbd "C-c i") '(lambda()
+                                            (interactive)
+                                            (require 'lsp-ui)
+                                            (lsp-ui-imenu)))
+            (local-set-key (kbd "C-c j") 'lsp-ivy-workspace-symbol)
+            ))
 (add-hook 'c++-mode-hook #'yas-minor-mode)
 
 ;; dockerfile
@@ -22,3 +31,11 @@
 ;; cmake
 (setq company-cmake-executable "/scratch/apel/new_arch/develop/extern/linux64/cmake-3.17/bin/cmake")
 (add-hook 'cmake-mode-hook #'lsp)
+
+(defun ma-cmake-upcase-completion-list (candidates)
+  "Converts all incoming completion candidates to upper case"
+  (if (string-equal major-mode "cmake-mode")
+      (mapcar 'upcase candidates)
+    candidates))
+
+(setq company-transformers '(ma-cmake-upcase-completion-list))
