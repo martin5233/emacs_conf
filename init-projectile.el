@@ -7,6 +7,8 @@
 (setq projectile-git-submodule-command nil)
 (setq projectile-mode-line-prefix "")
 
+(global-set-key (kbd "C-x C-f") 'counsel-projectile-find-file)
+
 (defun ma-projectile-mode-line()
   "Generates a projectile mode line"
   (format " Proj[%s]" (projectile-project-name)))

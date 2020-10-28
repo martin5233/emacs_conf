@@ -131,7 +131,6 @@
                         (global-set-key (kbd "M-%") 'vr/query-replace)
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
-        ;;         (:name guide-key)
         (:name which-key
                :after (which-key-mode))
         (:name yasnippet)
@@ -161,14 +160,20 @@
         (:name counsel-projectile
                :depends projectile
                :after (counsel-projectile-mode 1))
+        (:name company-mode
+               :after (global-company-mode))
+        (:name company-box-mode
+		         :type github
+		         :pkgname "sebastiencs/company-box"
+               :after (add-hook 'company-mode-hook 'company-box-mode)
+               :depends (company-mode))
+        (:name flycheck)
         ))
 
 (if work
     (setq el-get-sources
      (append el-get-sources
-        '((:name filecache
-           :type builtin)
-          (:name restclient
+        '((:name restclient
            :type github
            :pkgname "pashky/restclient.el")
           (:name language-detection
@@ -192,18 +197,10 @@
                (:name lsp-mode)
                (:name lsp-ui
                       :depends (lsp-mode))
-               (:name company-mode
-                      :after (global-company-mode))
-               (:name company-box-mode
-		                :type github
-		                :pkgname "sebastiencs/company-box"
-                      :after (add-hook 'company-mode-hook 'company-box-mode)
-                      :depends (company-mode))
                (:name lsp-ivy
                       :type github
                       :pkgname "emacs-lsp/lsp-ivy"
                       :depends lsp-mode)
-               (:name flycheck)
                (:name uuid
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
@@ -985,7 +982,6 @@ is the buffer position of the start of the containing expression."
  '(stash-repos
    '(("spckxxxx" . "/scratch/apel/new_arch/")
      ("spcktest" . "/scratch/apel/SpckTest/")
-     ("motionplatformloader" . "/scratch/apel/MotionPlatform/")
      ("devscripts" . "/scratch/apel/devscripts/")))
  '(stash-reviewer-shortcuts
    '(("autotest-linux" . "linux")
