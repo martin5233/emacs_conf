@@ -30,15 +30,6 @@
                         (global-set-key (kbd "C-c C-p") 'mc/mark-previous-like-this)
                         (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
                         (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
-        (:name etags-select
-               :type http
-               :url "http://www.emacswiki.org/emacs/download/etags-select.el"
-               :after (progn
-                        (add-hook 'c-mode-common-hook
-                                  (lambda()
-                                    (local-set-key (kbd "M-.") 'etags-select-find-tag-at-point)))
-                        (setq etags-select-go-if-unambiguous t)
-                        (setq etags-select-use-short-name-completion t)))
         (:name org-mode
                :branch "maint")
         (:name http-post-simple
@@ -72,23 +63,21 @@
                         (add-to-list 'ivy-completing-read-handlers-alist '(grep-read-files . completing-read-default))
                         ))
         (:name hydra)
-;;         (:name emacs-gdb
-;;                :type github
-;;                :pkgname "weirdNox/emacs-gdb"
-;;                :depends hydra
-;;                :autoloads gdb-mi.el
-;;                :after (progn
-;;                         (fmakunbound 'gdb)
-;;                         (fmakunbound 'gdb-enable-debug)
-;;                         (setq gdb-ignore-gdbinit nil)
-;;                         (defhydra hydra-gdb ()
-;;                           "gdb"
-;;                           ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
-;;                           ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
-;;                         (global-set-key (kbd "<f4>") 'hydra-gdb/body)
-;;                         ))
-        (:name smartscan
-               :after (global-smartscan-mode 1))
+        (:name gdb-mi
+               :type github
+               :pkgname "weirdNox/emacs-gdb"
+               :depends hydra
+               :after (progn
+                        (fmakunbound 'gdb)
+                        (fmakunbound 'gdb-enable-debug)
+                        (setq gdb-ignore-gdbinit nil)
+                        (defhydra hydra-gdb ()
+                          "gdb"
+                          ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
+                          ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
+                        (global-set-key (kbd "<f4>") 'hydra-gdb/body)
+                        ))
+        (:name smartscan)
         (:name git-timemachine)
         (:name git-gutter
                :after (global-git-gutter-mode 1))
@@ -168,6 +157,10 @@
                         (eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
                         (eval-after-load "which-key" '(diminish 'which-key-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
+        (:name projectile)
+        (:name counsel-projectile
+               :depends projectile
+               :after (counsel-projectile-mode 1))
         ))
 
 (if work
@@ -423,7 +416,9 @@
  '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(el-get-byte-compile-at-init t)
  '(eldoc-minor-mode-string nil)
+ '(electric-indent-mode t)
  '(electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
+ '(electric-pair-mode nil)
  '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode))
  '(erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
  '(erc-modules
@@ -459,6 +454,7 @@
    "find <D> <X> -type f <F> -exec grep <C> -nH -e <R> \\{\\} +")
  '(grep-template "grep <X> <C> -nH -e <R> <F>")
  '(grep-use-null-filename-separator nil)
+ '(groovy-indent-offset 3)
  '(gud-tooltip-mode t)
  '(imenu-sort-function 'imenu--sort-by-name)
  '(indent-tabs-mode nil)
@@ -483,7 +479,8 @@
  '(lsp-ui-doc-max-height 10)
  '(lsp-ui-doc-position 'bottom)
  '(lsp-ui-sideline-diagnostic-max-line-length 30)
- '(lsp-ui-sideline-show-hover t)
+ '(lsp-ui-sideline-show-diagnostics t)
+ '(lsp-ui-sideline-show-hover nil)
  '(magit-auto-revert-mode nil)
  '(magit-cherry-pick-arguments '("-x"))
  '(magit-commit-extend-override-date t)
@@ -957,9 +954,6 @@ is the buffer position of the start of the containing expression."
      (ma-build-dir . "")
      (ma-build-target)
      (ma-compile-command . "~/bin/ds/my_mkmk")
-     (tags-table-list "/scratch/apel/new_arch/.tags")
-     (tags-table-list "/scratch/apel/MotionPlatform/TAGS")
-     (tags-table-list "/scratch/apel/SpckTest/SquishTestSuites/TAGS")
      (eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
            (add-hook 'write-contents-functions
                      (lambda nil
@@ -1014,8 +1008,6 @@ is the buffer position of the start of the containing expression."
  '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
- '(tags-add-tables nil)
- '(tags-revert-without-query t)
  '(tex-close-quote "\"")
  '(tex-command nil t)
  '(tex-open-quote "\"")
@@ -1113,13 +1105,16 @@ is the buffer position of the start of the containing expression."
             (idle-highlight-mode)
             (hs-hide-initial-comment-block)))
 
-
 (add-hook 'python-mode-hook
           (lambda ()
             (local-unset-key [?\C-C ?\C-r])
             (idle-highlight-mode)
             (which-function-mode)
             (imenu-add-to-menubar "Functions")))
+
+(add-hook 'prog-mode-hook
+          (lambda()
+            (eval-after-load "smartscan" '(smartscan-mode 1))))
 
 (add-hook 'shell-mode-hook
           'dirtrack-mode)

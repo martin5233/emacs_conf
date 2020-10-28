@@ -1,15 +1,12 @@
 (dir-locals-set-class-variables 'new_arch
  '((c++-mode
-  (ma-compile-command . "~/bin/my_compile")
-  (tags-table-list . ("/scratch/apel/new_arch/.tags")))
+  (ma-compile-command . "~/bin/my_compile"))
    (c-mode
     (ma-compile-command . "~/bin/my_compile")
-    (tags-table-list . ("/scratch/apel/new_arch/.tags")))
-   ))
+   )))
 
 (dir-locals-set-class-variables 'squish
- '((python-mode
-  (tags-table-list . ("/scratch/apel/SpckTest/SquishTestSuites/TAGS")))))
+ '((python-mode)))
 
 (dir-locals-set-directory-class  "/scratch/apel/new_arch/develop/" 'new_arch)
 (dir-locals-set-directory-class  "/scratch/apel/SpckTest/SquishTestSuites" 'squish)

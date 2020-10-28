@@ -7,6 +7,10 @@
 (setq lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
 (setq lsp-response-timeout 2)
 (setq lsp-keymap-prefix "C-r")
+(setq lsp-enable-indentation nil)
+(setq lsp-enable-folding nil)
+(setq lsp-enable-on-type-formatting nil)
+
 (with-eval-after-load 'lsp-mode
   (progn
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)))

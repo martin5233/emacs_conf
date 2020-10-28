@@ -392,8 +392,9 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-src-trees
   '(("master" . "/scratch/apel/new_arch/")
-    ("2020" . "/scratch/apel/new_arch_2020.Y/")
     ("2020x" . "/scratch/apel/new_arch_2020x.Y/")
+    ("2021" . "/scratch/apel/new_arch_2021.Y/")
+    ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
     ("Windows" . "/win/d/users/apel/new_arch/")))
 
 
