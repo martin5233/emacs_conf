@@ -166,7 +166,10 @@
 		         :type github
 		         :pkgname "sebastiencs/company-box"
                :after (add-hook 'company-mode-hook 'company-box-mode)
-               :depends (company-mode))
+               :depends (company-mode frame-local))
+        (:name frame-local
+	       :type github
+	       :pkgname "sebastiencs/frame-local")
         (:name flycheck)
         ))
 
@@ -205,6 +208,15 @@
                       :type http
                       :url "http://www.emacswiki.org/emacs/download/uuid.el")
                ))))
+
+(if home
+    (setq el-get-sources
+     (append el-get-sources
+          '(
+            (:name platformio-mode
+                   :type github
+                   :pkgname "ZachMassia/platformio-mode"
+                   :depends projectile)))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
 
@@ -503,7 +515,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files '("~/org/na.org"))
+ '(org-agenda-files nil)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)
@@ -1093,7 +1105,8 @@ is the buffer position of the start of the containing expression."
             (local-unset-key (kbd "C-c C-p"))
             (local-unset-key (kbd "C-c C-z"))                       ;; Free keybinding for magit-status
 
-            (add-hook 'before-save-hook 'ma-create-or-update-copyright)
+            (if work
+                (add-hook 'before-save-hook 'ma-create-or-update-copyright))
             (c-toggle-hungry-state 1)
             (flyspell-prog-mode)
             (cwarn-mode)

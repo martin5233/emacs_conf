@@ -190,27 +190,37 @@ The value is a URL containing a %s placeholder for the search term."
          (url (format doc-site term)))
     (browse-url url)))
 
-(add-hook 'cmake-mode-hook
-	  (lambda ()
-	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
+(if work
+    (progn
+      (add-hook 'cmake-mode-hook
+	             (lambda ()
+	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
+      (add-hook 'c-mode-hook
+	             (lambda ()
+	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
+                  (local-set-key [f1]  'ma-lookup-doc)))
+      (add-hook 'c++-mode-hook
+	             (lambda ()
+	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
+	               (local-set-key [?\C-c ?\C-f] 'ma-compile-file)
+                  (local-set-key [f1]  'ma-lookup-doc)))
+      (add-hook 'java-mode-hook
+                (lambda()
+                  (local-set-key [?\C-c ?\C-c] 'ma-run-atlas-package)))
+      ))
 
-(add-hook 'c-mode-hook
-	  (lambda ()
-	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
-       (local-set-key [f1]  'ma-lookup-doc)))
-
-(add-hook 'c++-mode-hook
-	  (lambda ()
-	    (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	    (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
-	    (local-set-key [?\C-c ?\C-f] 'ma-compile-file)
-       (local-set-key [f1]  'ma-lookup-doc)))
-
-(add-hook 'java-mode-hook
-          (lambda()
-            (local-set-key [?\C-c ?\C-c] 'ma-run-atlas-package)))
+(if home
+    (progn
+      (add-hook 'c-mode-hook
+                (lambda()
+                  (local-set-key (kbd "C-c C-c") 'compile)))
+      (add-hook 'c++-mode-hook
+                (lambda()
+                  (local-set-key (kbd "C-c C-c") 'compile)))
+      ))
 
 (require 'notifications)
 (defun ma-send-desktop-notification (summary body timeout)
