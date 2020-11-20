@@ -205,7 +205,6 @@ The value is a URL containing a %s placeholder for the search term."
 	             (lambda ()
 	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
-	               (local-set-key [?\C-c ?\C-f] 'ma-compile-file)
                   (local-set-key [f1]  'ma-lookup-doc)))
       (add-hook 'java-mode-hook
                 (lambda()

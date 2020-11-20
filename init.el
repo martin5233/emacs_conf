@@ -123,8 +123,16 @@
                :after (setq cmake-tab-width 3))
         (:name idle-highlight-mode)
         (:name json-snatcher)
+        (:name json-reformat)
         (:name json-mode
-               :depends json-snatcher)
+               :depends (json-snatcher json-reformat))
+        (:name hierarchy
+               :type github
+               :pkgname "DamienCassou/hierarchy")  ;; To be removed after 27.1, as integrated into Emacs core
+        (:name json-navigator
+               :type github
+               :pkgname "DamienCassou/json-navigator"
+               :depends hierarchy)
         (:name markdown-mode)
         (:name visual-regexp
                :after (progn
@@ -1123,7 +1131,7 @@ is the buffer position of the start of the containing expression."
 
 (add-hook 'prog-mode-hook
           (lambda()
-            (eval-after-load "smartscan" '(smartscan-mode 1))))
+            (smartscan-mode 1)))
 
 (add-hook 'shell-mode-hook
           'dirtrack-mode)
@@ -1164,6 +1172,7 @@ is the buffer position of the start of the containing expression."
 (add-to-list 'auto-mode-alist '("\\.sjs$" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
 (electric-pair-mode)
 
 (if work-linux
