@@ -28,7 +28,7 @@
 (add-hook 'erc-insert-pre-hook 'ma-bitlbee-ignore-unimportant)
 (add-hook 'erc-join-hook 'ma-bitlbee-identify)
 
-(if (not home-office)
+(if work-linux-local
     (erc :server "localhost" :nick "martin" :password ""))
 (setq erc-autoaway-idle-seconds 1800)
 (setq erc-autoaway-message "Away")

@@ -3,15 +3,19 @@
 (global-set-key (kbd "C-c C-f") 'projectile--find-file)
 
 (setq projectile-completion-system 'ivy)
+(setq projectile-sort-order 'recently-active)
 
 (cond
- (work-linux (setq projectile-project-search-path '("/scratch/apel")))
+ (work-linux-local
+  (progn (setq projectile-project-search-path '("/scratch/apel"))
+         (setq projectile-git-command "/home/home_dev/MAL1/bin/projectile_ls.sh")))
+ (work-linux-remote
+  (progn (setq projectile-project-search-path nil)
+         (setq projectile-git-command "/home/home_dev/MAL1/bin/projectile_ls.sh")
+         (setq projectile-enable-caching t)))
  (work-win (setq projectile-project-search-path '("D:/users/apel")))
  (home (setq projectile-project-search-path '("/home/martin"))))
 
-(setq projectile-sort-order 'recently-active)
-(if work-linux
-    (setq projectile-git-command "/home/home_dev/MAL1/bin/projectile_ls.sh"))
 (setq projectile-git-submodule-command nil)
 (setq projectile-mode-line-prefix "")
 

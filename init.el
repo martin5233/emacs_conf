@@ -1,10 +1,19 @@
 (package-initialize)
 
 (setq home (string-match "^martin$" (user-login-name)))
-(setq work-linux (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-linux (or work-linux-local work-linux-remote))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
-(setq home-office (and work-linux (string-equal (getenv "DISPLAY") ":1.0")))
+(setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
+
+(if work-linux-remote
+    (progn
+      (setq work-remote-url "/ssh:MAL1@dell248cem:")
+      (setq enable-remote-dir-locals t)
+      (setq tramp-use-ssh-controlmaster-options nil)
+      ))
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
@@ -531,7 +540,9 @@
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(safe-local-variable-values
-   '((project-vc-merge-submodules)
+   '((ma-make-target . "all")
+     (ma-build-dir . "/scratch/apel/embed_nodejs/obj")
+     (project-vc-merge-submodules)
      (lsp--override-calculate-lisp-indent\? . t)
      (eval progn
            (let
@@ -1032,7 +1043,7 @@ is the buffer position of the start of the containing expression."
  '(tool-bar-mode nil)
  '(tramp-default-method "ssh")
  '(tramp-default-proxies-alist nil)
- '(tramp-smb-conf "/home/home_dev/MAL1/.smbclient.conf" nil (tramp))
+ '(tramp-smb-conf "/home/home_dev/MAL1/.smbclient.conf")
  '(truncate-lines t)
  '(use-file-dialog nil)
  '(user-full-name "Martin Apel")

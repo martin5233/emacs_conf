@@ -139,26 +139,28 @@ The value is a URL containing a %s placeholder for the search term."
   (compile (concat "cd " ma-build-dir "; cmake .; ~/bin/my_compile " ma-build-dir " " ma-make-target))
 )
 
+(defun ma-compile-command ()
+  "Return compilation command to use"
+  (if (boundp 'ma-compile-command)
+      ma-compile-command
+    (cond (work-linux-remote "~/bin/my_remote_compile.sh")
+          (t                 "~/bin/my_compile"))))
+
 (defun ma-run-compile ()
   "Run compilation"
   (interactive)
-  (if (boundp 'ma-compile-command)
-      (setq comp-command ma-compile-command)
-    (setq comp-command "~/bin/my_compile"))
+  (setq comp-command (ma-compile-command))
   (if (or (boundp 'ma-build-dir) (stringp 'ma-build-dir))
       (setq comp-command (concat comp-command " " ma-build-dir)))
   (if (or (boundp 'ma-make-target) (stringp 'ma-make-target))
       (setq comp-command (concat comp-command " " ma-make-target)))
   (print comp-command)
-  (compile comp-command)
-)
+  (compile comp-command))
 
 (defun ma-compile-file ()
   "Run compilation of current file"
   (interactive)
-  (if (boundp 'ma-compile-command)
-      (setq comp-command ma-compile-command)
-    (setq comp-command "~/bin/my_compile"))
+  (setq comp-command (ma-compile-command))
   (when (not (boundp 'ma-build-dir))
     (error "Build directory is not set"))
   (let* ((rel-name (file-relative-name (buffer-file-name) "/scratch/apel/new_arch/develop"))

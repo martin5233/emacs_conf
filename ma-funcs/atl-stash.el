@@ -184,13 +184,13 @@ for all open pull requests")
                (reviewers (assoc-default 'reviewers value))
                (saw-myself-in-reviewers nil))
           (progn
-            (if (string-equal author (upcase (user-login-name)))
+            (if (string-equal author (stash-effective-user-name))
                 (setq stash-own-pr-count (1+ stash-own-pr-count)))
             (dotimes (j (length reviewers))
               (let* ((reviewer (aref reviewers j))
                      (name (assoc-default 'name (assoc-default 'user reviewer)))
                      (approved (assoc-default 'approved reviewer)))
-                (if (and (string-equal name (upcase (user-login-name))) (eq approved :json-false))
+                (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false))
                     (setq saw-myself-in-reviewers t))
                 ))
             (if saw-myself-in-reviewers
@@ -258,6 +258,20 @@ for all open pull requests")
             (setq result pr))))
     result))
 
+(defun stash-get-repos()
+  "Retrieve the registered repos and add remote prefix if necessary"
+  (if work-linux-remote
+      (mapcar
+       (lambda(entry)
+         (cons (car entry) (concat work-remote-url (cdr entry)))) stash-repos)
+    stash-repos))
+
+(defun stash-effective-user-name()
+    "Return the username to use for checking current user"
+  (if work-linux-remote
+      "MAL1"
+    (upcase (user-login-name))))
+
 (defun stash-map-reviewer (reviewer)
   "Map REVIEWER by looking him up in `stash-reviewer-shortcuts'.
 If the reviewer is listed there, his shortcut
@@ -303,7 +317,7 @@ is returned.  If the reviewer is not found, the original string is returned."
       (let* ((reviewer (aref reviewers i))
              (name (assoc-default 'name (assoc-default 'user reviewer)))
              (approved (assoc-default 'approved reviewer)))
-        (if (and (string-equal name (upcase (user-login-name))) (eq approved :json-false))
+        (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false))
             (setq saw-myself-in-reviewers t))
         ))
     saw-myself-in-reviewers))
@@ -311,7 +325,7 @@ is returned.  If the reviewer is not found, the original string is returned."
 (defun stash-am-i-author (pr)
   "Returns true, if the current user is the author of this pull request."
   (let ((author (assoc-default 'name (assoc-default 'user (assoc-default 'author pr)))))
-    (string-equal author (upcase (user-login-name)))))
+    (string-equal author (stash-effective-user-name))))
 
 (defun stash-show-section(title predicate)
   "Display a section of pull-requests passing the predicate function."
@@ -437,12 +451,12 @@ is returned.  If the reviewer is not found, the original string is returned."
   (interactive)
   (let* ((default-directory (magit-read-repository nil))
          (project "SPCK")
-         (repo (car (rassoc default-directory stash-repos)))
+         (repo (car (rassoc default-directory (stash-get-repos))))
          (source-branch (substring (magit-get-upstream-branch) 7))
          (target-branch (stash-find-target-branch default-directory (concat "origin/" source-branch)))
          (merge-base (stash-merge-base default-directory (concat "origin/" source-branch) (concat "origin/" target-branch))))
     (unless repo
-      (user-error "Directory %s is not registered in stash-repos" default-directory))
+      (user-error "Directory %s is not registered in (stash-get-repos)" default-directory))
     (set-buffer (get-buffer-create "*Stash Create Pull Request*"))
     (erase-buffer)
     (message (concat "Calling git log " merge-base "..origin/" source-branch))
@@ -509,7 +523,7 @@ is returned.  If the reviewer is not found, the original string is returned."
         (from-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'fromRef pr))))
         (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
         (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'fromRef pr))))
-        (repo-dir (assoc-default repo stash-repos))
+        (repo-dir (assoc-default repo (stash-get-repos)))
         (default-directory repo-dir)
         (merge-base (stash-merge-base repo-dir from-branch to-branch)))
     (magit-diff-range (concat merge-base ".." from-branch))))
@@ -542,7 +556,7 @@ is returned.  If the reviewer is not found, the original string is returned."
          (from-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'fromRef pr))))
          (to-branch (replace-regexp-in-string "^refs/heads/" "origin/" (assoc-default 'id (assoc-default 'toRef pr))))
          (repo (assoc-default 'slug (assoc-default 'repository (assoc-default 'fromRef pr))))
-         (repo-dir (assoc-default repo stash-repos))
+         (repo-dir (assoc-default repo (stash-get-repos)))
          (default-directory repo-dir)
          (merge-base (stash-merge-base repo-dir from-branch to-branch))
          (default-directory repo-dir))

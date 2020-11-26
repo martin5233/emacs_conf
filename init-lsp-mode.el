@@ -3,7 +3,9 @@
 
 (setq lsp-completion-provider :capf)
 (setq lsp-eldoc-enable-hover nil)
-(setq lsp-enabled-clients '(clangd-ma dockerfile-ls cmakels clangd))
+(if work-linux-local
+    (setq lsp-enabled-clients '(dockerfile-ls cmakels clangd))
+    (setq lsp-enabled-clients '(dockerfile-ls cmakels clangd-remote)))
 (setq lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
 (setq lsp-response-timeout 2)
 (setq lsp-keymap-prefix "C-r")
@@ -13,7 +15,13 @@
 
 (with-eval-after-load 'lsp-mode
   (progn
-    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)))
+    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
+                      :major-modes '(c-mode c++-mode)
+                      :priority -1
+                      :remote? t
+                      :server-id 'clangd-remote))))
 
 ;; clangd
 (add-hook 'c++-mode-hook

@@ -15,7 +15,7 @@
     )
 )
 
-(if work-linux
+(if work-linux-local
     (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/ownCloud/private.org")))
   (when home
       (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/ownCloud/private.org")))))
