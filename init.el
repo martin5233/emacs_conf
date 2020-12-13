@@ -153,7 +153,9 @@
         (:name yasnippet)
         (:name ace-window
                :after
-               (global-set-key (kbd "C-x o") 'ace-window))
+               (progn
+                 (global-set-key (kbd "C-x o") 'ace-window)
+                 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
         (:name auto-compile
                :after (progn
                         (setq load-prefer-newer t)
@@ -188,6 +190,9 @@
 	       :type github
 	       :pkgname "sebastiencs/frame-local")
         (:name flycheck)
+        (:name doom-modeline)
+        (:name doom-themes
+               :after (load-theme 'doom-solarized-light t))
         ))
 
 (if work
@@ -1059,9 +1064,8 @@ is the buffer position of the start of the containing expression."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#ffffff" :foreground "#141312" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 88 :width normal :foundry "unknown" :family "DejaVu LGC Sans Mono"))))
  '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
- '(aw-leading-char-face ((t (:background "blue" :foreground "white"))))
+ '(aw-leading-char-face ((t (:background "deep sky blue" :foreground "white" :height 3.0))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
  '(lsp-ui-doc-background ((t (:background "OliveDrab2"))))
  '(lsp-ui-sideline-code-action ((t (:background "cyan" :foreground "red" :box (:line-width 2 :color "grey75" :style released-button) :slant italic))))
