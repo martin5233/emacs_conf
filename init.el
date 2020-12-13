@@ -448,8 +448,6 @@
  '(el-get-byte-compile-at-init t)
  '(eldoc-minor-mode-string nil)
  '(electric-indent-mode t)
- '(electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
- '(electric-pair-mode nil)
  '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode))
  '(erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
  '(erc-modules
@@ -1188,7 +1186,6 @@ is the buffer position of the start of the containing expression."
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
-(electric-pair-mode)
 
 (if work-linux
    (progn
