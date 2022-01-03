@@ -224,9 +224,10 @@
          :pkgname "abo-abo/avy")
         (:name eaf
          :type github
-         :pkgname "emacs-eaf/emacs-application-framework"
-         :features eaf eaf-browser eaf-terminal eaf-system-monitor eaf-pdf-viewer
-         :after (setq browse-url-browser-function 'eaf-open-browser))
+         :pkgname "emacs-eaf/emacs-application-framework")
+        (:name engine-mode
+         :type github
+         :pkgname "hrs/engine-mode")
         (:name keyfreq
                :type github
                :pkgname "dacap/keyfreq"
@@ -664,10 +665,9 @@
 
 (if (> (display-pixel-height) 1200)
     (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-7"))
+                 '(font . "DejaVu Sans Mono-10"))
     (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-10")))
-
+                 '(font . "DejaVu Sans Mono-7")))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
