@@ -8,12 +8,19 @@
 (setq work (or work-linux work-win))
 (setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
 
+;; (if (>= emacs-major-version 28)
+;;     (setenv "LIBRARY_PATH" "/usr/lib/x86_64-linux-gnu"))
+
 (if work-linux-remote
     (progn
-      (setq work-remote-url "/ssh:MAL1@dell248cem:")
-      (setq enable-remote-dir-locals t)
+      (setq work-remote-url "/ssh:MAL1@dell1254cem:")
+      (setq enable-remote-dir-locals nil)
       (setq tramp-use-ssh-controlmaster-options nil)
-      ))
+  ;; Avoid version-control checks for tramp buffers
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp))))
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
@@ -41,6 +48,8 @@
                         (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
         (:name org-mode
                :branch "maint")
+        (:name ox-pandoc
+               :depends org-mode)
         (:name http-post-simple
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
@@ -89,7 +98,8 @@
         (:name smartscan)
         (:name git-timemachine)
         (:name git-gutter
-               :after (global-git-gutter-mode 1))         ;; diff-hl-mode?
+               :after (if (not work-linux-remote)
+                          (global-git-gutter-mode 1)))
         (:name csv-mode
                :type elpa)
         (:name llvm-mode)
@@ -163,6 +173,10 @@
                         (auto-compile-on-load-mode 1)
                         (auto-compile-on-save-mode 1)))
         (:name graphviz-dot-mode)
+        (:name modern-cpp-font-lock
+               :type github
+               :pkgname "ludwigpacifici/modern-cpp-font-lock"
+               :after (modern-c++-font-lock-global-mode t))
         (:name diminish
                :after (progn
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
@@ -213,6 +227,15 @@
          :pkgname "emacs-eaf/emacs-application-framework"
          :features eaf eaf-browser eaf-terminal eaf-system-monitor eaf-pdf-viewer
          :after (setq browse-url-browser-function 'eaf-open-browser))
+        (:name keyfreq
+               :type github
+               :pkgname "dacap/keyfreq"
+               :after (progn
+                        (setq keyfreq-excluded-commands
+                              '(lsp-ui-doc--handle-mouse-movement
+                                gud-tooltip-mouse-motion))
+                        (keyfreq-mode 1)
+                        (keyfreq-autosave-mode 1)))
         ))
 
 (if work
@@ -517,12 +540,6 @@
  '(ldap-host-parameters-alist
    '(("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU057,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!")))
  '(log-edit-hook '(log-edit-insert-cvs-template log-edit-show-files))
- '(lsp-client-packages
-   '(lsp-bash lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
- '(lsp-completion-no-cache t)
- '(lsp-modeline-code-actions-enable nil)
- '(lsp-modeline-diagnostics-scope :file)
- '(lsp-restart 'auto-restart)
  '(lsp-ui-doc-border "deep sky blue")
  '(lsp-ui-doc-enable t)
  '(lsp-ui-doc-include-signature t)
@@ -556,9 +573,9 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil t)
+ '(org-agenda-files nil)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
- '(package-selected-packages '(csv-mode nil))
+ '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
@@ -575,7 +592,7 @@
  '(scroll-bar-mode 'right)
  '(send-mail-function nil)
  '(show-paren-mode t nil (paren))
- '(show-paren-style 'parenthesis)
+ '(show-paren-style 'expression)
  '(smartscan-symbol-selector "symbol")
  '(split-height-threshold 40)
  '(split-width-threshold 200)
@@ -606,9 +623,9 @@
  '(texinfo-close-quote "''")
  '(texinfo-open-quote "``")
  '(tool-bar-mode nil)
- '(tramp-default-method "ssh")
+ '(tramp-default-method "scp")
  '(tramp-default-proxies-alist nil)
- '(tramp-smb-conf "/home/home_dev/MAL1/.smbclient.conf")
+ '(tramp-smb-conf nil)
  '(truncate-lines t)
  '(use-file-dialog nil)
  '(user-full-name "Martin Apel")
@@ -645,8 +662,12 @@
 (put 'upcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
-(add-to-list 'default-frame-alist
-                       '(font . "DejaVu Sans Mono-10"))
+(if (> (display-pixel-height) 1200)
+    (add-to-list 'default-frame-alist
+                 '(font . "DejaVu Sans Mono-7"))
+    (add-to-list 'default-frame-alist
+                 '(font . "DejaVu Sans Mono-10")))
+
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -663,7 +684,7 @@
 (global-set-key (kbd "<kp-end>") 'shell)
 (global-set-key (kbd "<kp-next>") '(lambda () "Open init.el" (interactive) (find-file "~/.emacs.d/init.el")))
 (global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-s") 'swiper-isearch)
 (global-set-key (kbd "C-x r b") 'counsel-bookmark)
 (global-set-key (kbd "C-h b") 'counsel-descbinds)
 (global-set-key (kbd "C-h f") 'counsel-describe-function)

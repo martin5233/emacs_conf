@@ -15,21 +15,25 @@
     )
 )
 
-(if work-linux-local
-    (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/org/na.org" "~/ownCloud/private.org")))
-  (when home
-      (setq org-agenda-files (quote ("~/ownCloud/geburtstage.org" "~/ownCloud/private.org")))))
+(setq ma-na-org "~/org/na.org")
+(setq ma-private-org "~/Nextcloud/private.org")
+(if work-linux-remote
+    (progn
+      (setq ma-na-org (concat work-remote-url ma-na-org))
+      (setq ma-private-org (concat work-remote-url ma-private-org))))
+
+(setq org-agenda-files nil)
+(if (file-exists-p ma-na-org)
+   (push ma-na-org org-agenda-files))
+(if (file-exists-p ma-private-org)
+   (push ma-private-org org-agenda-files))
 
 (setq org-agenda-custom-commands
    (quote
     (("w" "Work agenda only" alltodo ""
-      ((org-agenda-files
-        (quote
-         ("~/org/na.org")))))
+      ((org-agenda-files (list ma-na-org))))
      ("h" "Home agenda only" agenda ""
-      ((org-agenda-files
-        (quote
-         ("~/ownCloud/private.org" "~/ownCloud/geburtstage.org")))))
+      ((org-agenda-files (list ma-private-org))))
      ("s" "Unscheduled items" alltodo ""
       ((org-agenda-skip-function
         (quote
@@ -55,7 +59,6 @@
       "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
 (setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
 (setq sorg-scheduled-past-days 5)
-(setq org-sort-agenda-notime-is-late nil)
 
 (global-set-key [?\C-c ?a]    'org-agenda)
 (global-set-key [?\C-c ?C]    'org-capture)

@@ -3,25 +3,22 @@
 
 (setq lsp-completion-provider :capf)
 (setq lsp-eldoc-enable-hover nil)
-(if work-linux-local
-    (setq lsp-enabled-clients '(dockerfile-ls cmakels clangd))
-    (setq lsp-enabled-clients '(dockerfile-ls cmakels clangd-remote)))
+(setq lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
+(setq lsp-enabled-clients '(dockerfile-ls cmakels clangd))
 (setq lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
-(setq lsp-response-timeout 2)
-(setq lsp-keymap-prefix "C-r")
+(setq lsp-completion-no-cache t)
 (setq lsp-enable-indentation nil)
 (setq lsp-enable-folding nil)
 (setq lsp-enable-on-type-formatting nil)
+(setq lsp-keymap-prefix "C-r")
+(setq lsp-modeline-code-actions-enable nil)
+(setq lsp-modeline-diagnostics-scope :file)
+(setq lsp-response-timeout 2)
+(setq lsp-restart 'auto-restart)
 
 (with-eval-after-load 'lsp-mode
   (progn
-    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-    (lsp-register-client
-     (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
-                      :major-modes '(c-mode c++-mode)
-                      :priority -1
-                      :remote? t
-                      :server-id 'clangd-remote))))
+    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)))
 
 ;; clangd
 (add-hook 'c++-mode-hook
@@ -37,11 +34,9 @@
 (add-hook 'c++-mode-hook #'yas-minor-mode)
 
 ;; dockerfile
-(setq lsp-dockerfile-language-server-command '("docker" "run" "-i" "--rm" "lsp-dockerfile:latest"))
 (add-hook 'dockerfile-mode-hook #'lsp)
 
 ;; cmake
-(setq company-cmake-executable "/scratch/apel/new_arch/develop/extern/linux64/cmake-3.17/bin/cmake")
 (add-hook 'cmake-mode-hook #'lsp)
 
 (defun ma-cmake-upcase-completion-list (candidates)

@@ -1,8 +1,8 @@
 (dir-locals-set-class-variables 'new_arch
  '((c++-mode
-  (ma-compile-command . "~/bin/my_compile"))
+  (ma-compile-command . "~/bin/my_remote_compile.sh"))
    (c-mode
-    (ma-compile-command . "~/bin/my_compile")
+    (ma-compile-command . "~/bin/my_remote_compile.sh")
    )))
 
 (dir-locals-set-class-variables 'squish

@@ -403,9 +403,8 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-src-trees
   '(("master" . "/scratch/apel/new_arch/")
-    ("2020x" . "/scratch/apel/new_arch_2020x.Y/")
-    ("2021" . "/scratch/apel/new_arch_2021.Y/")
     ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
+    ("2022"  . "/scratch/apel/new_arch_2022.Y/")
     ("Windows" . "/win/d/users/apel/new_arch/")))
 
 
@@ -450,5 +449,22 @@ not, a copyright comment is inserted at the start of the file."
       (message "Current file not found in any tree")
       ))
   )
+
+(defun ma-ifdef-region()
+  (interactive)
+  (if (region-active-p)
+      (progn
+        (narrow-to-region (region-beginning) (region-end))
+        (goto-char (point-min))
+        (insert "#ifdef SPCK_QTSCRIPT\n")
+        (goto-char (point-max))
+        (insert "#endif\n")
+        (widen)
+        )
+    (progn
+      (goto-char (line-beginning-position))
+      (insert "#ifdef SPCK_QTSCRIPT\n")
+      (goto-char (line-end-position))
+      (insert "\n#endif"))))
 
 (provide 'ma-funcs)

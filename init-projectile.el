@@ -8,10 +8,10 @@
 (cond
  (work-linux-local
   (progn (setq projectile-project-search-path '("/scratch/apel"))
-         (setq projectile-git-command "/home/home_dev/MAL1/bin/projectile_ls.sh")))
+         (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))))
  (work-linux-remote
-  (progn (setq projectile-project-search-path nil)
-         (setq projectile-git-command "/home/home_dev/MAL1/bin/projectile_ls.sh")
+  (progn (setq projectile-project-search-path '("/scratch/apel"))
+         (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))
          (setq projectile-enable-caching t)))
  (work-win (setq projectile-project-search-path '("D:/users/apel")))
  (home (setq projectile-project-search-path '("/home/martin"))))
