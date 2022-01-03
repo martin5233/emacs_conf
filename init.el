@@ -1,8 +1,8 @@
 (package-initialize)
 
-(setq home (string-match "^martin$" (user-login-name)))
+(setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
 (setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
-(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "debian")))
 (setq work-linux (or work-linux-local work-linux-remote))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
@@ -89,7 +89,7 @@
         (:name smartscan)
         (:name git-timemachine)
         (:name git-gutter
-               :after (global-git-gutter-mode 1))
+               :after (global-git-gutter-mode 1))         ;; diff-hl-mode?
         (:name csv-mode
                :type elpa)
         (:name llvm-mode)
@@ -191,8 +191,28 @@
 	       :pkgname "sebastiencs/frame-local")
         (:name flycheck)
         (:name doom-modeline)
-        (:name doom-themes
-               :after (load-theme 'doom-solarized-light t))
+;;         (:name doom-themes
+        ;;                :after (load-theme 'doom-solarized-light t))
+        (:name modus-themes
+               :type github
+               :pkgname "protesilaos/modus-themes"
+               :after (progn
+                        (modus-themes-load-themes)
+                        (setq modus-themes-deuteranopia t)
+                        (setq modus-themes-bold-constructs t)
+                        (setq modus-themes-italic-constructs t)
+                        (setq modus-themes-paren-match '(bold))
+                        (setq modus-themes-mode-line '(3d))
+                        (setq modus-themes-hl-line '(intense))
+                        (modus-themes-load-vivendi)))
+        (:name avy
+         :type github
+         :pkgname "abo-abo/avy")
+        (:name eaf
+         :type github
+         :pkgname "emacs-eaf/emacs-application-framework"
+         :features eaf eaf-browser eaf-terminal eaf-system-monitor eaf-pdf-viewer
+         :after (setq browse-url-browser-function 'eaf-open-browser))
         ))
 
 (if work
@@ -254,6 +274,7 @@
  ;; If there is more than one, they won't work right.
  '(appt-audible nil)
  '(auth-source-debug nil)
+ '(auth-source-save-behavior nil)
  '(auth-sources '("~/.authinfo.gpg"))
  '(auto-revert-check-vc-info nil)
  '(auto-revert-remote-files nil)
@@ -535,9 +556,9 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil)
+ '(org-agenda-files nil t)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
- '(package-selected-packages '(nil))
+ '(package-selected-packages '(csv-mode nil))
  '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
@@ -545,465 +566,11 @@
  '(safe-local-variable-values
    '((ma-make-target . "all")
      (ma-build-dir . "/scratch/apel/embed_nodejs/obj")
-     (project-vc-merge-submodules)
-     (lsp--override-calculate-lisp-indent\? . t)
-     (eval progn
-           (let
-               ((dirloc-lsp-defun-regexp
-                 (concat
-                  (concat "^\\s-*(" "lsp-defun" "\\s-+\\(")
-                  (or
-                   (bound-and-true-p lisp-mode-symbol-regexp)
-                   "\\(?:\\sw\\|\\s_\\|\\\\.\\)+")
-                  "\\)")))
-             (add-to-list 'imenu-generic-expression
-                          (list "Functions" dirloc-lsp-defun-regexp 1)))
-           (defvar lsp--override-calculate-lisp-indent\? nil "Whether to override `lisp-indent-function' with
-              the updated `calculate-lisp-indent' definition from
-              Emacs 28.")
-           (defun wrap-calculate-lisp-indent
-               (func &optional parse-start)
-             "Return appropriate indentation for current line as Lisp code.
-In usual case returns an integer: the column to indent to.
-If the value is nil, that means don't change the indentation
-because the line starts inside a string.
-
-PARSE-START may be a buffer position to start parsing from, or a
-parse state as returned by calling `parse-partial-sexp' up to the
-beginning of the current line.
-
-The value can also be a list of the form (COLUMN CONTAINING-SEXP-START).
-This means that following lines at the same level of indentation
-should not necessarily be indented the same as this line.
-Then COLUMN is the column to indent to, and CONTAINING-SEXP-START
-is the buffer position of the start of the containing expression."
-             (if
-                 (not lsp--override-calculate-lisp-indent\?)
-                 (funcall func parse-start)
-               (save-excursion
-                 (beginning-of-line)
-                 (let
-                     ((indent-point
-                       (point))
-                      state
-                      (desired-indent nil)
-                      (retry t)
-                      whitespace-after-open-paren calculate-lisp-indent-last-sexp containing-sexp)
-                   (cond
-                    ((or
-                      (markerp parse-start)
-                      (integerp parse-start))
-                     (goto-char parse-start))
-                    ((null parse-start)
-                     (beginning-of-defun))
-                    (t
-                     (setq state parse-start)))
-                   (unless state
-                     (while
-                         (<
-                          (point)
-                          indent-point)
-                       (setq state
-                             (parse-partial-sexp
-                              (point)
-                              indent-point 0))))
-                   (while
-                       (and retry state
-                            (>
-                             (elt state 0)
-                             0))
-                     (setq retry nil)
-                     (setq calculate-lisp-indent-last-sexp
-                           (elt state 2))
-                     (setq containing-sexp
-                           (elt state 1))
-                     (goto-char
-                      (1+ containing-sexp))
-                     (if
-                         (and calculate-lisp-indent-last-sexp
-                              (> calculate-lisp-indent-last-sexp
-                                 (point)))
-                         (let
-                             ((peek
-                               (parse-partial-sexp calculate-lisp-indent-last-sexp indent-point 0)))
-                           (if
-                               (setq retry
-                                     (car
-                                      (cdr peek)))
-                               (setq state peek)))))
-                   (if retry nil
-                     (goto-char
-                      (1+ containing-sexp))
-                     (setq whitespace-after-open-paren
-                           (looking-at
-                            (rx whitespace)))
-                     (if
-                         (not calculate-lisp-indent-last-sexp)
-                         (setq desired-indent
-                               (current-column))
-                       (parse-partial-sexp
-                        (point)
-                        calculate-lisp-indent-last-sexp 0 t)
-                       (cond
-                        ((looking-at "\\s("))
-                        ((>
-                          (save-excursion
-                            (forward-line 1)
-                            (point))
-                          calculate-lisp-indent-last-sexp)
-                         (if
-                             (or
-                              (=
-                               (point)
-                               calculate-lisp-indent-last-sexp)
-                              whitespace-after-open-paren)
-                             nil
-                           (progn
-                             (forward-sexp 1)
-                             (parse-partial-sexp
-                              (point)
-                              calculate-lisp-indent-last-sexp 0 t)))
-                         (backward-prefix-chars))
-                        (t
-                         (goto-char calculate-lisp-indent-last-sexp)
-                         (beginning-of-line)
-                         (parse-partial-sexp
-                          (point)
-                          calculate-lisp-indent-last-sexp 0 t)
-                         (backward-prefix-chars)))))
-                   (let
-                       ((normal-indent
-                         (current-column)))
-                     (cond
-                      ((elt state 3)
-                       nil)
-                      ((and
-                        (integerp lisp-indent-offset)
-                        containing-sexp)
-                       (goto-char containing-sexp)
-                       (+
-                        (current-column)
-                        lisp-indent-offset))
-                      (calculate-lisp-indent-last-sexp
-                       (or
-                        (and lisp-indent-function
-                             (not retry)
-                             (funcall lisp-indent-function indent-point state))
-                        (and
-                         (save-excursion
-                           (goto-char indent-point)
-                           (skip-chars-forward " 	")
-                           (looking-at ":"))
-                         (save-excursion
-                           (goto-char calculate-lisp-indent-last-sexp)
-                           (backward-prefix-chars)
-                           (while
-                               (not
-                                (or
-                                 (looking-back "^[ 	]*\\|([ 	]+"
-                                               (line-beginning-position))
-                                 (and containing-sexp
-                                      (>=
-                                       (1+ containing-sexp)
-                                       (point)))))
-                             (forward-sexp -1)
-                             (backward-prefix-chars))
-                           (setq calculate-lisp-indent-last-sexp
-                                 (point)))
-                         (> calculate-lisp-indent-last-sexp
-                            (save-excursion
-                              (goto-char
-                               (1+ containing-sexp))
-                              (parse-partial-sexp
-                               (point)
-                               calculate-lisp-indent-last-sexp 0 t)
-                              (point)))
-                         (let
-                             ((parse-sexp-ignore-comments t)
-                              indent)
-                           (goto-char calculate-lisp-indent-last-sexp)
-                           (or
-                            (and
-                             (looking-at ":")
-                             (setq indent
-                                   (current-column)))
-                            (and
-                             (<
-                              (line-beginning-position)
-                              (prog2
-                                  (backward-sexp)
-                                  (point)))
-                             (looking-at ":")
-                             (setq indent
-                                   (current-column))))
-                           indent))
-                        normal-indent))
-                      (desired-indent)
-                      (t normal-indent)))))))
-           (when
-               (< emacs-major-version 28)
-             (advice-add #'calculate-lisp-indent :around #'wrap-calculate-lisp-indent)))
-     (flycheck-disabled-checkers quote
-                                 (emacs-lisp-checkdoc))
-     (eval progn
-           (let
-               ((dirloc-lsp-defun-regexp
-                 (concat
-                  (concat "^\\s-*(" "lsp-defun" "\\s-+\\(")
-                  (or
-                   (bound-and-true-p lisp-mode-symbol-regexp)
-                   "\\(?:\\sw\\|\\s_\\|\\\\.\\)+")
-                  "\\)")))
-             (add-to-list 'imenu-generic-expression
-                          (list "Functions" dirloc-lsp-defun-regexp 1)))
-           (defvar lsp--override-calculate-lisp-indent\? nil "Whether to override the default
-              `calculate-lisp-indent'.")
-           (setq-local lsp--override-calculate-lisp-indent\? t)
-           (defun wrap~calculate-lisp-indent
-               (fn &optional parse-start)
-             "Add better indentation for quoted and backquoted lists."
-             (if
-                 (not lsp--override-calculate-lisp-indent\?)
-                 (funcall fn parse-start)
-               (defvar calculate-lisp-indent-last-sexp)
-               (save-excursion
-                 (beginning-of-line)
-                 (let
-                     ((indent-point
-                       (point))
-                      state
-                      (desired-indent nil)
-                      (retry t)
-                      calculate-lisp-indent-last-sexp containing-sexp)
-                   (cond
-                    ((or
-                      (markerp parse-start)
-                      (integerp parse-start))
-                     (goto-char parse-start))
-                    ((null parse-start)
-                     (beginning-of-defun))
-                    (t
-                     (setq state parse-start)))
-                   (unless state
-                     (while
-                         (<
-                          (point)
-                          indent-point)
-                       (setq state
-                             (parse-partial-sexp
-                              (point)
-                              indent-point 0))))
-                   (while
-                       (and retry state
-                            (>
-                             (elt state 0)
-                             0))
-                     (setq retry nil)
-                     (setq calculate-lisp-indent-last-sexp
-                           (elt state 2))
-                     (setq containing-sexp
-                           (elt state 1))
-                     (goto-char
-                      (1+ containing-sexp))
-                     (if
-                         (and calculate-lisp-indent-last-sexp
-                              (> calculate-lisp-indent-last-sexp
-                                 (point)))
-                         (let
-                             ((peek
-                               (parse-partial-sexp calculate-lisp-indent-last-sexp indent-point 0)))
-                           (if
-                               (setq retry
-                                     (car
-                                      (cdr peek)))
-                               (setq state peek)))))
-                   (if retry nil
-                     (goto-char
-                      (1+ containing-sexp))
-                     (if
-                         (not calculate-lisp-indent-last-sexp)
-                         (setq desired-indent
-                               (current-column))
-                       (parse-partial-sexp
-                        (point)
-                        calculate-lisp-indent-last-sexp 0 t)
-                       (cond
-                        ((looking-at "\\s("))
-                        ((>
-                          (save-excursion
-                            (forward-line 1)
-                            (point))
-                          calculate-lisp-indent-last-sexp)
-                         (if
-                             (or
-                              (=
-                               (point)
-                               calculate-lisp-indent-last-sexp)
-                              (let*
-                                  ((positions
-                                    (elt state 9))
-                                   (last
-                                    (car
-                                     (last positions)))
-                                   (rest
-                                    (reverse
-                                     (butlast positions)))
-                                   (any-quoted-p nil)
-                                   (point nil))
-                                (or
-                                 (when-let
-                                     ((char
-                                       (char-before last)))
-                                   (or
-                                    (char-equal char 39)
-                                    (char-equal char 96)))
-                                 (progn
-                                   (while
-                                       (and rest
-                                            (not any-quoted-p))
-                                     (setq point
-                                           (pop rest))
-                                     (setq any-quoted-p
-                                           (or
-                                            (when-let
-                                                ((char
-                                                  (char-before point)))
-                                              (or
-                                               (char-equal char 39)
-                                               (char-equal char 96)))
-                                            (save-excursion
-                                              (goto-char
-                                               (1+ point))
-                                              (looking-at-p "\\(?:back\\)?quote[
- ]+(")))))
-                                   any-quoted-p))))
-                             nil
-                           (progn
-                             (forward-sexp 1)
-                             (parse-partial-sexp
-                              (point)
-                              calculate-lisp-indent-last-sexp 0 t)))
-                         (backward-prefix-chars))
-                        (t
-                         (goto-char calculate-lisp-indent-last-sexp)
-                         (beginning-of-line)
-                         (parse-partial-sexp
-                          (point)
-                          calculate-lisp-indent-last-sexp 0 t)
-                         (backward-prefix-chars)))))
-                   (let
-                       ((normal-indent
-                         (current-column)))
-                     (cond
-                      ((elt state 3)
-                       nil)
-                      ((and
-                        (integerp lisp-indent-offset)
-                        containing-sexp)
-                       (goto-char containing-sexp)
-                       (+
-                        (current-column)
-                        lisp-indent-offset))
-                      (calculate-lisp-indent-last-sexp
-                       (or
-                        (and lisp-indent-function
-                             (not retry)
-                             (funcall lisp-indent-function indent-point state))
-                        (and
-                         (save-excursion
-                           (goto-char indent-point)
-                           (skip-chars-forward " 	")
-                           (looking-at ":"))
-                         (save-excursion
-                           (goto-char calculate-lisp-indent-last-sexp)
-                           (backward-prefix-chars)
-                           (while
-                               (not
-                                (or
-                                 (looking-back "^[ 	]*\\|([ 	]+"
-                                               (line-beginning-position))
-                                 (and containing-sexp
-                                      (>=
-                                       (1+ containing-sexp)
-                                       (point)))))
-                             (forward-sexp -1)
-                             (backward-prefix-chars))
-                           (setq calculate-lisp-indent-last-sexp
-                                 (point)))
-                         (> calculate-lisp-indent-last-sexp
-                            (save-excursion
-                              (goto-char
-                               (1+ containing-sexp))
-                              (parse-partial-sexp
-                               (point)
-                               calculate-lisp-indent-last-sexp 0 t)
-                              (point)))
-                         (let
-                             ((parse-sexp-ignore-comments t)
-                              indent)
-                           (goto-char calculate-lisp-indent-last-sexp)
-                           (or
-                            (and
-                             (looking-at ":")
-                             (setq indent
-                                   (current-column)))
-                            (and
-                             (<
-                              (line-beginning-position)
-                              (prog2
-                                  (backward-sexp)
-                                  (point)))
-                             (looking-at ":")
-                             (setq indent
-                                   (current-column))))
-                           indent))
-                        normal-indent))
-                      (desired-indent)
-                      (t normal-indent)))))))
-           (advice-add #'calculate-lisp-indent :around #'wrap~calculate-lisp-indent))
-     (c-file-offsets
-      (block-close . 0)
-      (brace-list-close . 0)
-      (brace-list-entry . 0)
-      (brace-list-intro . +)
-      (case-label . 0)
-      (class-close . 0)
-      (defun-block-intro . +)
-      (defun-close . 0)
-      (defun-open . 0)
-      (else-clause . 0)
-      (inclass . +)
-      (label . 0)
-      (statement . 0)
-      (statement-block-intro . +)
-      (statement-case-intro . +)
-      (statement-cont . +)
-      (substatement . +)
-      (topmost-intro . 0))
-     (dockerfile-image-name . "test")
      (ma-make-target . "")
      (ma-build-dir . "")
      (ma-build-target)
      (ma-compile-command . "~/bin/ds/my_mkmk")
-     (eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
-           (add-hook 'write-contents-functions
-                     (lambda nil
-                       (delete-trailing-whitespace)
-                       nil))
-           (require 'whitespace)
-           "Sometimes the mode needs to be toggled off and on."
-           (whitespace-mode 0)
-           (whitespace-mode 1))
-     (whitespace-line-column . 80)
-     (whitespace-style face tabs trailing lines-tail)
-     (ma-build-dir)
-     (ma-make-target)
-     (ma-make-target . undef)
-     (crontab-host . build-linux)
-     (crontab-host . redhat64)
-     (crontab-apply-after-save . t)
-     (ma-compile-command . "~/bin/my_compile")
-     (ma-compile-command . "/home/home_dev/MAL1/bin/ds/my_mkmk")))
+     (ma-compile-command . "~/bin/my_compile")))
  '(save-abbrevs nil)
  '(scroll-bar-mode 'right)
  '(send-mail-function nil)
@@ -1022,19 +589,14 @@ is the buffer position of the start of the containing expression."
      ("autotest-windows" . "win")
      ("autotest-fortran" . "fort")
      ("PKR3" . "PKl")
-     ("MSN5" . "MSi")
      ("BBR1" . "BB")
      ("WTG1" . "WT")
      ("HKP1" . "PK")
      ("MAL1" . "MA")
      ("MFH1" . "MF")
      ("MDE7" . "MD")
-     ("GHN1" . "GH")
      ("FMK1" . "FM")
-     ("MDL2" . "DM")
-     ("CWN1" . "ChW")
-     ("TBN1" . "TB")
-     ("PMK2" . "PM")))
+     ("MDL2" . "DM")))
  '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
  '(svn-log-edit-show-diff-for-commit t)
  '(tab-width 3)
@@ -1092,6 +654,8 @@ is the buffer position of the start of the containing expression."
 (global-set-key [?\C-c ?\C-g] 'goto-line)
 (global-set-key [?\C-x ?\C-b] 'ibuffer)
 (global-set-key [?\C-c ?\C-r] 'rgrep)
+(global-set-key (kbd "C-M-j") 'avy-goto-char-timer)
+
 (global-unset-key [?\C-x ?\C-c])
 (global-set-key [?\C-x ?\C-c ?\C-x] 'save-buffers-kill-terminal)
 (global-set-key "\M- " 'dabbrev-expand)
@@ -1107,7 +671,6 @@ is the buffer position of the start of the containing expression."
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 (global-set-key (kbd "C-x b") 'counsel-ibuffer)
 ;; (global-set-key (kbd "SPC") 'just-one-space)
-;; (global-set-key (kbd "S-SPC") '(lambda () (interactive) (insert-char #x20)))
 
 (windmove-default-keybindings)
 
@@ -1177,6 +740,7 @@ is the buffer position of the start of the containing expression."
 (server-start)
 
 (global-font-lock-mode 1)
+(global-hl-line-mode)
 
 (global-set-key [f2] 'customize-group)
 
