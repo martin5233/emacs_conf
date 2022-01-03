@@ -1,3 +1,4 @@
+(require 'engine-mode)
 (defengine duckduckgo
   "https://duckduckgo.com/?q=%s"
   :keybinding "d")
