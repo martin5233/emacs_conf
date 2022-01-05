@@ -1,3 +1,4 @@
+(require 'projectile)
 (projectile-mode 1)
 (define-key projectile-mode-map (kbd "C-M-S-p") 'projectile-command-map)
 (global-set-key (kbd "C-c C-f") 'projectile--find-file)

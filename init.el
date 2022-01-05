@@ -2,14 +2,11 @@
 
 (setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
 (setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
-(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "debian")))
+(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "LP5-MAL1-CEM")))
 (setq work-linux (or work-linux-local work-linux-remote))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))
 (setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
-
-;; (if (>= emacs-major-version 28)
-;;     (setenv "LIBRARY_PATH" "/usr/lib/x86_64-linux-gnu"))
 
 (if work-linux-remote
     (progn
@@ -47,7 +44,7 @@
                         (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
                         (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
         (:name org-mode
-               :branch "maint")
+               :type builtin)
         (:name ox-pandoc
                :depends org-mode)
         (:name http-post-simple
@@ -100,8 +97,6 @@
         (:name git-gutter
                :after (if (not work-linux-remote)
                           (global-git-gutter-mode 1)))
-        (:name csv-mode
-               :type elpa)
         (:name llvm-mode)
         (:name ascii-table)
         (:name crontab-mode)
@@ -574,7 +569,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil)
+ '(org-agenda-files nil t)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)
@@ -588,7 +583,8 @@
      (ma-build-dir . "")
      (ma-build-target)
      (ma-compile-command . "~/bin/ds/my_mkmk")
-     (ma-compile-command . "~/bin/my_compile")))
+     (ma-compile-command . "~/bin/my_compile")
+     (ma-compile-command . "~/bin/my_remote_compile.sh")))
  '(save-abbrevs nil)
  '(scroll-bar-mode 'right)
  '(send-mail-function nil)
@@ -636,20 +632,15 @@
  '(vc-display-status t)
  '(vc-git-diff-switches "-w")
  '(vc-handled-backends '(Git))
- '(w3m-pop-up-windows t))
+ '(w3m-pop-up-windows t)
+ '(warning-suppress-log-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ace-jump-face-foreground ((((class color)) (:foreground "blue" :inverse-video t))))
  '(aw-leading-char-face ((t (:background "deep sky blue" :foreground "white" :height 3.0))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
- '(lsp-ui-doc-background ((t (:background "OliveDrab2"))))
- '(lsp-ui-sideline-code-action ((t (:background "cyan" :foreground "red" :box (:line-width 2 :color "grey75" :style released-button) :slant italic))))
- '(lsp-ui-sideline-current-symbol ((t (:background "pale turquoise" :foreground "white" :box (:line-width -1 :color "white") :weight ultra-bold :height 0.99))))
- '(lsp-ui-sideline-symbol ((t (:background "pale turquoise" :foreground "grey" :box (:line-width -1 :color "grey") :height 0.99))))
- '(lsp-ui-sideline-symbol-info ((t (:background "pale turquoise" :slant italic :height 0.99))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
  '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5)))))
 
@@ -665,9 +656,9 @@
 
 (if (> (display-pixel-height) 1200)
     (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-10"))
+                 '(font . "DejaVu Sans Mono-7"))
     (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-7")))
+                 '(font . "DejaVu Sans Mono-10")))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
