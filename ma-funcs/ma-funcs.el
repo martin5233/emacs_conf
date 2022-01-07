@@ -29,8 +29,6 @@
   :type '(choice (const "/scratch/apel/new_arch/obj/64")
                  (const "/scratch/apel/new_arch/obj/dbg64")
                  (const "/scratch/apel/new_arch/obj/opt-g")
-                 (const "/scratch/apel/new_arch/obj/gcc8")
-                 (const "/scratch/apel/new_arch/obj/gcc8-opt-g")
                  )
   :group 'ma
 )
