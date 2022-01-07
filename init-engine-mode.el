@@ -11,5 +11,9 @@
   "http://doc.qt.io/qt-5.12/%s.html"
   :keybinding "q")
 
-(setq engine/browser-function 'eaf-open-browser-other-window)
+;; Use eww by default, but use eaf-browser, if available
+(setq engine/browser-function 'eww-browse-url)
+(eval-after-load "eaf-browser"
+  '(setq engine/browser-function 'eaf-open-browser-other-window))
+
 (engine-mode t)

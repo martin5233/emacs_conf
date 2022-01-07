@@ -217,9 +217,6 @@
         (:name avy
          :type github
          :pkgname "abo-abo/avy")
-        (:name eaf
-         :type github
-         :pkgname "emacs-eaf/emacs-application-framework")
         (:name engine-mode
          :type github
          :pkgname "hrs/engine-mode")
@@ -274,6 +271,9 @@
     (setq el-get-sources
      (append el-get-sources
           '(
+            (:name eaf
+                   :type github
+                   :pkgname "emacs-eaf/emacs-application-framework")
             (:name platformio-mode
                    :type github
                    :pkgname "ZachMassia/platformio-mode"
@@ -656,7 +656,7 @@
 
 (if (> (display-pixel-height) 1200)
     (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-7"))
+                 '(font . "DejaVu Sans Mono-8"))
     (add-to-list 'default-frame-alist
                  '(font . "DejaVu Sans Mono-10")))
 
