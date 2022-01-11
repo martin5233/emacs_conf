@@ -1,6 +1,6 @@
 (require 'projectile)
 (projectile-mode 1)
-(define-key projectile-mode-map (kbd "C-M-S-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-S-p") 'projectile-command-map)
 (global-set-key (kbd "C-c C-f") 'projectile--find-file)
 
 (setq projectile-completion-system 'ivy)

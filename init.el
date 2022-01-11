@@ -17,7 +17,8 @@
   (setq vc-ignore-dir-regexp
         (format "\\(%s\\)\\|\\(%s\\)"
                 vc-ignore-dir-regexp
-                tramp-file-name-regexp))))
+                tramp-file-name-regexp)))
+  (setq work-remote-url ""))
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (setq el-get-user-package-directory "~/.emacs.d")
@@ -220,6 +221,9 @@
         (:name engine-mode
          :type github
          :pkgname "hrs/engine-mode")
+        (:name "devdocs"
+         :type github
+         :pkgname "astoff/devdocs.el")
         (:name keyfreq
                :type github
                :pkgname "dacap/keyfreq"
@@ -642,7 +646,7 @@
  '(aw-leading-char-face ((t (:background "deep sky blue" :foreground "white" :height 3.0))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
- '(stash-section-title ((t (:background "light gray" :slant italic :height 1.5)))))
+ '(stash-section-title ((t (:background "blue" :slant italic :height 1.5)))))
 
 ;; Avoid version-control checks for tramp buffers
 (setq vc-ignore-dir-regexp
