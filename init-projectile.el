@@ -24,3 +24,7 @@
   "Generates a projectile mode line"
   (format " Proj[%s]" (projectile-project-name)))
 (setq projectile-mode-line-function 'ma-projectile-mode-line)
+
+;; This is needed to avoid slowdown when working with remote files.
+(defadvice projectile-project-root (around ignore-remote first activate)
+    (unless (file-remote-p default-directory) ad-do-it))

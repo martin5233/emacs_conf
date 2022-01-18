@@ -189,8 +189,7 @@
         (:name counsel-projectile
                :depends projectile
                :after (counsel-projectile-mode 1))
-        (:name company-mode
-               :after (global-company-mode))
+        (:name company-mode)
         (:name company-box-mode
 		         :type github
 		         :pkgname "sebastiencs/company-box"
@@ -224,6 +223,14 @@
         (:name "devdocs"
          :type github
          :pkgname "astoff/devdocs.el")
+        (:name "prescient"
+         :type github
+         :pkgname "raxod502/prescient.el"
+         :depends (swiper company-mode)
+         :after (progn
+                  (ivy-prescient-mode)
+                  (company-prescient-mode)
+                  (prescient-persist-mode)))
         (:name keyfreq
                :type github
                :pkgname "dacap/keyfreq"
@@ -545,7 +552,8 @@
  '(lsp-ui-doc-include-signature t)
  '(lsp-ui-doc-max-height 10)
  '(lsp-ui-doc-position 'bottom)
- '(lsp-ui-sideline-diagnostic-max-line-length 30)
+ '(lsp-ui-sideline-diagnostic-max-line-length 70)
+ '(lsp-ui-sideline-show-code-actions t)
  '(lsp-ui-sideline-show-diagnostics t)
  '(lsp-ui-sideline-show-hover nil)
  '(magit-auto-revert-mode nil)
@@ -573,7 +581,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil t)
+ '(org-agenda-files nil)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)

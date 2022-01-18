@@ -38,11 +38,3 @@
 
 ;; cmake
 (add-hook 'cmake-mode-hook #'lsp)
-
-(defun ma-cmake-upcase-completion-list (candidates)
-  "Converts all incoming completion candidates to upper case"
-  (if (string-equal major-mode "cmake-mode")
-      (mapcar 'upcase candidates)
-    candidates))
-
-(setq company-transformers '(ma-cmake-upcase-completion-list))

@@ -10,6 +10,15 @@
 (add-hook 'dockerfile-mode-hook
           (lambda()
             (setq-local devdocs-current-docs '("docker~19"))))
+(add-hook 'js-mode-hook
+          (lambda()
+            (setq-local devdocs-current-docs '("node" "javascript"))))
+(add-hook 'python-mode-hook
+          (lambda()
+            (setq-local devdocs-current-docs '("python~3.10"))))
+(add-hook 'perl-mode-hook
+          (lambda()
+            (setq-local devdocs-current-docs '("perl~5.34"))))
 
 (defun ma-devdocs-lookup-at-point()
   (interactive)
