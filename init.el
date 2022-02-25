@@ -131,9 +131,7 @@
                                   (subword-mode t))))
         (:name desktop
                :type builtin
-               :after (progn
-                        (desktop-save-mode t)
-                        (add-hook 'kill-emacs-hook 'ma-kill-old-buffers)))
+               :after (desktop-save-mode t))
         (:name cmake-mode
                :after (setq cmake-tab-width 3))
         (:name idle-highlight-mode)
@@ -144,6 +142,16 @@
         (:name hierarchy
                :type github
                :pkgname "DamienCassou/hierarchy")  ;; To be removed after 27.1, as integrated into Emacs core
+        (:name js2-mode
+               :type github
+               :pkgname "mooz/js2-mode"
+               :after (progn
+                        (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+                        (add-to-list 'auto-mode-alist '("\\.sjs$" . js2-mode))
+                        (add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
+                        (setq js2-include-node-externs t)
+                        (setq js2-mode-assume-strict t)))
+
         (:name json-navigator
                :type github
                :pkgname "DamienCassou/json-navigator"
@@ -200,8 +208,6 @@
 	       :pkgname "sebastiencs/frame-local")
         (:name flycheck)
         (:name doom-modeline)
-;;         (:name doom-themes
-        ;;                :after (load-theme 'doom-solarized-light t))
         (:name modus-themes
                :type github
                :pkgname "protesilaos/modus-themes"
@@ -230,7 +236,10 @@
          :after (progn
                   (ivy-prescient-mode)
                   (company-prescient-mode)
-                  (prescient-persist-mode)))
+                  (prescient-persist-mode)
+                  (setq prescient-sort-full-matches-first t)
+                  (setq ivy-prescient-sort-commands '(:not swiper swiper-isearch projectile--find-file counsel-ibuffer))))
+        (:name "dap-mode")
         (:name keyfreq
                :type github
                :pkgname "dacap/keyfreq"
@@ -240,6 +249,16 @@
                                 gud-tooltip-mouse-motion))
                         (keyfreq-mode 1)
                         (keyfreq-autosave-mode 1)))
+        (:name deadgrep
+               :after
+               (progn
+                 (global-set-key [?\C-c ?\C-r] 'deadgrep)
+                 (setq deadgrep-project-root-function (lambda ()
+                                                        (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa")
+                                                            "/scratch/apel/new_arch/develop/src/ooa"
+                                                        (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
+                                                            "/scratch/apel/new_arch/develop/src"
+                                                          (deadgrep--project-root)))))))
         ))
 
 (if work
@@ -581,7 +600,7 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil)
+ '(org-agenda-files nil t)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)
@@ -677,7 +696,6 @@
 (global-set-key [delete] 'delete-char)
 (global-set-key [?\C-c ?\C-g] 'goto-line)
 (global-set-key [?\C-x ?\C-b] 'ibuffer)
-(global-set-key [?\C-c ?\C-r] 'rgrep)
 (global-set-key (kbd "C-M-j") 'avy-goto-char-timer)
 
 (global-unset-key [?\C-x ?\C-c])
@@ -770,10 +788,8 @@
 
 (setq-default ediff-ignore-similar-regions t)
 
-(add-to-list 'auto-mode-alist '("\\.sjs$" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
 
 (if work-linux
    (progn
@@ -782,4 +798,5 @@
      (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
      (run-with-timer 60 60 'stash-update-stash-info)
      (global-set-key (kbd "C-c p") 'stash-show-pull-requests)
+     (run-with-idle-timer 1800 t 'ma-kill-old-buffers)
      ))

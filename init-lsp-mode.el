@@ -4,7 +4,6 @@
 (setq lsp-completion-provider :capf)
 (setq lsp-eldoc-enable-hover nil)
 (setq lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
-(setq lsp-enabled-clients '(dockerfile-ls cmakels clangd))
 (setq lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
 (setq lsp-completion-no-cache t)
 (setq lsp-enable-indentation nil)
@@ -23,7 +22,7 @@
 ;; clangd
 (add-hook 'c++-mode-hook
           (lambda()
-            (lsp)
+            (lsp-deferred)
             (yas-minor-mode)
             (local-set-key (kbd "C-c i") '(lambda()
                                             (interactive)
@@ -38,3 +37,6 @@
 
 ;; cmake
 (add-hook 'cmake-mode-hook #'lsp)
+
+;; Javascript
+(add-hook 'js2-mode-hook #'lsp)

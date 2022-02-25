@@ -60,11 +60,14 @@ The value is a URL containing a %s placeholder for the search term."
     (dolist (buffer (buffer-list))
       (if (and (or (string-match "^\*" (buffer-name buffer))
                    (string-match "\.hpp$" (buffer-name buffer)))
-               (not (processp (get-buffer-process buffer))))
+               (not (processp (get-buffer-process buffer)))
+               (not (buffer-modified-p buffer)))
           (kill-buffer buffer)))
 
     (dolist (buffer (reverse (nthcdr 50 (buffer-list))))
-      (unless (eq buffer (current-buffer))
+      (unless (or (eq buffer (current-buffer))
+                  (buffer-modified-p buffer)
+                  (processp (get-buffer-process buffer)))
         (kill-buffer buffer))))
 )
 
@@ -206,6 +209,10 @@ The value is a URL containing a %s placeholder for the search term."
 	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
                   (local-set-key [f1]  'ma-lookup-doc)))
+      (add-hook 'js-mode-hook
+	             (lambda ()
+	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'java-mode-hook
                 (lambda()
                   (local-set-key [?\C-c ?\C-c] 'ma-run-atlas-package)))
@@ -288,25 +295,6 @@ The value is a URL containing a %s placeholder for the search term."
   (c-indent-line)
 )
 
-(defun ma-setup-ediff ()
-  "Sets up the editor for ediff"
-  (interactive)
-  (window-configuration-to-register 'e)
-  (frameset-to-register 'f)
-  (set-frame-parameter nil 'top 0)
-  (set-frame-parameter nil 'left 0)
-  (set-frame-parameter nil 'width 240)
-  (set-frame-parameter nil 'height 64)
-  (show-frame)
-)
-
-(defun ma-cleanup-ediff ()
-  "Restores the previous configuration after ediff"
-  (interactive)
-  (jump-to-register 'e)
-  (jump-to-register 'f)
-)
-
 (defface ma-magit-highlight-remote-face
   '((t :inherit magit-branch-remote
        :underline t))
@@ -324,9 +312,6 @@ The value is a URL containing a %s placeholder for the search term."
     (downcase arg1)))
 
 (advice-add 'cmake-symbol-at-point :filter-return #'ma-lowercase-args)
-
-(add-hook 'ediff-before-setup-hook 'ma-setup-ediff)
-(add-hook 'ediff-quit-hook 'ma-cleanup-ediff)
 
 (defconst ma-simpack-copyright "Copyright Dassault Systemes Simulia Corp.")
 (defcustom ma-skip-copyright nil "Skip copyright update upon save, if set"
