@@ -10,6 +10,7 @@
 
 (if work-linux-remote
     (progn
+      (setq work-remote-machine "dell1254cem")
       (setq work-remote-url "/ssh:MAL1@dell1254cem:")
       (setq enable-remote-dir-locals nil)
       (setq tramp-use-ssh-controlmaster-options nil)
@@ -48,6 +49,11 @@
                :type builtin)
         (:name ox-pandoc
                :depends org-mode)
+        (:name org-jira
+               :depends org-mode)
+        (:name org-bullets
+               :depends org-mode
+               :after (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
         (:name http-post-simple
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
@@ -163,7 +169,9 @@
                         (global-set-key (kbd "C-M-%") 'vr/replace)))
         (:name visual-regexp-steroids)
         (:name which-key
-               :after (which-key-mode))
+               :after (progn
+                        (which-key-mode)
+                        (setq which-key-max-description-length 35)))
         (:name yasnippet)
         (:name ace-window
                :after
@@ -258,7 +266,13 @@
                                                             "/scratch/apel/new_arch/develop/src/ooa"
                                                         (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
                                                             "/scratch/apel/new_arch/develop/src"
-                                                          (deadgrep--project-root)))))))
+                                                          (deadgrep--project-root)))))
+                 (setq deadgrep-max-buffers 1)))
+        (:name vterm
+               :after
+               (add-hook 'vterm-mode-hook
+                         (lambda ()
+                           (local-set-key (kbd "C-g") 'vterm--self-insert))))
         ))
 
 (if work
@@ -292,9 +306,6 @@
                       :type github
                       :pkgname "emacs-lsp/lsp-ivy"
                       :depends lsp-mode)
-               (:name uuid
-                      :type http
-                      :url "http://www.emacswiki.org/emacs/download/uuid.el")
                ))))
 
 (if home
@@ -330,8 +341,7 @@
  '(auto-revert-verbose nil)
  '(blink-matching-paren-on-screen nil)
  '(browse-kill-ring-no-duplicates t)
- '(browse-url-browser-function '((".*" . browse-url-firefox)))
- '(browse-url-firefox-program "/home/home_dev/MAL1/tools/firefox/firefox")
+ '(browse-url-handlers '((".*" . browse-url-firefox)))
  '(c-basic-offset 3)
  '(c-cleanup-list '(scope-operator compact-empty-funcall))
  '(c-default-style
@@ -600,7 +610,6 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files nil t)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(nil))
  '(password-cache-expiry 36000)
@@ -725,7 +734,6 @@
             (local-set-key (kbd "C-M-e") 'end-of-defun)
             (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
             (local-set-key (kbd "C-c =") 'align-regexp)
-            (local-set-key (kbd "C-M-u") 'ma-insert-random-uuid)
             (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
             (local-unset-key (kbd "C-c C-n"))
             (local-unset-key (kbd "C-c C-p"))

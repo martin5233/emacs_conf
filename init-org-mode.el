@@ -15,18 +15,7 @@
     )
 )
 
-(setq ma-na-org "~/org/na.org")
-(setq ma-private-org "~/Nextcloud/private.org")
-(if work-linux-remote
-    (progn
-      (setq ma-na-org (concat work-remote-url ma-na-org))
-      (setq ma-private-org (concat work-remote-url ma-private-org))))
-
-(setq org-agenda-files nil)
-(if (file-exists-p ma-na-org)
-   (push ma-na-org org-agenda-files))
-(if (file-exists-p ma-private-org)
-   (push ma-private-org org-agenda-files))
+(setq org-agenda-files '("~/org" "~/org/jira"))
 
 (setq org-agenda-custom-commands
    (quote
@@ -49,15 +38,23 @@
 (setq org-agenda-start-on-weekday nil)
 (setq org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
 (setq org-export-backends (quote (ascii html icalendar latex md pandoc)))
+
+;; (setq org-capture-templates
+;;    (quote
+;;     (
+;; ;;      ("g" "General" entry
+;; ;;       (file+olp "~/org/na.org" "Unsorted")
+;; ;;       "** TODO %?")
+;;      ("t" "Test" entry (file "~/org/test.org") nil)
+;;      ("m" "TODO from Mail" entry
+;;       (file+headline "~/org/na.org" "Mail")
+;;       "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
+
 (setq org-capture-templates
-   (quote
-    (("g" "General" entry
-      (file+olp "~/org/na.org" "Unsorted")
-      "** TODO %?")
-     ("m" "TODO from Mail" entry
-      (file+headline "~/org/na.org" "Mail")
-      "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
-(setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
+   '(("t" "Test" entry
+      (file "~/org/test.org")
+      "")))
+
 (setq sorg-scheduled-past-days 5)
 
 (global-set-key [?\C-c ?a]    'org-agenda)

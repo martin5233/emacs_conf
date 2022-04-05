@@ -33,15 +33,6 @@
   :group 'ma
 )
 
-(defcustom ma-doc-sites
-  '(("Boost Filesystem" . "file:///scratch/apel/boost_1_67_0/libs/filesystem/doc/reference.html")
-    ("CPP Reference" . "https://en.cppreference.com/mwiki/index.php?search=%s")
-    ("Qt 5.12" . "http://doc.qt.io/qt-5.12/%s.html"))
-  "An alist of documentation sites. The key is a keyword offered for choosing, which one to use.
-The value is a URL containing a %s placeholder for the search term."
-  :type '(alist :key-type string :value-type string)
-  :group 'ma)
-
 (defun show-frame (&optional frame)
   "Show the current Emacs frame or the FRAME given as argument.
    And make sure that it really shows up!"
@@ -174,24 +165,15 @@ The value is a URL containing a %s placeholder for the search term."
       (print comp-command)
       (compile comp-command)))
 
-(defun ma-run-atlas-package ()
-  "Run atlassian-package on top-level directory the current buffer belongs to"
+(defun ma-run-sjs ()
+  "Run sjs script."
   (interactive)
-  (let ((cur-dir default-directory))
-    (while (and (not (string-equal cur-dir "/")) (not (file-exists-p (concat cur-dir "pom.xml"))))
-      (setq cur-dir (file-name-directory (directory-file-name cur-dir))))
-    (let ((default-directory cur-dir))
-      (compile "atlas-package"))))
-
-(defun ma-lookup-doc (&optional word)
-  "Look up a word in documentation. This uses the alist ma-doc-sites to offer choices to the user, where the search term should be looked up"
-  (interactive)
-  (let* ((term (if word word (thing-at-point 'symbol t)))
-         (sites (mapcar 'car ma-doc-sites))
-         (doc-site-alias (completing-read "Please choose doc site: " sites))
-         (doc-site (cdr (assoc doc-site-alias ma-doc-sites)))
-         (url (format doc-site term)))
-    (browse-url url)))
+  (let* ((script-name (file-local-name (buffer-file-name)))
+         (ld-lib-path (concat "LD_LIBRARY_PATH=" ma-build-dir "/run/bin/linux64;"))
+         (slv (concat ma-build-dir "/run/bin/linux64/simpack-slv"))
+         (local-cmd (mapconcat 'identity (list slv "-s" script-name) " "))
+         (cmd (concat ld-lib-path local-cmd)))
+    (compile cmd)))
 
 (if work
     (progn
@@ -202,20 +184,14 @@ The value is a URL containing a %s placeholder for the search term."
       (add-hook 'c-mode-hook
 	             (lambda ()
 	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
-                  (local-set-key [f1]  'ma-lookup-doc)))
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'c++-mode-hook
 	             (lambda ()
 	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)
-                  (local-set-key [f1]  'ma-lookup-doc)))
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'js-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
-	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
-      (add-hook 'java-mode-hook
-                (lambda()
-                  (local-set-key [?\C-c ?\C-c] 'ma-run-atlas-package)))
+	               (local-set-key [?\C-c ?\C-c] 'ma-run-sjs)))
       ))
 
 (if home
@@ -388,7 +364,7 @@ not, a copyright comment is inserted at the start of the file."
   '(("master" . "/scratch/apel/new_arch/")
     ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
     ("2022"  . "/scratch/apel/new_arch_2022.Y/")
-    ("Windows" . "/win/d/users/apel/new_arch/")))
+    ("Windows" . "/mnt/d/users/apel/new_arch/")))
 
 
 (defun ma-choose-file-in-other-tree()
