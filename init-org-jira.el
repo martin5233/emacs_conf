@@ -24,6 +24,6 @@
 (setq org-jira-use-status-as-todo t)
 
 (add-hook 'org-mode-hook
-          (lambda ()
-            (if (file-in-directory-p (buffer-file-name) "~/org/jira")
-                (org-jira-mode 1))))
+          (lambda()
+             (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
+                 (org-jira-mode 1))))

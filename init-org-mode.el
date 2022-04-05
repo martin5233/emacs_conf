@@ -39,21 +39,16 @@
 (setq org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
 (setq org-export-backends (quote (ascii html icalendar latex md pandoc)))
 
-;; (setq org-capture-templates
-;;    (quote
-;;     (
-;; ;;      ("g" "General" entry
-;; ;;       (file+olp "~/org/na.org" "Unsorted")
-;; ;;       "** TODO %?")
-;;      ("t" "Test" entry (file "~/org/test.org") nil)
-;;      ("m" "TODO from Mail" entry
-;;       (file+headline "~/org/na.org" "Mail")
-;;       "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
-
 (setq org-capture-templates
-   '(("t" "Test" entry
-      (file "~/org/test.org")
-      "")))
+   (quote
+    (
+     ("g" "General" entry
+      (file+olp "~/org/na.org" "Unsorted")
+      "** TODO %?")
+     ("t" "Test" entry (file "~/org/test.org") nil)
+     ("m" "TODO from Mail" entry
+      (file+headline "~/org/na.org" "Mail")
+      "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
 
 (setq sorg-scheduled-past-days 5)
 
