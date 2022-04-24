@@ -311,14 +311,14 @@
 (if home
     (setq el-get-sources
      (append el-get-sources
-          '(
-            (:name eaf
-                   :type github
-                   :pkgname "emacs-eaf/emacs-application-framework")
-            (:name platformio-mode
-                   :type github
-                   :pkgname "ZachMassia/platformio-mode"
-                   :depends projectile)))))
+             '(
+               (:name async
+                :type github
+                :pkgname "jwiegley/emacs-async")
+               (:name platformio-mode
+                :type github
+                :pkgname "ZachMassia/platformio-mode"
+                :depends (projectile async))))))
 
 (setq my-packages (mapcar 'el-get-source-name el-get-sources))
 
@@ -617,7 +617,9 @@
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(safe-local-variable-values
-   '((ma-make-target . "all")
+   '((ma-make-target)
+     (ma-build-dir)
+     (ma-make-target . "all")
      (ma-build-dir . "/scratch/apel/embed_nodejs/obj")
      (ma-make-target . "")
      (ma-build-dir . "")

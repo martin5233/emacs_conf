@@ -2,177 +2,313 @@
 # Gets user timeline, formats JSON, shows response status and headers underneath
 #
 #
-GET http://api.twitter.com/1/statuses/user_timeline.json?screen_name=twitterapi&count=2
+GET http://messi:8080/rest/things
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
 #
 # XML is supported - highlight, pretty-print
 #
-GET http://www.redmine.org/issues.xml?limit=10
+POST http://messi:8080/rest/things
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+  {
+    "channels": [
+      {
+        "linkedItems": [
+          "Sensor6_Luftfeuchtigkeit"
+        ],
+        "uid": "mqtt:topic:bedd4f97ef:Sensor6:Humidity",
+        "id": "Humidity",
+        "channelTypeUID": "mqtt:number",
+        "itemType": "Number",
+        "kind": "STATE",
+        "label": "Luftfeuchtigkeit",
+        "defaultTags": [],
+        "properties": {},
+        "configuration": {
+          "stateTopic": "zigbee2mqtt/Sensor6/humidity"
+        }
+      },
+      {
+        "linkedItems": [
+          "Sensor6_Empfangsqualitaet"
+        ],
+        "uid": "mqtt:topic:bedd4f97ef:Sensor6:LinkQuality",
+        "id": "LinkQuality",
+        "channelTypeUID": "mqtt:number",
+        "itemType": "Number",
+        "kind": "STATE",
+        "label": "Empfangsqualität",
+        "defaultTags": [],
+        "properties": {},
+        "configuration": {
+          "stateTopic": "zigbee2mqtt/Sensor6/linkquality"
+        }
+      },
+      {
+        "linkedItems": [
+          "Sensor6_Batterie"
+        ],
+        "uid": "mqtt:topic:bedd4f97ef:Sensor6:Battery",
+        "id": "Battery",
+        "channelTypeUID": "mqtt:number",
+        "itemType": "Number",
+        "kind": "STATE",
+        "label": "Batterie",
+        "defaultTags": [],
+        "properties": {},
+        "configuration": {
+          "stateTopic": "zigbee2mqtt/Sensor6/battery"
+        }
+      },
+      {
+        "linkedItems": [
+          "Sensor6_Temperatur",
+          "Sensor6_LastSeen"
+        ],
+        "uid": "mqtt:topic:bedd4f97ef:Sensor6:Temperature",
+        "id": "Temperature",
+        "channelTypeUID": "mqtt:number",
+        "itemType": "Number",
+        "kind": "STATE",
+        "label": "Temperatur",
+        "defaultTags": [],
+        "properties": {},
+        "configuration": {
+          "stateTopic": "zigbee2mqtt/Sensor6/temperature"
+        }
+      }
+    ],
+    "statusInfo": {
+      "status": "ONLINE",
+      "statusDetail": "NONE"
+    },
+    "editable": true,
+    "label": "Sensor 6",
+    "bridgeUID": "mqtt:broker:bedd4f97ef",
+    "configuration": {
+      "payloadNotAvailable": "offline",
+      "availabilityTopic": "zigbee2mqtt/Sensor6/availability",
+      "payloadAvailable": "online"
+    },
+    "properties": {},
+    "UID": "mqtt:topic:bedd4f97ef:Sensor6",
+    "thingTypeUID": "mqtt:topic"
+  }
+#
+GET http://messi:8080/rest/items
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+PUT http://messi:8080/rest/items
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+[
+  {
+    "members": [],
+    "link": "http://messi:8080/rest/items/Sensor6",
+    "state": "NULL",
+    "editable": true,
+    "type": "Group",
+    "name": "Sensor6",
+    "label": "Sensor 6",
+    "category": "",
+    "tags": [
+      "Sensor"
+    ],
+    "groupNames": []
+  },
+  {
+    "link": "http://messi:8080/rest/items/Sensor6_Empfangsqualitaet",
+    "state": "30",
+    "stateDescription": {
+      "step": 1,
+      "pattern": "%s",
+      "readOnly": true,
+      "options": []
+    },
+    "editable": true,
+    "type": "Number:Dimensionless",
+    "name": "Sensor6_Empfangsqualitaet",
+    "label": "Empfangsqualität Sensor 6",
+    "category": "",
+    "tags": [
+      "Measurement",
+      "SNZB-02"
+    ],
+    "groupNames": [
+      "gInflux",
+      "Sensor6"
+    ]
+  },
+  {
+    "link": "http://messi:8080/rest/items/Sensor6_Temperatur",
+    "state": "21.9 °C",
+    "stateDescription": {
+      "step": 1,
+      "pattern": "%s",
+      "readOnly": true,
+      "options": []
+    },
+    "editable": true,
+    "type": "Number:Temperature",
+    "name": "Sensor6_Temperatur",
+    "label": "Temperatur Sensor 6",
+    "category": "",
+    "tags": [
+      "Measurement",
+      "Temperature"
+    ],
+    "groupNames": [
+      "gInflux",
+      "Sensor6"
+    ]
+  },
+  {
+    "link": "http://messi:8080/rest/items/Sensor6_Batterie",
+    "state": "100",
+    "stateDescription": {
+      "step": 1,
+      "pattern": "%s",
+      "readOnly": true,
+      "options": []
+    },
+    "editable": true,
+    "type": "Number:Dimensionless",
+    "name": "Sensor6_Batterie",
+    "label": "Batterie Sensor 6",
+    "category": "",
+    "tags": [
+      "LowBattery"
+    ],
+    "groupNames": [
+      "Batterielevel",
+      "gInflux",
+      "Sensor6"
+    ]
+  },
+  {
+    "link": "http://messi:8080/rest/items/Sensor6_LastSeen",
+    "state": "2022-02-07T20:19:26.295528+0100",
+    "stateDescription": {
+      "step": 1,
+      "pattern": "%1$te.%1$tm.%1$ty %1$tH:%1$tM",
+      "readOnly": true,
+      "options": []
+    },
+    "editable": true,
+    "type": "DateTime",
+    "name": "Sensor6_LastSeen",
+    "label": "Letzte Aktualisierung Sensor 6",
+    "category": "",
+    "tags": [
+      "Measurement",
+      "Timestamp"
+    ],
+    "groupNames": [
+      "Sensor6"
+    ]
+  },
+  {
+    "link": "http://messi:8080/rest/items/LastSeenSensor6",
+    "state": "NULL",
+    "editable": true,
+    "type": "DateTime",
+    "name": "LastSeenSensor6",
+    "label": "Letzte Aktualisierung Sensor 6",
+    "category": "",
+    "tags": [],
+    "groupNames": []
+  },
+  {
+    "link": "http://messi:8080/rest/items/Sensor6_Luftfeuchtigkeit",
+    "state": "44",
+    "stateDescription": {
+      "step": 1,
+      "pattern": "%s",
+      "readOnly": true,
+      "options": []
+    },
+    "editable": true,
+    "type": "Number:Dimensionless",
+    "name": "Sensor6_Luftfeuchtigkeit",
+    "label": "Luftfeuchtigkeit Sensor 6",
+    "category": "",
+    "tags": [
+      "Humidity",
+      "Point"
+    ],
+    "groupNames": [
+      "Sensor6"
+    ]
+  }
+]
+#
+GET http://messi:8080/rest/links
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+ http://messi:8080/rest/links
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
 
-#
-# It can even show an image!
-#
-GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png
-#
-# A bit of json GET, you can pass headers too
-#
-GET https://jira.intec.dom:8443/rest/api/latest/issue/IM-24235
-Content-Type: application/json
-Authorization: Basic (base64-encode-region username:password
-#
-# A bit of json GET, you can pass headers too
-#
-GET https://jira.intec.dom:8443/rest/api/2/serverInfo
-Content-Type: application/json
-Authorization: Basic
-#
-# Retrieve open pull requests
-#
-GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/pull-requests/2534
-Content-Type: application/json
-Authorization: Basic bWFsMTpXdGhpd3d1Mm4=
-#
-#
-#
-GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/commits
-Content-Type: application/json
-Authorization: Basic TUFMMTpFbWFjczRFdmVy
-#
-GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/users/MAL1?avatarSize=24
-Content-Type: application/json
-Authorization: Basic bWFsMTpXdGhpd3d1Mm4=
 
-#
-# Retrieve open pull requests
-#
-GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/spckxxxx/pull-requests/424/activities
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-# Retrieve user autotest
-#
-GET https://stash.intec.dom:7990/rest/api/1.0/users?filter=autotest
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-# Retrieve open pull requests. Provided by stash-inbox plugin, which is part of stash, but REST API not documented
-#
-GET https://stash.intec.dom:7990/rest/inbox/1.0/pull-requests
-Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
-#
-# Retrieve hook configuration
-#
-GET https://stash.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/SpckXXXX/settings/hooks/com.simpack.stash.jira-hook:repositoryJiraIssueValidator
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-#
-#
-GET https://stash-staging.intec.dom:7990/rest/api/1.0/projects/SPCK/repos/Simpack_Src/commits?until=HEAD
-Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
-#
-#
-#
-GET http://jiratest.intec.dom:7990/rest/inbox/1.0/pull-requests/count
-Content-Type: application/json
-Authorization: Basic base64-encode-region username:password
-#
-# Set the build status on a commit
-#
-POST http://jiratest.intec.dom:7990/rest/build-status/1.0/commits/f3810cfceccbe3f7a3211e6039f59b37146d9717
-Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
-{
-   "state" : "FAILED",
-   "key": "build-win32",
-   "name": "build-win32: PR Title",
-   "url": "http://simdev-server.intec.dom/CDash/buildSummary.php?buildid=63671",
-   "description" : "PR description"
-}
-#
-# Retrieve Klocwork ids blocking a dev issue
-#
-GET https://jira.intec.dom:8443/rest/api/2/issue/IM-26203?fields=customfield_10027
-Content-Type: application/json
-Authorization: Basic
-#
-# Retrieve current status of a dev issue
-#
-GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-# Update Klocwork ids for a dev issue
-#
-PUT https://jira.intec.dom:8443/rest/api/2/issue/SPCK-26203
-Content-Type: application/json
-Authorization: Basic
-{ "fields": { "customfield_10027": "JuchHu" } }
-#
-# Retrieve issues between development in progress and Integration Test
-#
-GET https://jira.intec.dom:8443/rest/api/2/search?jql=project%20%3D%20IM%20AND%20issuetype%20%3D%20Development%20AND%20status%20in%20(%22IN%20PROGRESS%22%2C%20%22READY%22%2C%20%22INTEGRATION%20TEST%22)&validateQuery=true&fields=key&startAt=0
-Content-Type: application/json
-Authorization: Basic base64-encode-region username:password
 
-#
-POST http://jiratest.intec.dom:7990/rest/api/1.0/projects/TEST/repos/testrepo/pull-requests/12/comments
-Content-Type: application/json
-Authorization: Basic YXBlbDoyb2xkMnImcg==
-{
-   "text" : "Testkommentar"
-}
-#
-#
-GET https://jira.intec.dom:8443/rest/api/2/project/SPCK/role
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-GET https://spck-stash.ux.dsone.3ds.com:7990/rest/api/1.0/projects
-Content-Type: application/json
-Authorization: QmFzaWMgTUFMMTpjYUkxMGV0YQ==
-#
-GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-28418
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-GET https://jira.intec.dom:8443/rest/api/2/issue/SPCK-28419
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-#
-#
-PUT https://jira-staging.intec.dom:8443/rest/api/2/user?username=eichberg
-Content-Type: application/json
-Authorization: Basic YXBlbDpNaVd1aWJ2Rw==
-{
-   "name" : "AER3"
-}
-#
-#
-GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/issue/SPCK-40918
-Content-Type: application/json
-Authorization: Basic TUFMMTpFbWFjczRFdmVy
-#
-GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/project/SPCK/components
-Content-Type: application/json
-Authorization: Basic TUFMMTpEdWt0aWQ0Zw==
-#
-GET https://dsxdev-online-ppd.dsone.3ds.com/enovia/rest/irs;jsessionid=D936D80E6B1ED84AB389DD232982DE5E;jsessionid=9960214115EBC5179DADDD57A13B6042?Owner=LWT
-Content-Type: application/json
-#
-GET https://dsxdev-online-ppd.dsone.3ds.com/enovia/rest/irs/63199.28987.25072.47814;jsessionid=D936D80E6B1ED84AB389DD232982DE5E;jsessionid=9960214115EBC5179DADDD57A13B6042?Owner=LWT
-Content-Type: application/json
-#
-GET https://spck-stash.ux.dsone.3ds.com:7990/rest/jira/1.0/SPCK-44012/commits
-Content-Type: application/json
-Authorization: Basic TUFMMTptdmVtSnN1bjk=
-#
-GET http://lw5-mal1-cem.dsone.3ds.com:8080/3DRDF/service/rdfQL?query=count
-#
-GET http://lw5-mal1-cem.dsone.3ds.com:8080/3DRDF/service/rdfQL?query=import%20sample.ttl%20%2dprefixes
-#
-GET http://lw5-mal1-cem.dsone.3ds.com:8080/3DRDF/v0/resources/sample:A?$mask=dskern:Mask.Bounded
-#
-#
-#
+[
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Temperatursensor1:Humidity",
+    "configuration": {},
+    "itemName": "Temperatursensor1_Luftfeuchtigkeit"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Temperatursensor1:LinkQuality",
+    "configuration": {},
+    "itemName": "Temperatursensor1_LinkQuality"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:LinkQuality",
+    "configuration": {},
+    "itemName": "Sensor1_Empfangsqualitaet"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Humidity",
+    "configuration": {},
+    "itemName": "Sensor1_Luftfeuchtigkeit"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:LinkQuality",
+    "configuration": {},
+    "itemName": "Sensor1_Empfangsqualitat"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Battery",
+    "configuration": {},
+    "itemName": "Sensor1_Batterie"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Temperature",
+    "configuration": {},
+    "itemName": "Sensor1_Temperatur"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor2:Battery",
+    "configuration": {},
+    "itemName": "Sensor2_Batterie"
+  },
+  {
+    "editable": true,
+    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Temperature",
+    "configuration": {
+      "profile": "system:timestamp-update"
+    },
+    "itemName": "Sensor1_LastSeen"
+  }
+]
