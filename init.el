@@ -341,7 +341,6 @@
  '(auto-revert-verbose nil)
  '(blink-matching-paren-on-screen nil)
  '(browse-kill-ring-no-duplicates t)
- '(browse-url-handlers '((".*" . browse-url-firefox)))
  '(c-basic-offset 3)
  '(c-cleanup-list '(scope-operator compact-empty-funcall))
  '(c-default-style
@@ -501,7 +500,7 @@
  '(comment-style 'plain)
  '(compilation-ask-about-save nil)
  '(compilation-auto-jump-to-first-error t)
- '(compilation-error-regexp-alist '(bash cmake cmake-info gcc-include gnu perl))
+ '(compilation-error-regexp-alist '(bash cmake cmake-info gcc-include gnu msft perl))
  '(compilation-read-command nil)
  '(compilation-scroll-output 'first-error)
  '(compilation-search-path '("/scratch/apel/new_arch"))
@@ -725,8 +724,6 @@
 (global-set-key (kbd "C-x b") 'counsel-ibuffer)
 ;; (global-set-key (kbd "SPC") 'just-one-space)
 
-(windmove-default-keybindings)
-
 (add-hook 'c-mode-common-hook
        (lambda ()
             (imenu-add-to-menubar "Functions")
@@ -759,6 +756,7 @@
 
 (add-hook 'prog-mode-hook
           (lambda()
+            (lock-file-mode nil)
             (smartscan-mode 1)))
 
 (add-hook 'shell-mode-hook

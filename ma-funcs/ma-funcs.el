@@ -131,11 +131,24 @@
   (compile (concat "cd " ma-build-dir "; cmake .; ~/bin/my_compile " ma-build-dir " " ma-make-target))
 )
 
+(defun ma-is-windows-buffer(buffer)
+  "Check if the given buffer belongs to a file stored on a Windows disk accessed via WSL."
+  (string-match "^/mnt/[cd]/" (buffer-file-name buffer)))
+
+(setq compilation-transform-file-match-alist '(("^D:\\\\users\\\\apel\\\\new_arch\\\\develop\\\\\\([a-zA-Z\\\\]*\\.cpp\\)"  "/mnt/d/users/apel/new_arch/develop/\\1")))
+
+(defun ma-transform-compilation-file-name (filename)
+  "Transform Windows filename to filename as accessible through WSL."
+  (replace-regexp-in-string "^D:/users/apel/new_arch/" "/mnt/d/users/apel/new_arch/develop/" (string-replace "\\" "/" filename)))
+
+(setq compilation-parse-errors-filename-function 'ma-transform-compilation-file-name)
+
 (defun ma-compile-command ()
   "Return compilation command to use"
   (if (boundp 'ma-compile-command)
       ma-compile-command
-    (cond (work-linux-remote "~/bin/my_remote_compile.sh")
+    (cond (work-linux-remote
+           (if (ma-is-windows-buffer (current-buffer)) "/mnt/c/windows/system32/cmd.exe /c D:/users/apel/compile_win.bat" "~/bin/my_remote_compile.sh"))
           (t                 "~/bin/my_compile"))))
 
 (defun ma-run-compile ()
@@ -147,7 +160,12 @@
   (if (or (boundp 'ma-make-target) (stringp 'ma-make-target))
       (setq comp-command (concat comp-command " " ma-make-target)))
   (print comp-command)
-  (compile comp-command))
+
+  (if (ma-is-windows-buffer (current-buffer))
+      (let ((process-connection-type nil))              ;; This avoids processes hanging on WSL, when attempting to start
+        (compile comp-command))
+    (compile comp-command))
+  )
 
 (defun ma-compile-file ()
   "Run compilation of current file"
@@ -207,11 +225,13 @@
 (require 'notifications)
 (defun ma-send-desktop-notification (summary body timeout)
   "notify via dbus"
+(if work-linux-local
   (notifications-notify :title summary
                         :body body
                         :timeout timeout
                         :urgency "low"
-                        :transient t))
+                        :transient t)
+  (message (concat message body))))
 
 (defun ma-compile-notify (buffer message)
   (ma-send-desktop-notification "emacs compile" message 2000))
@@ -425,5 +445,16 @@ not, a copyright comment is inserted at the start of the file."
       (insert "#ifdef SPCK_QTSCRIPT\n")
       (goto-char (line-end-position))
       (insert "\n#endif"))))
+
+(defconst powershell-exe "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
+(defun ma-browse-url (url &optional new-window)
+  "Opens link via powershell.exe"
+  (let ((quotedUrl (format "start '%s'" url)))
+    (apply 'call-process powershell-exe
+           nil 0 nil (list "-Command" quotedUrl))))
+
+(if (file-executable-p powershell-exe)
+    (setq-default browse-url-browser-function 'ma-browse-url)
+    (setq-default browse-url-browser-function 'browse-url-firefox))
 
 (provide 'ma-funcs)
