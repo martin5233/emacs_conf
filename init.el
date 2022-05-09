@@ -54,6 +54,13 @@
         (:name org-bullets
                :depends org-mode
                :after (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+	(:name filenotify-recursive
+	       :type github
+	       :pkgname "jethrokuan/filenotify-recursive")
+        (:name org-roam
+	       :type github
+	       :pkgname "org-roam/org-roam"
+	       :depends (dash f s emacsql magit filenotify-recursive))
         (:name http-post-simple
                :type http
                :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
