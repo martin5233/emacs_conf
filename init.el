@@ -82,15 +82,7 @@
                (progn
                  (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
                  (global-set-key (kbd "C-c C-z") 'magit-status)))
-        (:name swiper
-               :after (progn
-                        (ivy-mode 1)
-                        (setq ivy-set-virtual-buffers t)
-                        (setq ivy-count-format "(%d/%d)")
-                        (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-                        (add-to-list 'ivy-completing-read-handlers-alist '(find-file . completing-read-default))
-                        (add-to-list 'ivy-completing-read-handlers-alist '(grep-read-files . completing-read-default))
-                        ))
+        (:name swiper)
         (:name hydra)
         (:name gdb-mi
                :type github
@@ -217,6 +209,18 @@
 		         :pkgname "sebastiencs/company-box"
                :after (add-hook 'company-mode-hook 'company-box-mode)
                :depends (company-mode frame-local))
+        (:name vertico
+               :type github
+               :pkgname "minad/vertico")
+        (:name orderless
+               :type github
+               :pkgname "oantolin/orderless"
+               :after
+               (setq completion-styles '(orderless basic)))
+        (:name marginalia
+               :type github
+               :pkgname "minad/marginalia"
+               :after (marginalia-mode))
         (:name frame-local
 	       :type github
 	       :pkgname "sebastiencs/frame-local")
@@ -240,16 +244,6 @@
         (:name "devdocs"
          :type github
          :pkgname "astoff/devdocs.el")
-        (:name "prescient"
-         :type github
-         :pkgname "raxod502/prescient.el"
-         :depends (swiper company-mode)
-         :after (progn
-                  (ivy-prescient-mode)
-                  (company-prescient-mode)
-                  (prescient-persist-mode)
-                  (setq prescient-sort-full-matches-first t)
-                  (setq ivy-prescient-sort-commands '(:not swiper swiper-isearch projectile--find-file counsel-ibuffer))))
         (:name "dap-mode")
         (:name keyfreq
                :type github
@@ -305,10 +299,6 @@
                (:name lsp-mode)
                (:name lsp-ui
                       :depends (lsp-mode))
-               (:name lsp-ivy
-                      :type github
-                      :pkgname "emacs-lsp/lsp-ivy"
-                      :depends lsp-mode)
                ))))
 
 (if home
@@ -591,7 +581,6 @@
  '(magit-cherry-pick-arguments '("-x"))
  '(magit-commit-extend-override-date t)
  '(magit-commit-reword-override-date t)
- '(magit-completing-read-function 'ivy-completing-read)
  '(magit-diff-refine-hunk t)
  '(magit-log-arguments '("-n20"))
  '(magit-log-section-arguments '("-n256" "--decorate"))
