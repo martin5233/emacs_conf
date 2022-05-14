@@ -54,7 +54,7 @@
         (:name org-bullets
                :depends org-mode
                :after (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-	(:name filenotify-recursive
+	     (:name filenotify-recursive
 	       :type github
 	       :pkgname "jethrokuan/filenotify-recursive")
         (:name org-roam
@@ -152,9 +152,6 @@
         (:name json-reformat)
         (:name json-mode
                :depends (json-snatcher json-reformat))
-        (:name hierarchy
-               :type github
-               :pkgname "DamienCassou/hierarchy")  ;; To be removed after 27.1, as integrated into Emacs core
         (:name js2-mode
                :type github
                :pkgname "mooz/js2-mode"
@@ -167,8 +164,7 @@
 
         (:name json-navigator
                :type github
-               :pkgname "DamienCassou/json-navigator"
-               :depends hierarchy)
+               :pkgname "DamienCassou/json-navigator")
         (:name markdown-mode)
         (:name visual-regexp
                :after (progn
@@ -241,9 +237,6 @@
         (:name avy
          :type github
          :pkgname "abo-abo/avy")
-        (:name engine-mode
-         :type github
-         :pkgname "hrs/engine-mode")
         (:name "devdocs"
          :type github
          :pkgname "astoff/devdocs.el")
