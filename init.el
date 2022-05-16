@@ -173,9 +173,7 @@
                (progn
                  (global-set-key (kbd "C-x o") 'ace-window)
                  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
-        (:name link-hint
-               :after
-               (global-set-key (kbd "C-c o") 'link-hint-open-link))
+        (:name link-hint)
         (:name auto-compile
                :after (progn
                         (setq load-prefer-newer t)

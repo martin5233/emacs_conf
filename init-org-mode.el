@@ -15,7 +15,7 @@
     )
 )
 
-(setq org-agenda-files '("~/org" "~/org/jira"))
+(setq org-agenda-files '("~/org" "~/org/jira" "~/org-roam"))
 
 (setq org-agenda-custom-commands
    (quote

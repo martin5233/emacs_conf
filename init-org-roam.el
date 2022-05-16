@@ -6,7 +6,12 @@
 (setq org-roam-capture-templates
       '(("d" "default" plain "%?" :target
          (file+head "%<%Y-%m-%d_%H:%M:%S>-${slug}.org" "#+title: ${title}")
-         :unnarrowed t)))
+         :unnarrowed t)
+        ("s" "spck" plain (file "~/org-roam/templates/spck-template.org")
+         :target (file "%<%Y-%m-%d_%H:%M:%S>-SPCK-${slug}.org")
+         :unnarrowed t)
+        )
+      )
 
 
 (org-roam-db-autosync-mode)
