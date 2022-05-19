@@ -28,7 +28,6 @@
                                             (interactive)
                                             (require 'lsp-ui)
                                             (lsp-ui-imenu)))
-            (local-set-key (kbd "C-c j") 'lsp-ivy-workspace-symbol)
             ))
 (add-hook 'c++-mode-hook #'yas-minor-mode)
 

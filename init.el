@@ -198,9 +198,6 @@
                         (eval-after-load "which-key" '(diminish 'which-key-mode))
                         (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
         (:name projectile)
-        (:name counsel-projectile
-               :depends projectile
-               :after (counsel-projectile-mode 1))
         (:name company-mode)
         (:name company-box-mode
 		         :type github
@@ -701,17 +698,7 @@
 (global-unset-key [?\C-x ?\C-c])
 (global-set-key [?\C-x ?\C-c ?\C-x] 'save-buffers-kill-terminal)
 (global-set-key "\M- " 'dabbrev-expand)
-(global-set-key (kbd "C-.") 'goto-last-change)
-(global-set-key (kbd "<kp-end>") 'shell)
-(global-set-key (kbd "<kp-next>") '(lambda () "Open init.el" (interactive) (find-file "~/.emacs.d/init.el")))
-(global-set-key (kbd "M-x") 'counsel-M-x)
 (global-set-key (kbd "C-s") 'swiper-isearch)
-(global-set-key (kbd "C-x r b") 'counsel-bookmark)
-(global-set-key (kbd "C-h b") 'counsel-descbinds)
-(global-set-key (kbd "C-h f") 'counsel-describe-function)
-(global-set-key (kbd "C-h v") 'counsel-describe-variable)
-(global-set-key (kbd "M-y") 'counsel-yank-pop)
-(global-set-key (kbd "C-x b") 'counsel-ibuffer)
 ;; (global-set-key (kbd "SPC") 'just-one-space)
 
 (add-hook 'c-mode-common-hook

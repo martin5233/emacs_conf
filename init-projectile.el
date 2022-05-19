@@ -3,7 +3,6 @@
 (define-key projectile-mode-map (kbd "C-S-p") 'projectile-command-map)
 (global-set-key (kbd "C-c C-f") 'projectile--find-file)
 
-(setq projectile-completion-system 'ivy)
 (setq projectile-sort-order 'recently-active)
 
 (cond

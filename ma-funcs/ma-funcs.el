@@ -371,15 +371,6 @@ not, a copyright comment is inserted at the start of the file."
 
 (add-hook 'grep-setup-hook 'ma-grep-setup-erase-date)
 
-(defun ma-turn-off-ivy-for-grep-read-files(orig-fun &rest args)
-  (ivy-mode 0)
-  (message "ma-turn-off-ivy-for-grep-read-files called")
-  (let ((res (apply orig-fun args)))
-    (ivy-mode 1)
-    res))
-
-(advice-add 'grep-read-files :around #'ma-turn-off-ivy-for-grep-read-files)
-
 (defconst ma-src-trees
   '(("master" . "/scratch/apel/new_arch/")
     ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
