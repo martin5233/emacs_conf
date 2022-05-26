@@ -76,6 +76,14 @@
         (:name treepy)
         (:name with-editor)
         (:name transient)
+        (:name calendar
+               :type builtin)
+        (:name german-holidays
+               :type github
+               :pkgname "rudolfochrist/german-holidays"
+               :after (progn
+                         (require 'german-holidays)
+                         (setq calendar-holidays holiday-german-BY-holidays)))
         (:name magit
                :depends (dash ghub graphql magit-popup treepy with-editor transient)
                :after
@@ -174,7 +182,9 @@
                  (global-set-key (kbd "C-x o") 'ace-window)
                  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
         (:name link-hint)
+        (:name packed)
         (:name auto-compile
+               :depends packed
                :after (progn
                         (setq load-prefer-newer t)
                         (require 'auto-compile)
@@ -410,48 +420,6 @@
      (inexpr-class . +)
      (inline-open . 0)))
  '(c-style-variables-are-local-p nil)
- '(calendar-holidays
-   '((holiday-fixed 1 1 "New Year's Day")
-     (holiday-float 1 1 3 "Martin Luther King Day")
-     (holiday-fixed 2 2 "Groundhog Day")
-     (holiday-fixed 2 14 "Valentine's Day")
-     (holiday-float 2 1 3 "President's Day")
-     (holiday-fixed 3 17 "St. Patrick's Day")
-     (holiday-fixed 4 1 "April Fools' Day")
-     (holiday-float 5 0 2 "Mother's Day")
-     (holiday-float 5 1 -1 "Memorial Day")
-     (holiday-fixed 6 14 "Flag Day")
-     (holiday-float 6 0 3 "Father's Day")
-     (holiday-fixed 7 4 "Independence Day")
-     (holiday-float 9 1 1 "Labor Day")
-     (holiday-float 10 1 2 "Columbus Day")
-     (holiday-fixed 10 31 "Halloween")
-     (holiday-fixed 11 11 "Veteran's Day")
-     (holiday-float 11 4 4 "Thanksgiving")
-     (holiday-easter-etc)
-     (holiday-fixed 12 25 "Christmas")
-     (if calendar-christian-all-holidays-flag
-         (append
-          (holiday-fixed 1 6 "Epiphany")
-          (holiday-julian 12 25 "Eastern Orthodox Christmas")
-          (holiday-greek-orthodox-easter)
-          (holiday-fixed 8 15 "Assumption")
-          (holiday-advent 0 "Advent")))
-     (solar-equinoxes-solstices)
-     (holiday-sexp calendar-daylight-savings-starts
-                   (format "Daylight Saving Time Begins %s"
-                           (solar-time-string
-                            (/ calendar-daylight-savings-starts-time
-                               (float 60))
-                            calendar-standard-time-zone-name)))
-     (holiday-sexp calendar-daylight-savings-ends
-                   (format "Daylight Saving Time Ends %s"
-                           (solar-time-string
-                            (/ calendar-daylight-savings-ends-time
-                               (float 60))
-                            calendar-daylight-time-zone-name)))))
- '(calendar-mark-holidays-flag t)
- '(calendar-view-diary-initially-flag t)
  '(cc-other-file-alist
    '(("\\.cc\\'"
       (".hh" ".h"))
@@ -504,7 +472,6 @@
    '(desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history))
  '(desktop-restore-eager 20)
  '(desktop-save 'ask-if-new)
- '(diary-file "~/.diary")
  '(dired-auto-revert-buffer 'dired-directory-changed-p)
  '(dired-dwim-target t)
  '(dired-omit-files "^\\.?#\\|^\\.")
@@ -528,7 +495,6 @@
  '(eudc-protocol 'ldap)
  '(eudc-query-form-attributes '(name firstname email phone Uid))
  '(eudc-server "10.29.111.1")
- '(european-calendar-style nil)
  '(ff-always-in-other-window t)
  '(ff-always-try-to-create nil)
  '(ff-ignore-include t)
@@ -596,8 +562,10 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
+ '(org-agenda-files
+   '("/home/martin/org/2022-01-31_ProtokollUmweltausschuss.org" "/home/martin/org/2022-01-31_notizenumweltausschuss.org" "/home/martin/org/adb.org" "/home/martin/org/charlotte.org" "/home/martin/org/filme.org" "/home/martin/org/heizung.org" "/home/martin/org/ideen.org" "/home/martin/org/kodi.org" "/home/martin/org/kv_sitzung_2020-12-09.org" "/home/martin/org/vortrag_heimautomatisierung.org" "/home/martin/org/zuordnung_sensoren_gethsemane.org"))
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
- '(package-selected-packages '(nil))
+ '(package-selected-packages '(csv-mode nil))
  '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
