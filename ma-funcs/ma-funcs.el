@@ -342,13 +342,12 @@ not, a copyright comment is inserted at the start of the file."
   (interactive)
   (insert (uuid)))
 
-(defun ma-offlineimap-get-password (host)
-  (let* ((auth-source-creation-prompts '((user . "Offlineimap user at %h: ")
-                                         (secret . "Offlineimap Password: ")))
+(defun ma-get-password ()
+  (let* ((host "message.emea.3ds.com")
          (found (nth 0 (auth-source-search :max 1
                                            :host host
                                            :require '(:user :secret)
-                                           :create t))))
+                                           :create nil))))
     (if found
         (let* ((secret (plist-get found :secret))
                (password (if (functionp secret) (funcall secret) secret))
@@ -439,7 +438,12 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst powershell-exe "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
 (defun ma-browse-url (url &optional new-window)
-  "Opens link via powershell.exe"
+  "Opens link via powershell.exe."
+  (when (request-url-file-p url)
+    (let* ((src-path (substring url 7))
+           (filename (file-name-nondirectory src-path)))
+      (copy-file src-path (concat "/mnt/c/temp/" filename))
+      (setq url (concat "file://C:/temp/" filename))))
   (let ((quotedUrl (format "start '%s'" url)))
     (apply 'call-process powershell-exe
            nil 0 nil (list "-Command" quotedUrl))))

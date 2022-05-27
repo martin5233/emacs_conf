@@ -104,7 +104,6 @@
                           "gdb"
                           ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
                           ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
-                        (global-set-key (kbd "<f4>") 'hydra-gdb/body)
                         ))
         (:name smartscan)
         (:name git-timemachine)
@@ -195,6 +194,8 @@
                :type github
                :pkgname "ludwigpacifici/modern-cpp-font-lock"
                :after (modern-c++-font-lock-global-mode t))
+        (:name unicode-fonts
+               :after (unicode-fonts-setup))
         (:name diminish
                :after (progn
                         (eval-after-load "cwarn" '(diminish 'cwarn-mode))
@@ -269,12 +270,29 @@
                                                         (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
                                                             "/scratch/apel/new_arch/develop/src"
                                                           (deadgrep--project-root)))))
+                 (add-hook 'deadgrep-mode-hook (lambda () (next-error-follow-minor-mode t)))
                  (setq deadgrep-max-buffers 1)))
         (:name vterm
                :after
                (add-hook 'vterm-mode-hook
                          (lambda ()
                            (local-set-key (kbd "C-g") 'vterm--self-insert))))
+        (:name mu4e
+               :branch "release/1.6")
+        (:name mu4e-alert)
+        (:name emacs-htmlize
+               :type github
+               :pkgname "hniksic/emacs-htmlize")
+        (:name org-msg
+               :type github
+               :pkgname "jeremy-compostella/org-msg"
+               :depends (emacs-htmlize mu4e))
+        (:name guess-language
+               :type github
+               :pkgname "tmalsburg/guess-language.el"
+               :after
+               (progn
+                 (setq guess-language-languages '(en de))))
         ))
 
 (if work
