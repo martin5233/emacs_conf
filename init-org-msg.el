@@ -15,15 +15,15 @@ Viele Grüße,
 Martin
 #+end_signature")
 
-;; (defun ma-org-msg-get-to-name-advice(orig &rest args)
-;;   "Return first name of addressee or defer to org-msg-get-to-name."
-;;   (save-excursion
-;;     (let ((to (org-msg-message-fetch-field "to")))
-;;       (if (string-match "\([:upper:]+\) \([:upper:][:lower:]+\) <[:print:]+@3ds\.com>" to)
-;;           (match-string 2)
-;;         (apply orig args)))))
+(defun ma-org-msg-get-to-name-advice(orig &rest args)
+  "Return first name of addressee or defer to org-msg-get-to-name."
+  (save-excursion
+    (let ((to (org-msg-message-fetch-field "to")))
+      (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
+          (match-string 2 to)
+        (apply orig args)))))
 
-;; (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
+(advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
 
 
 (org-msg-mode)
