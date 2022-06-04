@@ -31,5 +31,5 @@
 
 (appt-activate 1)
 
-(ma-getcal)
+(add-hook 'after-init-hook 'ma-getcal)
 (run-with-idle-timer 60 t 'ma--getcal-if-necessary)
