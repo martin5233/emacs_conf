@@ -1,10 +1,9 @@
 (setq mu4e-bookmarks
    (quote
-    (("flag:unread AND NOT flag:trashed AND NOT maildir:\"/Deleted Items\"" "Unread messages" 117)
-     ("(maildir:/INBOX OR maildir:/Inbox/.AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
-     ("date:today..now AND NOT flag:trashed AND NOT maildir:\"/Deleted Items\" AND NOT \"maildir:/Junk\"" "Today's messages" 116)
-     ("date:7d..now AND NOT flag:trashed AND NOT maildir:\"/Deleted Items\" AND NOT \"maildir:/Junk\"" "Last 7 days" 119)
-     ("mime:image/*" "Messages with images" 112))))
+    (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
+     ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+     ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
+     ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
 (setq mu4e-headers-fields
       '( (:human-date . 12)
          (:flags . 6)
@@ -14,13 +13,13 @@
 (setq mu4e-compose-dont-reply-to-self t)
 (setq mu4e-compose-complete-only-after "2020-01-01")
 (setq mu4e-drafts-folder "/Drafts")
-(setq mu4e-get-mail-command "mbsync -a")
+(setq mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
 (setq mu4e-completing-read-function 'completing-read)
 (setq mu4e-headers-include-related nil)
 (setq mu4e-index-update-error-warning nil)
 (setq mu4e-hide-index-messages t)
 (setq mu4e-sent-folder "/Sent")
-(setq mu4e-trash-folder "/Deleted Items")
+(setq mu4e-trash-folder "/Trash")
 (setq mu4e-update-interval 120)
 (setq mu4e-use-fancy-chars t)
 (setq mu4e-attachment-dir "/tmp")
@@ -58,8 +57,8 @@
 (add-hook 'mu4e-compose-mode-hook
           (lambda()
             (flyspell-mode 1)
-            (set-fill-column 120)
-            (guess-language-mode 1)))
+            (guess-language-mode 1)
+            (set-fill-column 120)))
 
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))

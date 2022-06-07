@@ -22,7 +22,8 @@
   (with-current-buffer (find-file-noselect diary-file)
     (erase-buffer) ;; to avoid duplicating events
     (ma--getcal-do calendar-url diary-file)
-    (basic-save-buffer)))
+    (setq ma--getcal-last-update (float-time))
+    (save-buffer)))
 
 (defun ma--getcal-if-necessary ()
   "Reload the calendar if it hasn't been updated for an hour."

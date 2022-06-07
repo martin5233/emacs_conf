@@ -1,19 +1,19 @@
+(defconst ma-org-msg-greeting-fmt-de "\nHallo%s,\n\n")
+(defconst ma-org-msg-signature-de "\n\n#+begin_signature\nViele Grüße,\n\nMartin\n#+end_signature")
+(defconst ma-org-msg-greeting-fmt-en "\nHi%s,\n\n")
+(defconst ma-org-msg-signature-en "\n\n#+begin_signature\nThanks,\n\nMartin\n#+end_signature")
+
+
 (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
 (setq org-msg-startup "hidestars indent inlineimages")
-(setq	org-msg-greeting-fmt "\nHallo%s,\n\n")
+(setq	org-msg-greeting-fmt ma-org-msg-greeting-fmt-de)
 (setq	org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")))
 (setq org-msg-greeting-name-limit 3)
 (setq org-msg-default-alternatives '((new		. (text html))
 				                         (reply-to-html	. (text html))
 				                         (reply-to-text	. (text))))
 (setq org-msg-convert-citation t)
-(setq org-msg-signature "
-
-#+begin_signature
-Viele Grüße,
-
-Martin
-#+end_signature")
+(setq org-msg-signature ma-org-msg-signature-de)
 
 (defun ma-org-msg-get-to-name-advice(orig &rest args)
   "Return first name of addressee or defer to org-msg-get-to-name."

@@ -289,10 +289,7 @@
                :depends (emacs-htmlize mu4e))
         (:name guess-language
                :type github
-               :pkgname "tmalsburg/guess-language.el"
-               :after
-               (progn
-                 (setq guess-language-languages '(en de))))
+               :pkgname "tmalsburg/guess-language.el")
         ))
 
 (if work
