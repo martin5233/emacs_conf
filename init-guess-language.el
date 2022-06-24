@@ -18,5 +18,3 @@ Argument LANG: Language code."
 
 (eval-after-load "guess-language"
   '(add-hook 'guess-language-after-detection-functions #'ma-switch-input-method-after-language-guess))
-
-;; (remove-hook 'guess-language-after-detection-functions #'ma-switch-input-method-after-language-guess)

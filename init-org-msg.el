@@ -1,7 +1,7 @@
 (defconst ma-org-msg-greeting-fmt-de "\nHallo%s,\n\n")
-(defconst ma-org-msg-signature-de "\n\n#+begin_signature\nViele Grüße,\n\nMartin\n#+end_signature")
+(defconst ma-org-msg-signature-de "\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature")
 (defconst ma-org-msg-greeting-fmt-en "\nHi%s,\n\n")
-(defconst ma-org-msg-signature-en "\n\n#+begin_signature\nThanks,\n\nMartin\n#+end_signature")
+(defconst ma-org-msg-signature-en "\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature")
 
 
 (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
@@ -27,3 +27,10 @@
 
 
 (org-msg-mode)
+
+(add-hook 'org-msg-edit-mode-hook
+          (lambda ()
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)))

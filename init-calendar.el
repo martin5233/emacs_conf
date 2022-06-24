@@ -7,6 +7,8 @@
 (setq appt-display-diary t)
 (setq org-agenda-include-diary t)
 
+(add-hook 'diary-list-entries-hook #'diary-sort-entries t)
+
 (defvar ma--getcal-last-update nil "Last time the calendar has been updated.")
 
 (defun ma--getcal-do (url file)
