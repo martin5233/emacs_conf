@@ -183,7 +183,7 @@
         (:name link-hint)
         (:name packed)
         (:name auto-compile
-               :depends packed
+               :depends (packed compat)
                :after (progn
                         (setq load-prefer-newer t)
                         (require 'auto-compile)

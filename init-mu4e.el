@@ -58,6 +58,8 @@
           (lambda()
             (flyspell-mode 1)
             (guess-language-mode 1)
+            (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
+            (flyspell-mode)
             (set-fill-column 120)))
 
 (when (fboundp 'imagemagick-register-types)
