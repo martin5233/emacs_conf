@@ -183,7 +183,7 @@
         (:name link-hint)
         (:name packed)
         (:name auto-compile
-               :depends (packed compat)
+               :depends (packed)
                :after (progn
                         (setq load-prefer-newer t)
                         (require 'auto-compile)
@@ -278,7 +278,10 @@
                          (lambda ()
                            (local-set-key (kbd "C-g") 'vterm--self-insert))))
         (:name mu4e
-               :branch "release/1.6")
+               :branch "release/1.8"
+               :post-init (setq mu4e-mu-binary (expand-file-name "mu" (expand-file-name "mu" (expand-file-name "build" (el-get-package-directory 'mu4e)))))
+               :load-path "build/mu4e"
+               :info nil)
         (:name mu4e-alert)
         (:name emacs-htmlize
                :type github

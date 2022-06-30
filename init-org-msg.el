@@ -1,7 +1,7 @@
 (defconst ma-org-msg-greeting-fmt-de "\nHallo%s,\n\n")
-(defconst ma-org-msg-signature-de "\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature")
+(defconst ma-org-msg-signature-de "\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n\n#+end_signature")
 (defconst ma-org-msg-greeting-fmt-en "\nHi%s,\n\n")
-(defconst ma-org-msg-signature-en "\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature")
+(defconst ma-org-msg-signature-en "\n\n#+begin_signature\n--\nBest Regards,\n\nMartin\n\n#+end_signature")
 
 
 (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")

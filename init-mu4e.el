@@ -41,7 +41,7 @@
   (interactive)
   (unless (mu4e-running-p)
     (mu4e t))
-  (mu4e-headers-search-bookmark (mu4e-get-bookmark-query ?i))
+  (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
   (mu4e-headers-change-sorting :date 'ascending))
 
 (global-set-key [f4] 'ma-switch-to-mu4e)
@@ -54,13 +54,27 @@
 (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
 
-(add-hook 'mu4e-compose-mode-hook
+(defun ma-compose-hook()
+  "Hook function for compose mode."
+  (flyspell-mode 1)
+  (guess-language-mode 1)
+  (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
+  (setq message-cite-style message-cite-style-outlook)
+  ;; Workaround for bug in mu4e 1.8.2: message-cite-reply-position is ignored
+  (message-goto-body)
+  (re-search-forward "^> ")
+  (forward-line -3)
+  (set-fill-column 120))
+
+(add-hook 'mu4e-compose-mode-hook 'ma-compose-hook)
+
+(add-hook 'mu4e-compose-pre-hook
           (lambda()
+            (setq message-cite-style message-cite-style-outlook
+                  message-cite-reply-position 'above)
             (flyspell-mode 1)
             (guess-language-mode 1)
-            (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
-            (flyspell-mode)
-            (set-fill-column 120)))
+            (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)))
 
 (when (fboundp 'imagemagick-register-types)
    (imagemagick-register-types))

@@ -452,4 +452,39 @@ not, a copyright comment is inserted at the start of the file."
     (setq-default browse-url-browser-function 'ma-browse-url)
     (setq-default browse-url-browser-function 'browse-url-firefox))
 
+
+(defvar ma-current-dev nil "Number of current SPCK issue to work on.")
+(defconst ma-devs-basedir "/ssh:MAL1@dell1254cem:devs/")
+
+(defun ma-set-current-dev (dev-issue)
+  "Set current dev issue."
+  (interactive "nPlease input current SPCK number: ")
+  (setq ma-current-dev (number-to-string dev-issue)))
+
+(defun ma--current-dev-dir()
+  "Return the directory belonging to the current directory for the dev issue stored in ma-current-dev"
+  (concat ma-devs-basedir ma-current-dev))
+
+(defun ma-dired-current-dev()
+  "Open dired in the directory for the current dev issue."
+  (interactive)
+  (unless ma-current-dev
+    (ma-set-current-dev))
+  (let ((dir (ma--current-dev-dir)))
+    (unless (file-exists-p dir)
+      (progn
+        (message (concat "Downloading data for SPCK-" ma-current-dev))
+        (shell-command (concat "ssh MAL1@dell1254cem /home/home_dev/MAL1/perl/download_jira_attachments.pl " ma-current-dev) (generate-new-buffer (concat "*Download " ma-current-dev "*")))))
+    (dired (file-truename (ma--current-dev-dir)))))
+
+(defun ma-browse-current-dev()
+  "Open browser with the current dev issue."
+  (interactive)
+  (browse-url (concat jiralib-url "/browse/SPCK-" ma-current-dev)))
+
+(defun ma-insert-current-dev()
+  "Insert the current dev issue number at point."
+  (interactive)
+  (insert ma-current-dev))
+
 (provide 'ma-funcs)
