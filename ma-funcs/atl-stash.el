@@ -31,6 +31,7 @@
 (require 'url-parse)
 (require 'magit)
 (require 'cl)
+(require 'org-jira)
 
 ;; Custom variables
 
@@ -556,6 +557,36 @@ is returned.  If the reviewer is not found, the original string is returned."
          (merge-base (stash-merge-base repo-dir from-branch to-branch))
          (default-directory repo-dir))
     (magit-log-setup-buffer (list (concat merge-base ".." from-branch)) nil nil)))
+
+(defun stash-create-branch(&optional ask-for-issue-id)
+  "Create a branch for the current dev issue.
+Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a prefix argument and will cause the user to be asked for the issue id."
+  (interactive "P")
+  (let* ((issue-id (concat "SPCK-" (if ask-for-issue-id (read-string "Please input issue id (without SPCK- prefix):" (number-to-string ma-current-dev)) (number-to-string ma-current-dev))))
+         (issue (car (org-jira-get-issue-by-id issue-id)))
+         (summary (org-jira-get-issue-summary issue))
+         (summary-adjusted (downcase (replace-regexp-in-string "[^a-zA-Z0-9]" "-" summary)))
+         (key (org-jira-get-issue-key issue))
+         (branch-name (read-string "Branch name: " (concat key "-MAL1-" summary-adjusted)))
+         (repo (completing-read "Repository: " '("spckxxxx" "spcktest") nil nil "spckxxxx"))
+         (branch-base (completing-read "Branch to fork from: " '("master" "SIMPACK_2023.Y" "SIMPACK_2022x.Y") nil nil "master"))
+         (url (concat stash-url (format "/rest/api/1.0/projects/SPCK/repos/%s/branches" repo)))
+         (body `(("name"       . ,branch-name)
+                 ("startPoint" . ,branch-base)))
+         (body-encoded (json-encode-alist body)))
+
+    (message (format "Creating branch in repo %s branching off from %s, branch name is %s" repo branch-base branch-name))
+    (request url
+      :headers stash-access-headers
+      :type "POST"
+      :data body-encoded
+      :success (function*
+                (lambda (&key data &allow-other-keys)
+                  (message "Creating branch succeeded")))
+      :error (function*
+                (lambda (&key data &allow-other-keys)
+                  (message "Creating branch failed"))))))
+(global-set-key (kbd "C-c m c") 'stash-create-branch)
 
 (define-derived-mode stash-mode special-mode "Stash"
   "Stash mode to provide access to pull requests in Stash"

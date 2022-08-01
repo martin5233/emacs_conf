@@ -694,6 +694,7 @@
             (local-set-key (kbd "C-M-e") 'end-of-defun)
             (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
             (local-set-key (kbd "C-c =") 'align-regexp)
+            (local-set-key (kbd "C-c *") 'ma-insert-separator)
             (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
             (local-unset-key (kbd "C-c C-n"))
             (local-unset-key (kbd "C-c C-p"))
@@ -768,4 +769,5 @@
      (run-with-timer 60 60 'stash-update-stash-info)
      (global-set-key (kbd "C-c p") 'stash-show-pull-requests)
      (run-with-idle-timer 1800 t 'ma-kill-old-buffers)
+     (load "marginalia-jira")
      ))

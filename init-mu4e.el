@@ -51,6 +51,10 @@
 (setq mu4e-alert-interesting-mail-query "maildir:/INBOX AND NOT flag:trashed AND flag:unread")
 (setq shr-color-visible-luminance-min 80)
 
+(with-eval-after-load 'message-mode
+  (setq message-cite-style message-cite-style-outlook
+        message-cite-reply-position 'above))
+
 (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
 (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
 
@@ -60,10 +64,6 @@
   (guess-language-mode 1)
   (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
   (setq message-cite-style message-cite-style-outlook)
-  ;; Workaround for bug in mu4e 1.8.2: message-cite-reply-position is ignored
-  (message-goto-body)
-  (re-search-forward "^> ")
-  (forward-line -3)
   (set-fill-column 120))
 
 (add-hook 'mu4e-compose-mode-hook 'ma-compose-hook)

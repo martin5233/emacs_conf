@@ -2,6 +2,8 @@
 (require 'cl-seq)
 (if (featurep 'uuid)
     (require 'uuid))
+(require 'jiralib)
+(require 'org-jira)
 
 (defgroup ma nil
   "Martins customizations"
@@ -45,11 +47,12 @@
 
 
 (defun ma-kill-old-buffers ()
-  "Kill buffers from end of buffer list (not used recently) until no more than 50 buffers are left. Remove temporary buffers first."
+  "Kill buffers from end of buffer list (not used recently) until no more than 50 buffers are left. Remove temporary buffers and org mode files first."
   (interactive)
   (save-excursion
     (dolist (buffer (buffer-list))
       (if (and (or (string-match "^\*" (buffer-name buffer))
+                   (string-match "\.org$" (buffer-name buffer))
                    (string-match "\.hpp$" (buffer-name buffer)))
                (not (processp (get-buffer-process buffer)))
                (not (buffer-modified-p buffer)))
@@ -453,13 +456,20 @@ not, a copyright comment is inserted at the start of the file."
     (setq-default browse-url-browser-function 'browse-url-firefox))
 
 
-(defvar ma-current-dev nil "Number of current SPCK issue to work on.")
+(defcustom ma-current-dev "" "Number of current SPCK issue to work on."
+  :type '(string)
+  :group 'ma)
+
 (defconst ma-devs-basedir "/ssh:MAL1@dell1254cem:devs/")
 
-(defun ma-set-current-dev (dev-issue)
+(defun ma-set-current-dev ()
   "Set current dev issue."
-  (interactive "nPlease input current SPCK number: ")
-  (setq ma-current-dev (number-to-string dev-issue)))
+  (interactive)
+  (let* ((issue-key (ma-select-jira-issue)))
+    (unless (string-match "^SPCK-\\([0-9]+\\)$" issue-key)
+      (error "Unexpected SPCK issue number format"))
+    (setq ma-current-dev (string-to-number (match-string 1 issue-key)))))
+(global-set-key (kbd "C-c m s") 'ma-set-current-dev)
 
 (defun ma--current-dev-dir()
   "Return the directory belonging to the current directory for the dev issue stored in ma-current-dev"
@@ -476,15 +486,53 @@ not, a copyright comment is inserted at the start of the file."
         (message (concat "Downloading data for SPCK-" ma-current-dev))
         (shell-command (concat "ssh MAL1@dell1254cem /home/home_dev/MAL1/perl/download_jira_attachments.pl " ma-current-dev) (generate-new-buffer (concat "*Download " ma-current-dev "*")))))
     (dired (file-truename (ma--current-dev-dir)))))
+(global-set-key (kbd "C-c m d") 'ma-dired-current-dev)
 
 (defun ma-browse-current-dev()
   "Open browser with the current dev issue."
   (interactive)
   (browse-url (concat jiralib-url "/browse/SPCK-" ma-current-dev)))
+(global-set-key (kbd "C-c m b") 'ma-browse-current-dev)
 
 (defun ma-insert-current-dev()
   "Insert the current dev issue number at point."
   (interactive)
   (insert ma-current-dev))
+(global-set-key (kbd "C-c m i") 'ma-insert-current-dev)
+
+(defun ma-insert-separator()
+  "Insert a separator line consisting of asterisks before the current function.
+   The file is scanned for existing separator lines and inserts a
+   line with the maximum length of any existing separator lines.
+   If no separator lines exist, a line of length 80 will be
+   inserted. A warning is issued, if the length of separator
+   lines is inconsistent in the file.  Point is not modified."
+  (interactive)
+  (let ((longest 0)
+        (shortest 1000))
+    (save-mark-and-excursion
+      (goto-char (point-min))
+      (while (and (not (eobp)) (re-search-forward "^//\\*+[:space:]*$" nil t))
+        (let ((len (length (match-string 0))))
+          (setq longest (max longest len))
+          (setq shortest (min shortest len))))
+      (if (eq longest 0)
+          (setq longest 80)
+        (when (not (eq longest shortest))
+          (message "Asterisk separators are not consistent."))))
+    (save-mark-and-excursion
+      (c-beginning-of-defun)
+      (let ((end (point)))
+        (c-end-of-defun -1)
+        (let ((start (point)))
+          (delete-region start end)
+          (insert (concat "\n//" (make-string (- longest 2) ?*) "\n\n")))))))
+
+(defun ma-select-jira-issue()
+  "Select a jira issue using completion from the list of JIRA development issues, which are currently marked as 'in progress'."
+  (let* ((issues (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND status = \"In Progress\" AND assignee in (currentUser())"))
+         (keys (cl-mapcar 'org-jira-get-issue-key issues)))
+    (completing-read "Select JIRA issue: " keys)))
+
 
 (provide 'ma-funcs)
