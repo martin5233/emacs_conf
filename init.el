@@ -2,7 +2,7 @@
 
 (setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
 (setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
-(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "LP5-MAL1-CEM")))
+(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "LP15-MAL1-CEM")))
 (setq work-linux (or work-linux-local work-linux-remote))
 (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
 (setq work (or work-linux work-win))

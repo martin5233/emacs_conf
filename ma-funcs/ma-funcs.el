@@ -136,7 +136,7 @@
 
 (defun ma-is-windows-buffer(buffer)
   "Check if the given buffer belongs to a file stored on a Windows disk accessed via WSL."
-  (string-match "^/mnt/[cd]/" (buffer-file-name buffer)))
+  (string-match "^/mnt/[ce]/" (buffer-file-name buffer)))
 
 (setq compilation-transform-file-match-alist '(("^D:\\\\users\\\\apel\\\\new_arch\\\\develop\\\\\\([a-zA-Z\\\\]*\\.cpp\\)"  "/mnt/d/users/apel/new_arch/develop/\\1")))
 
@@ -151,7 +151,7 @@
   (if (boundp 'ma-compile-command)
       ma-compile-command
     (cond (work-linux-remote
-           (if (ma-is-windows-buffer (current-buffer)) "/mnt/c/windows/system32/cmd.exe /c D:/users/apel/compile_win.bat" "~/bin/my_remote_compile.sh"))
+           (if (ma-is-windows-buffer (current-buffer)) "/mnt/c/windows/system32/cmd.exe /c E:/users/apel/compile_win.bat" "~/bin/my_remote_compile.sh"))
           (t                 "~/bin/my_compile"))))
 
 (defun ma-run-compile ()
@@ -377,7 +377,7 @@ not, a copyright comment is inserted at the start of the file."
   '(("master" . "/scratch/apel/new_arch/")
     ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
     ("2022"  . "/scratch/apel/new_arch_2022.Y/")
-    ("Windows" . "/mnt/d/users/apel/new_arch/")))
+    ("Windows" . "/mnt/e/users/apel/new_arch/")))
 
 
 (defun ma-choose-file-in-other-tree()
