@@ -497,7 +497,7 @@ not, a copyright comment is inserted at the start of the file."
 (defun ma-insert-current-dev()
   "Insert the current dev issue number at point."
   (interactive)
-  (insert ma-current-dev))
+  (insert (concat "SPCK-" (number-to-string ma-current-dev))))
 (global-set-key (kbd "C-c m i") 'ma-insert-current-dev)
 
 (defun ma-insert-separator()
