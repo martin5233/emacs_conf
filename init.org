@@ -1,0 +1,735 @@
+#+auto_tangle: t
+#+PROPERTY: header-args :tangle "~/.emacs.d/init.el"
+
+* Early init
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle "~/.emacs.d/early-init.el"
+:END:
+** Header warning for generated code
+#+begin_src emacs-lisp
+  ;; This code is generated from init.org.
+  ;; Do not modify, modify the source instead
+
+#+end_src
+** Set up straight
+*** Bootstrap Straight
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+	(expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+	  (url-retrieve-synchronously
+	  "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	  'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+end_src
+*** Disable standard packages completely
+#+begin_src emacs-lisp
+  (setq package-enable-at-startup nil)
+#+end_src
+* Startup
+** Header warning for generated code
+#+begin_src emacs-lisp
+  ;; This code is generated from init.org.
+  ;; Do not modify, modify the source instead
+
+#+end_src
+** Environment detection (Work or home, OS)
+#+begin_src emacs-lisp
+(setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
+(setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
+(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "LP15-MAL1-CEM")))
+(setq work-linux (or work-linux-local work-linux-remote))
+(setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
+(setq work (or work-linux work-win))
+(setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
+#+end_src
+** use-package
+#+begin_src emacs-lisp
+  (straight-use-package 'use-package)
+#+end_src
+** straight
+#+begin_src emacs-lisp
+   (use-package straight
+   :custom (straight-use-package-by-default t))
+#+end_src
+** Customization
+Since init.el will be generated from this file, we save customization in a dedicated file.
+
+#+begin_src emacs-lisp
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+
+  (when (file-exists-p custom-file)
+    (load custom-file nil t))
+#+end_src
+** Desktop
+#+begin_src emacs-lisp
+  (use-package desktop
+    :straight (:type built-in)
+    :config (desktop-save-mode t))
+#+end_src
+** Global keybindings
+#+begin_src emacs-lisp
+  (global-set-key (kbd "<delete>") 'c-electric-delete-forward)
+  (global-set-key (kbd "C-c C-g") 'goto-line)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+  (global-unset-key (kbd "C-x C-c"))
+  (global-set-key (kbd "C-x C-c C-x") 'save-buffers-kill-terminal)
+  (global-set-key (kbd "M-<space>") 'dabbrev-expand)
+#+end_src
+
+* Basics
+** Editing
+*** Avy
+#+begin_src emacs-lisp
+  (use-package avy
+    :bind ("C-M-j" . 'avy-goto-char-timer))
+#+end_src
+*** Expand Region
+#+begin_src emacs-lisp
+  (use-package expand-region
+	       :bind ("M-o" . er/expand-region))
+#+end_src
+*** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :diminish flycheck-mode
+    :hook (c-mode-common-hook . flyspell-prog-mode))
+#+end_src
+*** Multiple cursors
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+	       :bind (("C-c C-n" . mc/mark-next-like-this)
+		      ("C-c C-p" . mc/mark-previous-like-this)
+		      ("C-c C-a" . mc/mark-all-like-this-in-defun)
+		      ("C-c C-|" . mc/edit-lines)))
+#+end_src
+*** Swiper
+#+begin_src emacs-lisp
+  (use-package swiper
+    :bind ("C-s" . swiper-isearch))
+#+end_src
+*** Smartscan
+#+begin_src emacs-lisp
+  (use-package smartscan)
+#+end_src
+*** Browse kill ring
+#+begin_src emacs-lisp
+  (use-package browse-kill-ring)
+#+end_src
+
+*** Visual Regexp
+#+begin_src emacs-lisp
+  (use-package visual-regexp
+    :bind ("M-%" . 'vr/query-replace)
+          ("C-M-%" . 'vr/replace))
+#+end_src
+*** Visual Regexp Steroids
+#+begin_src emacs-lisp
+  (use-package visual-regexp-steroids)
+#+end_src
+*** Miscellaneous
+#+begin_src emacs-lisp
+  (add-hook 'before-save-hook
+            'delete-trailing-whitespace)
+#+end_src
+** Version control
+*** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind ("C-c C-z" . magit-status))
+#+end_src
+*** git-timemachine
+#+begin_src emacs-lisp
+  (use-package git-timemachine)
+#+end_src
+*** git-gutter
+#+begin_src emacs-lisp
+  (use-package git-gutter
+    :unless work-linux-remote
+    :diminish git-gutter-mode
+    :config (global-git-gutter-mode 1))
+#+end_src
+** Remote work
+#+begin_src emacs-lisp
+(if work-linux-remote
+    (progn
+      (setq work-remote-machine "dell1254cem")
+      (setq work-remote-url "/ssh:MAL1@dell1254cem:")
+      (setq enable-remote-dir-locals nil)
+      (setq tramp-use-ssh-controlmaster-options nil)
+  ;; Avoid version-control checks for tramp buffers
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp)))
+  (setq work-remote-url ""))
+#+end_src
+** Password cache
+#+begin_src emacs-lisp
+    (use-package password-cache
+      :straight (:type built-in)
+      :custom (password-cache-expiry 36000))
+#+end_src
+** Navigation
+*** Link-Hint
+#+begin_src emacs-lisp
+  (defun ma-spck-next-link (end)
+    "Return position of next SPCK-{ID} link or nil if there is none."
+    (save-excursion
+      (when (looking-at "\\(SPCK-[0-9.]+\\)")
+        (progn
+          (skip-chars-forward "SPCK-")
+          (skip-chars-forward "[:digit:]")))
+      (when (re-search-forward "\\(SPCK-[[:digit:]]+\\)" end t)
+        (progn
+          (skip-chars-backward "[SPCK\\-][:digit:]")
+          (point)))))
+
+
+  (defun ma-spck-link-at-point-p ()
+    "Return SPCK-{ID} link at point or nil if there is none."
+    (save-excursion
+      (skip-chars-backward "[SPCK\\-][:digit:]")
+      (and
+       (looking-at "\\(SPCK-[0-9.]+\\)")
+       (concat "https://spck-jira.ux.dsone.3ds.com:8443/browse/" (match-string 1)))))
+
+    (use-package link-hint
+      :config
+      (link-hint-define-type 'spck-url
+                             :next 'ma-spck-next-link
+                             :at-point-p 'ma-spck-link-at-point-p
+                             :open #'browse-url)
+      (push 'link-hint-spck-url link-hint-types)
+      :bind ("C-c o" . 'link-hint-open-link))
+
+#+end_src
+*** Projectile
+#+begin_src emacs-lisp
+    (cond
+     (work-linux-local
+      (progn (setq projectile-project-search-path '("/scratch/apel"))
+             (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))))
+     (work-linux-remote
+      (progn (setq projectile-project-search-path '("/scratch/apel"))
+             (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))
+             (setq projectile-enable-caching t)))
+     (work-win (setq projectile-project-search-path '("D:/users/apel")))
+     (home (setq projectile-project-search-path '("/home/martin"))))
+
+  (defun ma-projectile-mode-line()
+    "Generates a projectile mode line"
+    (format " Proj[%s]" (projectile-project-name)))
+
+  (use-package projectile
+             :config
+             (projectile-mode 1)
+             ;; This is needed to avoid slowdown when working with remote files.
+             (defadvice projectile-project-root (around ignore-remote first activate)
+               (unless (file-remote-p default-directory) ad-do-it))
+
+             :bind
+             ("C-c C-f" . 'projectile--find-file)
+             :bind-keymap
+             ("C-S-p" . 'projectile-command-map)
+             :custom
+             (projectile-sort-order 'recently-active)
+             (projectile-git-submodule-command nil)
+             (projectile-mode-line-prefix "")
+             (projectile-mode-line-function 'ma-projectile-mode-line))
+#+end_src
+*** Deadgrep
+#+begin_src emacs-lisp
+  (use-package deadgrep
+    :bind ("C-c C-r" . deadgrep)
+    :custom (deadgrep-max-buffers  1)
+    (deadgrep-project-root-function . (lambda ()
+                                        (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa")
+                                            "/scratch/apel/new_arch/develop/src/ooa"
+                                          (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
+                                              "/scratch/apel/new_arch/develop/src"
+                                            (deadgrep--project-root)))))
+    :hook (deadgrep-mode . (lambda () (next-error-follow-minor-mode t))))
+#+end_src
+* Appearance
+** Diminish
+#+begin_src emacs-lisp
+  (use-package diminish)
+#+end_src
+** Buffer management
+*** Uniquify
+#+begin_src emacs-lisp
+  (use-package uniquify
+    :straight (:type built-in)
+    :custom (uniquify-buffer-name-style 'post-forward-angle-brackets))
+#+end_src
+*** Ace-window
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :bind ("C-x o" . 'ace-window)
+    :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+#+end_src
+
+** Which-key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :diminish which-key-mode
+    :config (which-key-mode)
+    :custom (which-key-max-description-length 35))
+#+end_src
+** Doom Modeline
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :custom
+    (doom-modeline-modal-icon nil)
+    (doom-modeline-persp-icon nil)
+    (doom-modeline-persp-name nil)
+    (doom-modeline-buffer-file-name-style 'buffer-name)
+    (doom-modeline-vcs-max-length 25)
+    :config
+    (progn
+      (doom-modeline-mode 1)
+      (if home
+          (display-battery-mode t))))
+#+end_src
+** Modus Theme
+#+begin_src emacs-lisp
+  (use-package modus-themes
+    :custom
+      (modus-themes-deuteranopia t)
+      (modus-themes-bold-constructs t)
+      (modus-themes-italic-constructs t)
+      (modus-themes-paren-match '(bold))
+      (modus-themes-mode-line '(3d))
+      (modus-themes-hl-line '(intense))
+    :config
+    (progn
+      (modus-themes-load-themes)
+      (modus-themes-load-vivendi)))
+#+end_src
+
+** Unicode fonts
+#+begin_src emacs-lisp
+  (use-package unicode-fonts
+  :config (unicode-fonts-setup))
+#+end_src
+
+** Miscellaneous
+#+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+* Documentation
+** Devdocs
+#+begin_src emacs-lisp
+  (defun ma-devdocs-lookup-at-point()
+    (interactive)
+    (devdocs-lookup nil (thing-at-point 'symbol)))
+
+  (use-package devdocs
+    :bind
+    ("C-c C-S-d" . 'ma-devdocs-lookup-at-point)
+    ("C-c C-d" . devdocs-lookup)
+    :config
+    (add-hook 'c-mode-common-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("cpp" "qt~5.12"))
+                (local-unset-key (kbd "C-c C-d"))))
+    (add-hook 'cmake-mode-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("cmake~3.17"))
+                (local-unset-key (kbd "C-c C-d"))))
+    (add-hook 'dockerfile-mode-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("docker~19"))))
+    (add-hook 'js-mode-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("node" "javascript"))))
+    (add-hook 'python-mode-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("python~3.10"))))
+    (add-hook 'perl-mode-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("perl~5.34")))))
+#+end_src
+
+* Completion
+** Company
+#+begin_src emacs-lisp
+  (defun ma-cmake-upcase-completion-list (candidates)
+    "Converts all incoming completion candidates to upper case"
+    (if (string-equal major-mode "cmake-mode")
+   (mapcar 'upcase candidates)
+      candidates))
+
+  (use-package company
+   :diminish company-mode
+   :config
+   (global-company-mode)
+   :custom
+     (company-dabbrev-downcase nil)
+     (company-transformers '(ma-cmake-upcase-completion-list company-sort-by-occurrence)))
+#+end_src
+** Company Box Mode
+#+begin_src emacs-lisp
+  ;; (use-package company-box
+  ;;   :after company
+  ;;   :diminish company-box-mode
+  ;;   :hook company-mode)
+#+end_src
+** Vertico
+#+begin_src emacs-lisp
+  (use-package vertico
+    :custom
+      (vertico-sort-function #'vertico-sort-history-alpha)
+    :config
+    (progn
+      (vertico-mode)
+      (savehist-mode)))
+#+end_src
+** Orderless
+#+begin_src emacs-lisp
+  (use-package orderless
+    :custom (completion-styles '(orderless basic)))
+#+end_src
+** Marginalia
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :config (marginalia-mode))
+#+end_src
+* PIM
+** Mail
+*** Mu4e
+#+begin_src emacs-lisp
+  (use-package mu4e)
+#+end_src
+** Calendar
+#+begin_src emacs-lisp
+  (use-package german-holidays
+    :custom calendar-holidays holiday-german-BY-holidays)
+#+end_src
+** Org-dependent stuff
+*** Org mode
+#+begin_src emacs-lisp
+   (defun ma-show-agenda-if-hidden ()
+     "Show Org agenda of today if it is currently hidden. Returns t, if it already was visible, otherwise nil"
+     (interactive)
+     (let* ((buf (get-buffer "*Org Agenda*")))
+       (if (not buf)
+           (progn
+             (org-agenda-list 1)
+             nil)
+         (if (not (get-buffer-window buf))
+             (progn
+               (switch-to-buffer buf)
+               nil)
+           t)
+         )
+       )
+     )
+
+   (use-package org
+     :custom
+     (org-agenda-files '("~/org" "~/org/jira" "~/org-roam"))
+     (org-agenda-custom-commands
+      (quote
+       (("w" "Work agenda only" alltodo ""
+         ((org-agenda-files (list ma-na-org))))
+        ("h" "Home agenda only" agenda ""
+         ((org-agenda-files (list ma-private-org))))
+        ("s" "Unscheduled items" alltodo ""
+         ((org-agenda-skip-function
+           (quote
+            (org-agenda-skip-entry-if
+             (quote scheduled)
+             (quote nottodo)
+             (quote todo))))))
+        )))
+     (org-agenda-repeating-timestamp-show-all nil)
+     (org-agenda-skip-deadline-prewarning-if-scheduled t)
+     (org-agenda-skip-scheduled-if-deadline-is-shown t)
+     (org-agenda-start-on-weekday nil)
+     (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
+     (org-export-backends (quote (ascii html icalendar latex md pandoc)))
+     (org-capture-templates
+           (quote
+            (
+             ("g" "General" entry
+              (file+olp "~/org/na.org" "Unsorted")
+              "** TODO %?")
+             ("t" "Test" entry (file "~/org/test.org") nil)
+             ("m" "TODO from Mail" entry
+              (file+headline "~/org/na.org" "Mail")
+              "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
+     (sorg-scheduled-past-days 5)
+     :bind
+     ("C-c a" . 'org-agenda)
+     ("C-c C" . 'org-capture))
+#+end_src
+*** Org Export to Pandoc
+#+begin_src emacs-lisp
+  (use-package ox-pandoc
+      :straight t)
+#+end_src
+*** Org Jira
+#+begin_src emacs-lisp
+  (use-package org-jira)
+#+end_src
+*** Org Bullets
+#+begin_src emacs-lisp
+    (use-package org-bullets
+      :hook (org-mode . org-bullets-mode))
+#+end_src
+*** Org Roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :custom
+    (org-roam-directory "~/org-roam")
+    (org-roam-capture-templates
+     '(("d" "default" plain "%?" :target
+        (file+head "%<%Y-%m-%d_%H:%M:%S>-${slug}.org" "#+title: ${title}")
+        :unnarrowed t)
+       ("s" "spck" plain (file "~/org-roam/templates/spck-template.org")
+        :target (file "%<%Y-%m-%d_%H:%M:%S>-SPCK-${slug}.org")
+        :unnarrowed t)
+       ))
+    :bind
+    ("C-c n l" . 'org-roam-buffer-toggle)
+    ("C-c n f" . 'org-roam-node-find)
+    ("C-c n i" . 'org-roam-node-insert)
+    :config
+    (org-roam-db-autosync-mode))
+#+end_src
+*** Org Autotangle
+#+begin_src emacs-lisp
+    (use-package org-auto-tangle
+      :diminish org-auto-tangle-mode
+      :hook (org-mode . org-auto-tangle-mode))
+#+end_src
+
+* Programming languages
+** All programming languages
+*** Subword mode
+#+begin_src emacs-lisp
+  (use-package subword
+    :straight (:type built-in)
+    :config
+    (add-hook 'prog-mode-hook
+              (lambda()
+                (local-set-key (kbd "M-<left>") 'subword-backward)
+                (local-set-key (kbd "M-<right>") 'subword-forward)
+                (subword-mode t))))
+#+end_src
+*** Idle highlight mode
+#+begin_src emacs-lisp
+  (use-package idle-highlight-mode
+    :hook prog-mode)
+#+end_src
+*** Turn off lock-file mode and turn on smartscan-mode
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook
+            (lambda()
+              (lock-file-mode nil)
+              (smartscan-mode 1)))
+#+end_src
+*** LSP
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :custom
+    (read-process-output-max (* 1024 1024)) ;; 1mb
+    (gc-cons-threshold 100000000)
+
+    (lsp-completion-provider :capf)
+    (lsp-eldoc-enable-hover nil)
+    (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
+    (lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
+    (lsp-completion-no-cache t)
+    (lsp-enable-indentation nil)
+    (lsp-enable-folding nil)
+    (lsp-enable-on-type-formatting nil)
+    (lsp-keymap-prefix "C-r")
+    (lsp-modeline-code-actions-enable nil)
+    (lsp-modeline-diagnostics-scope :file)
+    (lsp-response-timeout 2)
+    (lsp-restart 'auto-restart)
+    :hook lsp-enable-which-key-integration
+    (c++-mode . lsp-deferred))
+
+  (use-package lsp-ui
+    :after (lsp)
+    :hook (c++-mode . yas-minor-mode))
+#+end_src
+** C++
+*** Modern-cpp-font-lock
+#+begin_src emacs-lisp
+  (use-package modern-cpp-font-lock
+  :config (modern-c++-font-lock-global-mode t))
+#+end_src
+*** Start SMerge session, if necessary
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-common-hook 'smerge-start-session)
+#+end_src
+*** Keybindings
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (imenu-add-to-menubar "Functions")
+              (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+              (local-set-key (kbd "C-c C-s") 'hs-show-block)
+              (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+              (local-set-key (kbd "C-M-e") 'end-of-defun)
+              (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+              (local-set-key (kbd "C-c =") 'align-regexp)
+              (local-set-key (kbd "C-c *") 'ma-insert-separator)
+              (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+              (local-unset-key (kbd "C-c C-n"))
+              (local-unset-key (kbd "C-c C-p"))
+              (local-unset-key (kbd "C-c C-z"))                       ;; Free keybinding for magit-status
+
+              (if work
+                  (add-hook 'before-save-hook 'ma-create-or-update-copyright))
+              (c-toggle-hungry-state 1)
+              (cwarn-mode)
+              (hs-minor-mode)
+              (hs-hide-initial-comment-block)))
+#+end_src
+** CMake
+#+begin_src emacs-lisp
+  (use-package cmake-mode
+    :custom (cmake-tab-width 3)
+    :init
+    (add-hook 'cmake-mode-hook
+              (lambda ()
+                (local-set-key (kbd "C-c C-d") 'cmake-help)
+                (flyspell-prog-mode)
+                (setq indent-line-function 'indent-relative))))
+#+end_src
+
+** Dockerfile
+** Javascript
+** Elisp
+*** Auto-compile
+#+begin_src emacs-lisp
+  (use-package auto-compile
+    :custom (load-prefer-newer t)
+    :config (auto-compile-on-load-mode 1)
+            (auto-compile-on-save-mode 1))
+#+end_src
+*** Keybindings
+#+begin_src emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (local-set-key (kbd "M-.") 'find-function-other-window)))
+#+end_src
+
+** Shell
+#+begin_src emacs-lisp
+(add-hook 'sh-set-shell-hook
+          (lambda()
+            (when (string-equal sh-shell "tcsh")
+              (progn
+                (require 'csh-mode)
+                (setq-local indent-line-function 'csh-indent-line)
+                (setq-local indent-region-function 'csh-indent-region)))))
+(add-hook 'shell-mode-hook
+          'dirtrack-mode)
+(add-hook 'after-save-hook
+  'executable-make-buffer-file-executable-if-script-p)
+#+end_src
+* Other specialized modes
+** Generic
+#+begin_src emacs-lisp
+  (use-package generic
+    :straight (:type built-in)
+    :config
+    (define-generic-mode
+   'spck-mode
+      '("!")
+      '("body"
+   "constr"
+   "control"
+   "ens"
+   "express"
+   "force"
+   "joint"
+   "marker"
+   "poly"
+   "prim"
+   "road"
+   "refsys"
+   "sensor"
+   "slv"
+   "substr"
+   "subvar"
+   "track"
+   "timex"
+   "view"
+   "yout")
+      '(
+   ("\\(\\$[A-Za-z0-9_]+\\)" 1 font-lock-variable-name-face)
+   ("\\([+-]?[0-9]\\.[0-9]+E[+-][0-9]+\\)" 1 font-lock-constant-face)
+   ("'\\([^']+\\)'" 1 font-lock-string-face)
+   )
+      '("\\.sys$" "\\.ani$" "\\.spck$")
+      (list
+       (function
+   (lambda ()
+     (setq imenu-generic-expression
+      '((nil "(.*\\(\\$[A-Za-z0-9_]+\\).*) *=" 1)))
+     (imenu-add-menubar-index)
+     (local-set-key [?\C-c ?\C-j] 'imenu))))
+      "A mode for SIMPACK model files"))
+#+end_src
+
+** Skeleton
+#+begin_src emacs-lisp
+  (use-package skeleton
+    :straight (:type built-in)
+    :config
+    (define-skeleton header-skeleton
+      "Define a C++ header file skeleton"
+      ""
+      "// Copyright Dassault Systemes Simulia Corp.\n\n"
+      "#pragma once\n\n"
+      "#include \"base/WinExportDefs.h\"\n\n"
+      "namespace " (skeleton-read "Namespace name?") "\n"
+      "{\n\n"
+      "class SPCK_XXX_EXPORT " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "\n"
+      "{\n"
+      "public:\n\n"
+      "   " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "(const " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "&) = delete;\n"
+      "   " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "& operator=(const " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "&) = delete;\n"
+      "};\n"
+      "}\n"
+      ))
+#+end_src
+
+** Auto-Insert
+#+begin_src emacs-lisp
+  (use-package auto-insert
+    :straight (:type built-in)
+    :after (skeleton)
+    :hook (find-file-hook . auto-insert)
+    :config (define-auto-insert "\\.h\\'" 'header-skeleton))
+#+end_src
+
+
+
+
+
+
+
+
+
+
+* System
+** VTerm
+#+begin_src emacs-lisp
+  ;; (use-package vterm
+  ;;   :bind ("C-g" . 'vterm-self-insert))
+#+end_src

@@ -1,3 +1,4 @@
+
 (dir-locals-set-class-variables 'new_arch
  '((c++-mode
   (ma-compile-command . "~/bin/my_remote_compile.sh"))

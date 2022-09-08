@@ -24,3 +24,7 @@
 /devdocs/
 /org-roam.db
 /diary
+/early-test-init.el
+/test-init.el
+/straight/
+init.el
