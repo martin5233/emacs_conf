@@ -585,8 +585,6 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files
-   '("/home/martin/org/2022-01-31_ProtokollUmweltausschuss.org" "/home/martin/org/2022-01-31_notizenumweltausschuss.org" "/home/martin/org/adb.org" "/home/martin/org/charlotte.org" "/home/martin/org/filme.org" "/home/martin/org/heizung.org" "/home/martin/org/ideen.org" "/home/martin/org/kodi.org" "/home/martin/org/kv_sitzung_2020-12-09.org" "/home/martin/org/vortrag_heimautomatisierung.org" "/home/martin/org/zuordnung_sensoren_gethsemane.org"))
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(csv-mode nil))
  '(password-cache-expiry 36000)
@@ -778,3 +776,9 @@
      (run-with-idle-timer 1800 t 'ma-kill-old-buffers)
      (load "marginalia-jira")
      ))
+
+
+(require 'whitespace)
+(setq whitespace-line-column 120)
+(setq whitespace-style '(face lines-tail))
+(add-hook 'prog-mode-hook 'whitespace-mode)

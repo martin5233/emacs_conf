@@ -60,8 +60,8 @@
 
 (defun ma-compose-hook()
   "Hook function for compose mode."
-  (flyspell-mode 1)
   (guess-language-mode 1)
+  (flyspell-mode 1)
   (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
   (setq message-cite-style message-cite-style-outlook)
   (set-fill-column 120))
@@ -72,8 +72,8 @@
           (lambda()
             (setq message-cite-style message-cite-style-outlook
                   message-cite-reply-position 'above)
-            (flyspell-mode 1)
             (guess-language-mode 1)
+            (flyspell-mode 1)
             (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)))
 
 (when (fboundp 'imagemagick-register-types)
