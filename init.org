@@ -81,8 +81,12 @@ Since init.el will be generated from this file, we save customization in a dedic
   (global-unset-key (kbd "C-x C-c"))
   (global-set-key (kbd "C-x C-c C-x") 'save-buffers-kill-terminal)
   (global-set-key (kbd "M-<space>") 'dabbrev-expand)
+  (global-set-key (kbd "<f2>") 'customize-group)
 #+end_src
-
+** Start Server
+#+begin_src emacs-lisp
+  (server-start)
+#+end_src
 * Basics
 ** Editing
 *** Avy
@@ -133,6 +137,13 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package visual-regexp-steroids)
 #+end_src
+*** Yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :diminish yas-minor-mode
+    :hook (prog-mode . yas-minor-mode))
+  (use-package yasnippet-snippets)
+#+end_src
 *** Miscellaneous
 #+begin_src emacs-lisp
   (add-hook 'before-save-hook
@@ -141,8 +152,18 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Version control
 *** Magit
 #+begin_src emacs-lisp
+  (defface ma-magit-highlight-remote-face
+    '((t :inherit magit-branch-remote
+         :underline t))
+    "Face for highlighting remote branches with specific text in them."
+    :group 'ma)
+
   (use-package magit
-    :bind ("C-c C-z" . magit-status))
+    :bind ("C-c C-z" . magit-status)
+    :config
+    (add-hook 'magit-refs-mode-hook
+              (lambda ()
+                (add-to-list 'magit-ref-namespaces '("\\`refs/remotes/origin/\\(SPCK-[0-9]+-MAL1-.*\\)" . ma-magit-highlight-remote-face)))))
 #+end_src
 *** git-timemachine
 #+begin_src emacs-lisp
@@ -334,10 +355,19 @@ Since init.el will be generated from this file, we save customization in a dedic
       (modus-themes-load-vivendi)))
 #+end_src
 
-** Unicode fonts
+** Fonts
 #+begin_src emacs-lisp
+  (if (> (display-pixel-height) 1200)
+      (add-to-list 'default-frame-alist
+                   '(font . "DejaVu Sans Mono-8"))
+    (add-to-list 'default-frame-alist
+                 '(font . "DejaVu Sans Mono-10")))
+
   (use-package unicode-fonts
-  :config (unicode-fonts-setup))
+    :config (unicode-fonts-setup))
+
+  (global-font-lock-mode 1)
+  (global-hl-line-mode)
 #+end_src
 
 ** Miscellaneous
@@ -393,7 +423,13 @@ Since init.el will be generated from this file, we save customization in a dedic
    (global-company-mode)
    :custom
      (company-dabbrev-downcase nil)
-     (company-transformers '(ma-cmake-upcase-completion-list company-sort-by-occurrence)))
+     (company-transformers '(ma-cmake-upcase-completion-list company-sort-by-occurrence))
+     (company-cmake-executable "/scratch/apel/new_arch/develop/extern/linux64/cmake-3.21/bin/cmake")
+     (company-backends '(company-cmake company-capf company-files
+                                       (company-dabbrev-code company-keywords)
+                                       company-dabbrev))
+     (company-idle-delay 2.0)
+     :bind ("<f3>" . company-complete))
 #+end_src
 ** Company Box Mode
 #+begin_src emacs-lisp
@@ -420,81 +456,227 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Marginalia
 #+begin_src emacs-lisp
   (use-package marginalia
-    :config (marginalia-mode))
+    :init
+    (marginalia-mode))
 #+end_src
 * PIM
 ** Mail
 *** Mu4e
 #+begin_src emacs-lisp
-  (use-package mu4e)
+  (defun ma-switch-to-mu4e ()
+    "Switch to unread mail in mu4e"
+    (interactive)
+    (unless (mu4e-running-p)
+      (mu4e t))
+    (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
+    (mu4e-headers-change-sorting :date 'ascending))
+
+  (use-package mu4e
+    :load-path "straight/repos/mu/build/mu4e"
+    :commands mu4e-running-p
+    :custom
+    (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
+    (mu4e-bookmarks
+     (quote
+      (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
+       ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+       ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
+       ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
+    (mu4e-headers-fields
+     '( (:human-date . 12)
+        (:flags . 6)
+        (:from-or-to . 30)
+        (:subject)))
+    (mu4e-compose-signature-auto-include nil)
+    (mu4e-compose-dont-reply-to-self t)
+    (mu4e-compose-complete-only-after "2020-01-01")
+    (mu4e-drafts-folder "/Drafts")
+    (mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
+    (mu4e-completing-read-function 'completing-read)
+    (mu4e-headers-include-related nil)
+    (mu4e-index-update-error-warning nil)
+    (mu4e-hide-index-messages t)
+    (mu4e-sent-folder "/Sent")
+    (mu4e-trash-folder "/Trash")
+    (mu4e-update-interval 120)
+    (mu4e-use-fancy-chars t)
+    (mu4e-attachment-dir "/tmp")
+    (mu4e-change-filenames-when-moving t)
+
+    (message-send-mail-function (quote smtpmail-send-it))
+
+    (smtpmail-debug-info nil)
+    (smtpmail-local-domain "3ds.com")
+    (smtpmail-smtp-server "smtps.emea.3ds.com")
+    (smtpmail-smtp-service 587)
+    (smtpmail-stream-type (quote starttls))
+
+    (mail-user-agent 'mu4e-user-agent)
+    (shr-color-visible-luminance-min 80)
+    :config
+    (set-variable 'read-mail-command 'mu4e)
+    :bind ("<f4>" . ma-switch-to-mu4e))
+#+end_src
+*** Mu4e Alert
+#+begin_src emacs-lisp
+  (use-package mu4e-alert
+    :after (mu4e)
+    :custom
+    (mu4e-alert-email-notification-types '(count))
+    (mu4e-alert-style 'notifications)
+    (mu4e-alert-interesting-mail-query "maildir:/INBOX AND NOT flag:trashed AND flag:unread")
+    :defer 10
+    :config
+    (mu4e-alert-enable-mode-line-display)
+    (mu4e-alert-enable-notifications))
+#+end_src
+*** Org-msg
+#+begin_src emacs-lisp
+  (defconst ma-org-msg-greeting-fmt-de "\nHallo%s,\n\n")
+  (defconst ma-org-msg-signature-de "\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n\n#+end_signature")
+  (defconst ma-org-msg-greeting-fmt-en "\nHi%s,\n\n")
+  (defconst ma-org-msg-signature-en "\n\n#+begin_signature\n--\nBest Regards,\n\nMartin\n\n#+end_signature")
+
+  (use-package org-msg
+    :after (mu4e)
+    :custom
+    (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
+    (org-msg-startup "hidestars indent inlineimages")
+    (org-msg-greeting-fmt ma-org-msg-greeting-fmt-de)
+    (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")))
+    (org-msg-greeting-name-limit 3)
+    (org-msg-default-alternatives '((new		. (text html))
+                                    (reply-to-html	. (text html))
+                                    (reply-to-text	. (text))))
+    (org-msg-convert-citation t)
+    (org-msg-signature ma-org-msg-signature-de))
+
+  (defun ma-org-msg-get-to-name-advice(orig &rest args)
+    "Return first name of addressee or defer to org-msg-get-to-name."
+    (save-excursion
+      (let ((to (org-msg-message-fetch-field "to")))
+        (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
+            (match-string 2 to)
+          (apply orig args)))))
+
+  (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
+
+  (org-msg-mode)
+
+  (add-hook 'org-msg-edit-mode-hook
+            (lambda ()
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)))
+
 #+end_src
 ** Calendar
 #+begin_src emacs-lisp
   (use-package german-holidays
     :custom calendar-holidays holiday-german-BY-holidays)
-#+end_src
+
+  (setq diary-file "~/.emacs.d/diary")
+  (setq calendar-url "http://localhost:1080/users/Martin.APEL@3ds.com/calendar/")
+  (setq calendar-view-diary-initially-flag t)
+  (setq diary-number-of-entries 3)
+  (setq calendar-time-display-form '(24-hours ":" minutes))
+  (setq calendar-week-start-day 1)
+  (setq appt-display-diary t)
+  (setq org-agenda-include-diary t)
+
+  (add-hook 'diary-list-entries-hook #'diary-sort-entries t)
+
+  (defvar ma--getcal-last-update nil "Last time the calendar has been updated.")
+
+  (defun ma--getcal-do (url file)
+    "Download ics file and add it to file"
+    (let ((tmpfile (url-file-local-copy url)))
+      (icalendar-import-file tmpfile file)
+      (kill-buffer (car (last (split-string tmpfile "/"))))))
+
+  (defun ma-getcal ()
+    "Load an ICS calendar into the Emacs diary"
+    (interactive)
+    (message (concat "Loading " calendar-url " into " diary-file))
+    (with-current-buffer (find-file-noselect diary-file)
+      (erase-buffer) ;; to avoid duplicating events
+      (ma--getcal-do calendar-url diary-file)
+      (setq ma--getcal-last-update (float-time))
+      (save-buffer)))
+
+  (defun ma--getcal-if-necessary ()
+    "Reload the calendar if it hasn't been updated for an hour."
+    (when (or (not (and (floatp ma--getcal-last-update) (< (- (float-time) ma--getcal-last-update) 3600))))
+      (ma-getcal)))
+
+  (appt-activate 1)
+
+  (run-with-idle-timer 60 t 'ma--getcal-if-necessary)
+    #+end_src
 ** Org-dependent stuff
 *** Org mode
 #+begin_src emacs-lisp
-   (defun ma-show-agenda-if-hidden ()
-     "Show Org agenda of today if it is currently hidden. Returns t, if it already was visible, otherwise nil"
-     (interactive)
-     (let* ((buf (get-buffer "*Org Agenda*")))
-       (if (not buf)
-           (progn
-             (org-agenda-list 1)
-             nil)
-         (if (not (get-buffer-window buf))
-             (progn
-               (switch-to-buffer buf)
-               nil)
-           t)
-         )
-       )
-     )
+  (defun ma-show-agenda-if-hidden ()
+    "Show Org agenda of today if it is currently hidden. Returns t, if it already was visible, otherwise nil"
+    (interactive)
+    (let* ((buf (get-buffer "*Org Agenda*")))
+      (if (not buf)
+          (progn
+            (org-agenda-list 1)
+            nil)
+        (if (not (get-buffer-window buf))
+            (progn
+              (switch-to-buffer buf)
+              nil)
+          t)
+        )
+      )
+    )
 
-   (use-package org
-     :custom
-     (org-agenda-files '("~/org" "~/org/jira" "~/org-roam"))
-     (org-agenda-custom-commands
-      (quote
-       (("w" "Work agenda only" alltodo ""
-         ((org-agenda-files (list ma-na-org))))
-        ("h" "Home agenda only" agenda ""
-         ((org-agenda-files (list ma-private-org))))
-        ("s" "Unscheduled items" alltodo ""
-         ((org-agenda-skip-function
-           (quote
-            (org-agenda-skip-entry-if
-             (quote scheduled)
-             (quote nottodo)
-             (quote todo))))))
-        )))
-     (org-agenda-repeating-timestamp-show-all nil)
-     (org-agenda-skip-deadline-prewarning-if-scheduled t)
-     (org-agenda-skip-scheduled-if-deadline-is-shown t)
-     (org-agenda-start-on-weekday nil)
-     (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
-     (org-export-backends (quote (ascii html icalendar latex md pandoc)))
-     (org-capture-templates
-           (quote
-            (
-             ("g" "General" entry
-              (file+olp "~/org/na.org" "Unsorted")
-              "** TODO %?")
-             ("t" "Test" entry (file "~/org/test.org") nil)
-             ("m" "TODO from Mail" entry
-              (file+headline "~/org/na.org" "Mail")
-              "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
-     (sorg-scheduled-past-days 5)
-     :bind
-     ("C-c a" . 'org-agenda)
-     ("C-c C" . 'org-capture))
+  (use-package org
+    :straight (:type built-in)
+    :custom
+    (org-agenda-files '("~/org" "~/org/jira" "~/org-roam"))
+    (org-agenda-custom-commands
+     (quote
+      (("w" "Work agenda only" alltodo ""
+        ((org-agenda-files (list ma-na-org))))
+       ("h" "Home agenda only" agenda ""
+        ((org-agenda-files (list ma-private-org))))
+       ("s" "Unscheduled items" alltodo ""
+        ((org-agenda-skip-function
+          (quote
+           (org-agenda-skip-entry-if
+            (quote scheduled)
+            (quote nottodo)
+            (quote todo))))))
+       )))
+    (org-agenda-repeating-timestamp-show-all nil)
+    (org-agenda-skip-deadline-prewarning-if-scheduled t)
+    (org-agenda-skip-scheduled-if-deadline-is-shown t)
+    (org-agenda-start-on-weekday nil)
+    (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
+    (org-export-backends (quote (ascii html icalendar latex md pandoc)))
+    (org-capture-templates
+     (quote
+      (
+       ("g" "General" entry
+        (file+olp "~/org/na.org" "Unsorted")
+        "** TODO %?")
+       ("t" "Test" entry (file "~/org/test.org") nil)
+       ("m" "TODO from Mail" entry
+        (file+headline "~/org/na.org" "Mail")
+        "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
+    (sorg-scheduled-past-days 5)
+    :bind
+    ("C-c a" . 'org-agenda)
+    ("C-c C" . 'org-capture))
 #+end_src
 *** Org Export to Pandoc
 #+begin_src emacs-lisp
   (use-package ox-pandoc
-      :straight t)
+    :straight t)
 #+end_src
 *** Org Jira
 #+begin_src emacs-lisp
@@ -502,8 +684,8 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org Bullets
 #+begin_src emacs-lisp
-    (use-package org-bullets
-      :hook (org-mode . org-bullets-mode))
+  (use-package org-bullets
+    :hook (org-mode . org-bullets-mode))
 #+end_src
 *** Org Roam
 #+begin_src emacs-lisp
@@ -527,9 +709,9 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org Autotangle
 #+begin_src emacs-lisp
-    (use-package org-auto-tangle
-      :diminish org-auto-tangle-mode
-      :hook (org-mode . org-auto-tangle-mode))
+  (use-package org-auto-tangle
+    :diminish org-auto-tangle-mode
+    :hook (org-mode . org-auto-tangle-mode))
 #+end_src
 
 * Programming languages
@@ -588,7 +770,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 *** Modern-cpp-font-lock
 #+begin_src emacs-lisp
   (use-package modern-cpp-font-lock
-  :config (modern-c++-font-lock-global-mode t))
+    :config (modern-c++-font-lock-global-mode t))
 #+end_src
 *** Start SMerge session, if necessary
 #+begin_src emacs-lisp
@@ -598,7 +780,6 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (add-hook 'c-mode-common-hook
             (lambda ()
-              (imenu-add-to-menubar "Functions")
               (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
               (local-set-key (kbd "C-c C-s") 'hs-show-block)
               (local-set-key (kbd "C-M-a") 'beginning-of-defun)
@@ -609,8 +790,13 @@ Since init.el will be generated from this file, we save customization in a dedic
               (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
               (local-unset-key (kbd "C-c C-n"))
               (local-unset-key (kbd "C-c C-p"))
-              (local-unset-key (kbd "C-c C-z"))                       ;; Free keybinding for magit-status
-
+              (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+#+end_src
+*** Misc
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (imenu-add-to-menubar "Functions")
               (if work
                   (add-hook 'before-save-hook 'ma-create-or-update-copyright))
               (c-toggle-hungry-state 1)
@@ -631,14 +817,24 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 
 ** Dockerfile
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode)
+#+end_src
 ** Javascript
+#+begin_src emacs-lisp
+  (use-package js2-mode
+  :mode ("\\.js$" "\\.sjs$")
+  :custom
+  (js2-include-node-externs t)
+  (js2-mode-assume-strict t))
+#+end_src
 ** Elisp
 *** Auto-compile
 #+begin_src emacs-lisp
   (use-package auto-compile
     :custom (load-prefer-newer t)
     :config (auto-compile-on-load-mode 1)
-            (auto-compile-on-save-mode 1))
+    (auto-compile-on-save-mode 1))
 #+end_src
 *** Keybindings
 #+begin_src emacs-lisp
@@ -649,17 +845,17 @@ Since init.el will be generated from this file, we save customization in a dedic
 
 ** Shell
 #+begin_src emacs-lisp
-(add-hook 'sh-set-shell-hook
-          (lambda()
-            (when (string-equal sh-shell "tcsh")
-              (progn
-                (require 'csh-mode)
-                (setq-local indent-line-function 'csh-indent-line)
-                (setq-local indent-region-function 'csh-indent-region)))))
-(add-hook 'shell-mode-hook
-          'dirtrack-mode)
-(add-hook 'after-save-hook
-  'executable-make-buffer-file-executable-if-script-p)
+  (add-hook 'sh-set-shell-hook
+            (lambda()
+              (when (string-equal sh-shell "tcsh")
+                (progn
+                  (require 'csh-mode)
+                  (setq-local indent-line-function 'csh-indent-line)
+                  (setq-local indent-region-function 'csh-indent-region)))))
+  (add-hook 'shell-mode-hook
+            'dirtrack-mode)
+  (add-hook 'after-save-hook
+            'executable-make-buffer-file-executable-if-script-p)
 #+end_src
 * Other specialized modes
 ** Generic
@@ -668,41 +864,41 @@ Since init.el will be generated from this file, we save customization in a dedic
     :straight (:type built-in)
     :config
     (define-generic-mode
-   'spck-mode
+        'spck-mode
       '("!")
       '("body"
-   "constr"
-   "control"
-   "ens"
-   "express"
-   "force"
-   "joint"
-   "marker"
-   "poly"
-   "prim"
-   "road"
-   "refsys"
-   "sensor"
-   "slv"
-   "substr"
-   "subvar"
-   "track"
-   "timex"
-   "view"
-   "yout")
+        "constr"
+        "control"
+        "ens"
+        "express"
+        "force"
+        "joint"
+        "marker"
+        "poly"
+        "prim"
+        "road"
+        "refsys"
+        "sensor"
+        "slv"
+        "substr"
+        "subvar"
+        "track"
+        "timex"
+        "view"
+        "yout")
       '(
-   ("\\(\\$[A-Za-z0-9_]+\\)" 1 font-lock-variable-name-face)
-   ("\\([+-]?[0-9]\\.[0-9]+E[+-][0-9]+\\)" 1 font-lock-constant-face)
-   ("'\\([^']+\\)'" 1 font-lock-string-face)
-   )
+        ("\\(\\$[A-Za-z0-9_]+\\)" 1 font-lock-variable-name-face)
+        ("\\([+-]?[0-9]\\.[0-9]+E[+-][0-9]+\\)" 1 font-lock-constant-face)
+        ("'\\([^']+\\)'" 1 font-lock-string-face)
+        )
       '("\\.sys$" "\\.ani$" "\\.spck$")
       (list
        (function
-   (lambda ()
-     (setq imenu-generic-expression
-      '((nil "(.*\\(\\$[A-Za-z0-9_]+\\).*) *=" 1)))
-     (imenu-add-menubar-index)
-     (local-set-key [?\C-c ?\C-j] 'imenu))))
+        (lambda ()
+          (setq imenu-generic-expression
+                '((nil "(.*\\(\\$[A-Za-z0-9_]+\\).*) *=" 1)))
+          (imenu-add-menubar-index)
+          (local-set-key [?\C-c ?\C-j] 'imenu))))
       "A mode for SIMPACK model files"))
 #+end_src
 
@@ -737,16 +933,33 @@ Since init.el will be generated from this file, we save customization in a dedic
     :hook (find-file-hook . auto-insert)
     :config (define-auto-insert "\\.h\\'" 'header-skeleton))
 #+end_src
-
-
-
-
-
-
-
-
-
-
+* Martin's specials
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/ma-funcs")
+  (require 'ma-funcs)
+#+end_src
+** Bitbucket interface
+#+begin_src emacs-lisp
+  (use-package atl-stash
+    :straight (:type built-in)
+    :if work
+    :commands (stash-update-stash-info
+               stash-create-branch
+               stash-show-pull-requests)
+    :config (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
+    :bind ("C-c p" . stash-show-pull-requests))
+  (run-with-timer 60 60 'stash-update-stash-info)
+#+end_src
+** Kill old buffers
+#+begin_src emacs-lisp
+  (run-with-idle-timer 1800 t 'ma-kill-old-buffers)
+#+end_src
+** Marginalia for Jira
+#+begin_src emacs-lisp
+  (use-package marginalia-jira
+    :straight (:type built-in)
+    :defer 10)
+#+end_src
 * System
 ** VTerm
 #+begin_src emacs-lisp

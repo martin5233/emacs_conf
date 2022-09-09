@@ -35,17 +35,6 @@
   :group 'ma
 )
 
-(defun show-frame (&optional frame)
-  "Show the current Emacs frame or the FRAME given as argument.
-   And make sure that it really shows up!"
-  (raise-frame)
-  ; yes, you have to call this twice. Don’t ask me why…
-  ; select-frame-set-input-focus calls x-focus-frame and does a bit of
-  ; additional magic.
-  (select-frame-set-input-focus (selected-frame))
-  (select-frame-set-input-focus (selected-frame)))
-
-
 (defun ma-kill-old-buffers ()
   "Kill buffers from end of buffer list (not used recently) until no more than 50 buffers are left. Remove temporary buffers and org mode files first."
   (interactive)
@@ -91,32 +80,6 @@
        (interactive)
        (switch-to-buffer (get-buffer-create "*scratch*"))
        (lisp-interaction-mode))
-
-(defun ma-assistant ()
-  "runs qt assistant"
-  (interactive)
-  (let ((p (get-process "assistant")))
-    (if p
-        (process-send-string p (concat "activateKeyword " (current-word) "\n"))
-      (progn
-        (setenv "QT_SELECT" "5")
-        (let ((q (start-process "assistant" nil "/usr/bin/assistant" "-enableRemoteControl")))
-          (process-send-string q (concat "activateKeyword " (current-word) "\n")))
-        ))
-    )
-)
-(global-set-key [f11] 'ma-assistant)
-
-
-(defun ma-occur-at-point ()
-  "Run occur for word at point"
-  (interactive)
-  (if (not (use-region-p))
-      (er/mark-word))
-  (occur (buffer-substring (region-beginning) (region-end)))
-  (select-window (get-buffer-window "*Occur*"))
-)
-(global-set-key "\M-O" 'ma-occur-at-point)
 
 (defun ma-update-ebrowse-db ()
   "Update the database for Ebrowse"
@@ -169,22 +132,6 @@
         (compile comp-command))
     (compile comp-command))
   )
-
-(defun ma-compile-file ()
-  "Run compilation of current file"
-  (interactive)
-  (setq comp-command (ma-compile-command))
-  (when (not (boundp 'ma-build-dir))
-    (error "Build directory is not set"))
-  (let* ((rel-name (file-relative-name (buffer-file-name) "/scratch/apel/new_arch/develop"))
-         (filename-in-build-dir (concat ma-build-dir "/" rel-name))
-         (obj-dir (file-name-directory filename-in-build-dir)))
-    (while (not (file-exists-p (concat obj-dir "CMakeFiles")))
-      (setq obj-dir (file-name-directory (directory-file-name obj-dir))))
-    (setq rel-name (concat (file-name-sans-extension (file-relative-name filename-in-build-dir obj-dir)) ".o"))
-      (setq comp-command (concat comp-command " " obj-dir " " rel-name))
-      (print comp-command)
-      (compile comp-command)))
 
 (defun ma-run-sjs ()
   "Run sjs script."
@@ -293,16 +240,6 @@
   (forward-line -1)
   (c-indent-line)
 )
-
-(defface ma-magit-highlight-remote-face
-  '((t :inherit magit-branch-remote
-       :underline t))
-  "Face for highlighting remote branches with specific text in them."
-  :group 'ma)
-
-(add-hook 'magit-refs-mode-hook
-          (lambda ()
-            (add-to-list 'magit-ref-namespaces '("\\`refs/remotes/origin/\\(SPCK-[0-9]+-MAL1-.*\\)" . ma-magit-highlight-remote-face))))
 
 (defun ma-lowercase-args (&rest args)
   "Convert all arguments to lowercase"

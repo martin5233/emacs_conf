@@ -26,3 +26,5 @@
                  '(jira ma-marginalia-jira--annotator))))
 
 (run-with-idle-timer 30 nil 'ma-marginalia-jira--fill-cache)
+
+(provide 'marginalia-jira)
