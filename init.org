@@ -276,6 +276,26 @@ Since init.el will be generated from this file, we save customization in a dedic
     :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 #+end_src
 
+*** Display buffer AList
+#+begin_src emacs-lisp
+  (defun ma-project-tab-name (buffer alist)
+    "Returns the last part of the project's root directory or nil."
+    (with-current-buffer buffer
+      (let ((root (projectile-project-root)))
+        (when root
+          (file-name-nondirectory (substring root 0 (1- (length root))))))))
+
+    (defun ma-part-of-project-p (buffer action)
+      (ma-project-tab-name buffer nil))
+
+    (add-to-list 'display-buffer-alist
+                 '(ma-part-of-project-p
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . ma-project-tab-name)))
+
+    (setq switch-to-buffer-obey-display-actions t)
+#+end_src
+
 ** Which-key
 #+begin_src emacs-lisp
   (use-package which-key
