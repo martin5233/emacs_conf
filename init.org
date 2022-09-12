@@ -143,7 +143,9 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package yasnippet
     :diminish yas-minor-mode
-    :hook (prog-mode . yas-minor-mode))
+    :hook
+    (prog-mode . yas-minor-mode)
+    (org-mode . yas-minor-mode))
   (use-package yasnippet-snippets)
 #+end_src
 *** Miscellaneous
@@ -251,7 +253,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (format " Proj[%s]" (projectile-project-name)))
 
   (use-package projectile
-             :config
+             :init
              (projectile-mode 1)
              ;; This is needed to avoid slowdown when working with remote files.
              (defadvice projectile-project-root (around ignore-remote first activate)
@@ -308,15 +310,34 @@ Since init.el will be generated from this file, we save customization in a dedic
         (when root
           (file-name-nondirectory (substring root 0 (1- (length root))))))))
 
-    (defun ma-part-of-project-p (buffer action)
-      (ma-project-tab-name buffer nil))
+  (defun ma-part-of-project-p (buffer action)
+    (ma-project-tab-name buffer nil))
 
-    (add-to-list 'display-buffer-alist
+  (defun ma-make-display-buffer-matcher-function-org-msg()
+    (lambda (buffer-name action)
+      (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
+
+  (add-to-list 'display-buffer-alist
                  '(ma-part-of-project-p
                    (display-buffer-in-tab display-buffer-reuse-window)
                    (tab-name . ma-project-tab-name)))
 
-    (setq switch-to-buffer-obey-display-actions t)
+  (add-to-list 'display-buffer-alist
+               `("^\\*mu4e"
+                 (display-buffer-in-tab display-buffer-reuse-window)
+                 (tab-name . "📧 Mail")))
+
+  (add-to-list 'display-buffer-alist
+               `("^\\*Article\\*"
+                 (display-buffer-in-tab display-buffer-reuse-window)
+                 (tab-name . "📧 Mail")))
+
+  (add-to-list 'display-buffer-alist
+               `(,(ma-make-display-buffer-matcher-function-org-msg)
+                 (display-buffer-in-tab display-buffer-reuse-window)
+                 (tab-name . "📧 Mail")))
+
+  (setq switch-to-buffer-obey-display-actions t)
 #+end_src
 
 ** Which-key
@@ -372,6 +393,14 @@ Since init.el will be generated from this file, we save customization in a dedic
   (global-hl-line-mode)
 #+end_src
 
+** Long lines
+#+begin_src emacs-lisp
+    (use-package whitespace
+      :straight (:type built-in)
+      :custom (whitespace-line-column 150)
+      (whitespace-style '(face lines-tail))
+      :hook (prog-mode . whitespace-mode))
+#+end_src
 ** Miscellaneous
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -678,7 +707,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     ("C-c a" . 'org-agenda)
     ("C-c C" . 'org-capture)
     :config
-    (local-unset-key (kbd "C-c C-z")))      ;; Free up for global magit-status binding
+    (define-key org-mode-map (kbd "C-c C-z") nil))      ;; Free up for global magit-status binding
 #+end_src
 *** Org Export to Pandoc
 #+begin_src emacs-lisp
