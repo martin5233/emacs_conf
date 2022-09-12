@@ -4,6 +4,7 @@
     (require 'uuid))
 (require 'jiralib)
 (require 'org-jira)
+(require 'ma-jira-cache)
 
 (defgroup ma nil
   "Martins customizations"
@@ -399,10 +400,10 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-devs-basedir "/ssh:MAL1@dell1254cem:devs/")
 
-(defun ma-set-current-dev ()
+(defun ma-set-current-dev (&optional all-cached-issues)
   "Set current dev issue."
-  (interactive)
-  (let* ((issue-key (ma-select-jira-issue)))
+  (interactive "P")
+  (let* ((issue-key (ma-select-jira-issue all-cached-issues)))
     (unless (string-match "^SPCK-\\([0-9]+\\)$" issue-key)
       (error "Unexpected SPCK issue number format"))
     (setq ma-current-dev (string-to-number (match-string 1 issue-key)))))
@@ -465,9 +466,11 @@ not, a copyright comment is inserted at the start of the file."
           (delete-region start end)
           (insert (concat "\n//" (make-string (- longest 2) ?*) "\n\n")))))))
 
-(defun ma-select-jira-issue()
-  "Select a jira issue using completion from the list of JIRA development issues, which are currently marked as 'in progress'."
-  (let* ((issues (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND status = \"In Progress\" AND assignee in (currentUser())"))
+(defun ma-select-jira-issue(all-cached-issues)
+  "Select a jira issue using completion."
+  (let* ((issues (if all-cached-issues
+                     (ma-jira-cache-keys)
+                   (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND status = \"In Progress\" AND assignee in (currentUser())")))
          (keys (cl-mapcar 'org-jira-get-issue-key issues)))
     (completing-read "Select JIRA issue: " keys)))
 

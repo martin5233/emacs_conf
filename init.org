@@ -80,8 +80,10 @@ Since init.el will be generated from this file, we save customization in a dedic
 
   (global-unset-key (kbd "C-x C-c"))
   (global-set-key (kbd "C-x C-c C-x") 'save-buffers-kill-terminal)
-  (global-set-key (kbd "M-<space>") 'dabbrev-expand)
+  (global-unset-key (kbd "M-SPC"))     ;; Originally just-one-space
+  (global-set-key (kbd "M-SPC") 'dabbrev-expand)
   (global-set-key (kbd "<f2>") 'customize-group)
+  (global-unset-key (kbd "C-z"))       ;; Who needs suspend-frame?
 #+end_src
 ** Start Server
 #+begin_src emacs-lisp
@@ -256,9 +258,9 @@ Since init.el will be generated from this file, we save customization in a dedic
                (unless (file-remote-p default-directory) ad-do-it))
 
              :bind
-             ("C-c C-f" . 'projectile--find-file)
+             ("C-c C-f" . projectile-find-file)
              :bind-keymap
-             ("C-S-p" . 'projectile-command-map)
+             ("C-S-p" . projectile-command-map)
              :custom
              (projectile-sort-order 'recently-active)
              (projectile-git-submodule-command nil)
@@ -408,6 +410,10 @@ Since init.el will be generated from this file, we save customization in a dedic
                 (setq-local devdocs-current-docs '("perl~5.34")))))
 #+end_src
 
+** Info
+#+begin_src emacs-lisp
+  (setq Info-directory-list '("/usr/local/share/info/" "/usr/share/info/"))
+#+end_src
 * Completion
 ** Company
 #+begin_src emacs-lisp
@@ -525,8 +531,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (mu4e-alert-email-notification-types '(count))
     (mu4e-alert-style 'notifications)
     (mu4e-alert-interesting-mail-query "maildir:/INBOX AND NOT flag:trashed AND flag:unread")
-    :defer 10
-    :config
+    :init
     (mu4e-alert-enable-mode-line-display)
     (mu4e-alert-enable-notifications))
 #+end_src
@@ -671,7 +676,9 @@ Since init.el will be generated from this file, we save customization in a dedic
     (sorg-scheduled-past-days 5)
     :bind
     ("C-c a" . 'org-agenda)
-    ("C-c C" . 'org-capture))
+    ("C-c C" . 'org-capture)
+    :config
+    (local-unset-key (kbd "C-c C-z")))      ;; Free up for global magit-status binding
 #+end_src
 *** Org Export to Pandoc
 #+begin_src emacs-lisp
@@ -680,7 +687,18 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org Jira
 #+begin_src emacs-lisp
-  (use-package org-jira)
+  (use-package org-jira
+    :custom
+    (jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443")
+    (org-jira-working-dir "~/org/jira")
+;;                            other         dev 2023               dev 2023x    in progress       testing             ready
+    (org-jira-default-jql "filter = 33100 OR filter = 62300 OR filter = 33400 OR filter = 10903 OR filter = 14101 ORDER BY status asc")
+    (org-jira-use-status-as-todo t)
+    :config
+    (add-hook 'org-mode-hook
+          (lambda()
+             (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
+                 (org-jira-mode 1)))))
 #+end_src
 *** Org Bullets
 #+begin_src emacs-lisp
@@ -803,6 +821,7 @@ Since init.el will be generated from this file, we save customization in a dedic
               (cwarn-mode)
               (hs-minor-mode)
               (hs-hide-initial-comment-block)))
+  (add-to-list 'auto-mode-alist '("\\.h" . c++-mode))
 #+end_src
 ** CMake
 #+begin_src emacs-lisp

@@ -6,8 +6,6 @@
                                             (require 'lsp-ui)
                                             (lsp-ui-imenu)))
             ))
-(add-hook 'c++-mode-hook #'yas-minor-mode)
-
 ;; dockerfile
 (add-hook 'dockerfile-mode-hook #'lsp)
 
