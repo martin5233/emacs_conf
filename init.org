@@ -507,6 +507,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (mu4e-headers-change-sorting :date 'ascending))
 
   (use-package mu4e
+    :straight (:branch "release/1.8")
     :load-path "straight/repos/mu/build/mu4e"
     :commands mu4e-running-p
     :custom
