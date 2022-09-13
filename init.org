@@ -645,9 +645,9 @@ Since init.el will be generated from this file, we save customization in a dedic
     (when (or (not (and (floatp ma--getcal-last-update) (< (- (float-time) ma--getcal-last-update) 3600))))
       (ma-getcal)))
 
-  (appt-activate 1)
-
-  (run-with-idle-timer 60 t 'ma--getcal-if-necessary)
+  (when work
+    (appt-activate 1)
+    (run-with-idle-timer 60 t 'ma--getcal-if-necessary))
     #+end_src
 ** Org-dependent stuff
 *** Org mode
@@ -718,6 +718,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 *** Org Jira
 #+begin_src emacs-lisp
   (use-package org-jira
+    :if work
     :custom
     (jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443")
     (org-jira-working-dir "~/org/jira")
@@ -726,9 +727,9 @@ Since init.el will be generated from this file, we save customization in a dedic
     (org-jira-use-status-as-todo t)
     :config
     (add-hook 'org-mode-hook
-          (lambda()
-             (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
-                 (org-jira-mode 1)))))
+              (lambda()
+                (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
+                    (org-jira-mode 1)))))
 #+end_src
 *** Org Bullets
 #+begin_src emacs-lisp
@@ -911,6 +912,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package generic
     :straight (:type built-in)
+    :if work
     :config
     (define-generic-mode
         'spck-mode
@@ -955,6 +957,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package skeleton
     :straight (:type built-in)
+    :if work
     :config
     (define-skeleton header-skeleton
       "Define a C++ header file skeleton"
@@ -997,7 +1000,8 @@ Since init.el will be generated from this file, we save customization in a dedic
                stash-show-pull-requests)
     :config (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
     :bind ("C-c p" . stash-show-pull-requests))
-  (run-with-timer 60 60 'stash-update-stash-info)
+  (when work
+    (run-with-idle-timer 60 60 'stash-update-stash-info))
 #+end_src
 ** Kill old buffers
 #+begin_src emacs-lisp
@@ -1007,11 +1011,13 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package marginalia-jira
     :straight (:type built-in)
-    :defer 10)
+    :defer 10
+    :if work)
 #+end_src
 * System
 ** VTerm
 #+begin_src emacs-lisp
-  ;; (use-package vterm
-  ;;   :bind ("C-g" . 'vterm-self-insert))
+  (use-package vterm
+    :if work
+    :bind ("C-g" . 'vterm-self-insert))
 #+end_src
