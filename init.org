@@ -443,6 +443,15 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (setq Info-directory-list '("/usr/local/share/info/" "/usr/share/info/"))
 #+end_src
+** Helpful
+#+begin_src emacs-lisp
+  (use-package helpful
+  :bind
+  ("C-h f" . helpful-callable)
+  ("C-h v" . helpful-variable)
+  ("C-h k" . helpful-key)
+  ("C-c C-d" . helpful-at-point))
+#+end_src
 * Completion
 ** Company
 #+begin_src emacs-lisp
@@ -486,7 +495,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Orderless
 #+begin_src emacs-lisp
   (use-package orderless
-    :custom (completion-styles '(orderless basic)))
+    :custom (completion-styles '(substring orderless basic)))
 #+end_src
 ** Marginalia
 #+begin_src emacs-lisp
