@@ -1,5 +1,3 @@
-(setq Info-directory-list '("/usr/local/share/info/" "/usr/share/info/"))
-
         (:name request)
         (:name files
                :type builtin)
@@ -67,8 +65,3 @@
 (setq-default ediff-ignore-similar-regions t)
 
 (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
-
-(if work-linux
-   (progn
-     (load "marginalia-jira")
-     ))

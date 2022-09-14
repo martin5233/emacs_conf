@@ -16,15 +16,15 @@
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
   (let ((bootstrap-file
-	(expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-	(bootstrap-version 5))
+   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+   (bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-	  (url-retrieve-synchronously
-	  "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	  'silent 'inhibit-cookies)
-	(goto-char (point-max))
-	(eval-print-last-sexp)))
+     (url-retrieve-synchronously
+     "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+     'silent 'inhibit-cookies)
+   (goto-char (point-max))
+   (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 #+end_src
 *** Disable standard packages completely
@@ -237,52 +237,75 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Projectile
 #+begin_src emacs-lisp
-    (cond
-     (work-linux-local
-      (progn (setq projectile-project-search-path '("/scratch/apel"))
-             (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))))
-     (work-linux-remote
-      (progn (setq projectile-project-search-path '("/scratch/apel"))
-             (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))
-             (setq projectile-enable-caching t)))
-     (work-win (setq projectile-project-search-path '("D:/users/apel")))
-     (home (setq projectile-project-search-path '("/home/martin"))))
+  (cond
+   (work-linux-local
+    (progn (setq projectile-project-search-path '("/scratch/apel"))
+           (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))))
+   (work-linux-remote
+    (progn (setq projectile-project-search-path '("/scratch/apel"))
+           (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))
+           (setq projectile-enable-caching t)))
+   (work-win (setq projectile-project-search-path '("D:/users/apel")))
+   (home (setq projectile-project-search-path '("/home/martin"))))
 
   (defun ma-projectile-mode-line()
     "Generates a projectile mode line"
     (format " Proj[%s]" (projectile-project-name)))
 
-  (use-package projectile
-             :init
-             (projectile-mode 1)
-             ;; This is needed to avoid slowdown when working with remote files.
-             (defadvice projectile-project-root (around ignore-remote first activate)
-               (unless (file-remote-p default-directory) ad-do-it))
+  (defun ma-project-tab-name (buffer alist)
+    "Returns the last part of the project's root directory or nil."
+    (with-current-buffer buffer
+      (let ((root (projectile-project-root)))
+        (when root
+          (file-name-nondirectory (substring root 0 (1- (length root))))))))
 
-             :bind
-             ("C-c C-f" . projectile-find-file)
-             :bind-keymap
-             ("C-S-p" . projectile-command-map)
-             :custom
-             (projectile-sort-order 'recently-active)
-             (projectile-git-submodule-command nil)
-             (projectile-mode-line-prefix "")
-             (projectile-mode-line-function 'ma-projectile-mode-line))
+  (defun ma-part-of-project-p (buffer action)
+    (ma-project-tab-name buffer nil))
+
+  (use-package projectile
+    :init
+    (projectile-mode 1)
+    ;; This is needed to avoid slowdown when working with remote files.
+    (defadvice projectile-project-root (around ignore-remote first activate)
+      (unless (file-remote-p default-directory) ad-do-it))
+
+    :bind
+    ("C-c C-f" . projectile-find-file)
+    :bind-keymap
+    ("C-S-p" . projectile-command-map)
+    :custom
+    (projectile-sort-order 'recently-active)
+    (projectile-git-submodule-command nil)
+    (projectile-mode-line-prefix "")
+    (projectile-mode-line-function 'ma-projectile-mode-line)
+    :config
+    (add-to-list 'display-buffer-alist
+                 '(ma-part-of-project-p
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . ma-project-tab-name))))
+
 #+end_src
 *** Deadgrep
 #+begin_src emacs-lisp
+  (defun ma-deadgrep-root-function()
+    "Determine root directory for current buffer."
+    (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa")
+        "/scratch/apel/new_arch/develop/src/ooa"
+      (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
+          "/scratch/apel/new_arch/develop/src"
+        (deadgrep--project-root))))
+
   (use-package deadgrep
     :bind ("C-c C-r" . deadgrep)
     :custom (deadgrep-max-buffers  1)
-    (deadgrep-project-root-function . (lambda ()
-                                        (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa")
-                                            "/scratch/apel/new_arch/develop/src/ooa"
-                                          (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
-                                              "/scratch/apel/new_arch/develop/src"
-                                            (deadgrep--project-root)))))
+    (deadgrep-project-root-function 'ma-deadgrep-root-function)
     :hook (deadgrep-mode . (lambda () (next-error-follow-minor-mode t))))
 #+end_src
 * Appearance
+** Icons
+#+begin_src emacs-lisp
+(use-package all-the-icons)
+#+end_src
 ** Diminish
 #+begin_src emacs-lisp
   (use-package diminish)
@@ -303,40 +326,12 @@ Since init.el will be generated from this file, we save customization in a dedic
 
 *** Display buffer AList
 #+begin_src emacs-lisp
-  (defun ma-project-tab-name (buffer alist)
-    "Returns the last part of the project's root directory or nil."
-    (with-current-buffer buffer
-      (let ((root (projectile-project-root)))
-        (when root
-          (file-name-nondirectory (substring root 0 (1- (length root))))))))
-
-  (defun ma-part-of-project-p (buffer action)
-    (ma-project-tab-name buffer nil))
-
-  (defun ma-make-display-buffer-matcher-function-org-msg()
-    (lambda (buffer-name action)
-      (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
-
   (add-to-list 'display-buffer-alist
-                 '(ma-part-of-project-p
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . ma-project-tab-name)))
-
-  (add-to-list 'display-buffer-alist
-               `("^\\*mu4e"
-                 (display-buffer-in-tab display-buffer-reuse-window)
-                 (tab-name . "📧 Mail")))
-
-  (add-to-list 'display-buffer-alist
-               `("^\\*Article\\*"
-                 (display-buffer-in-tab display-buffer-reuse-window)
-                 (tab-name . "📧 Mail")))
-
-  (add-to-list 'display-buffer-alist
-               `(,(ma-make-display-buffer-matcher-function-org-msg)
-                 (display-buffer-in-tab display-buffer-reuse-window)
-                 (tab-name . "📧 Mail")))
-
+               `("^\\*compilation\\*$"
+                 (display-buffer-in-tab display-buffer-reuse-window display-buffer-in-direction)
+                 (tab-name . "new_arch")
+                 (direction . bottom)
+                 (window-height . 0.3)))
   (setq switch-to-buffer-obey-display-actions t)
 #+end_src
 
@@ -560,6 +555,22 @@ Since init.el will be generated from this file, we save customization in a dedic
     (shr-color-visible-luminance-min 80)
     :config
     (set-variable 'read-mail-command 'mu4e)
+    (add-to-list 'display-buffer-alist
+                 `("^\\*mu4e-headers\\*$"
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . "📧 Mail")
+                   (window-min-height . 0.25)))
+
+    (add-to-list 'display-buffer-alist
+                 `("^\\*mu4e"
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . "📧 Mail")))
+
+    (add-to-list 'display-buffer-alist
+                 `("^\\*Article\\*"
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . "📧 Mail")))
+
     :bind ("<f4>" . ma-switch-to-mu4e))
 #+end_src
 *** Mu4e Alert
@@ -581,6 +592,10 @@ Since init.el will be generated from this file, we save customization in a dedic
   (defconst ma-org-msg-greeting-fmt-en "\nHi%s,\n\n")
   (defconst ma-org-msg-signature-en "\n\n#+begin_signature\n--\nBest Regards,\n\nMartin\n\n#+end_signature")
 
+  (defun ma-make-display-buffer-matcher-function-org-msg()
+    (lambda (buffer-name action)
+      (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
+
   (use-package org-msg
     :after (mu4e)
     :custom
@@ -593,7 +608,12 @@ Since init.el will be generated from this file, we save customization in a dedic
                                     (reply-to-html	. (text html))
                                     (reply-to-text	. (text))))
     (org-msg-convert-citation t)
-    (org-msg-signature ma-org-msg-signature-de))
+    (org-msg-signature ma-org-msg-signature-de)
+    :config
+    (add-to-list 'display-buffer-alist
+                 `(,(ma-make-display-buffer-matcher-function-org-msg)
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                 (tab-name . "📧 Mail"))))
 
   (defun ma-org-msg-get-to-name-advice(orig &rest args)
     "Return first name of addressee or defer to org-msg-get-to-name."
@@ -1028,5 +1048,10 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package vterm
     :if work
-    :bind ("C-g" . 'vterm-self-insert))
+    :bind ("C-g" . 'vterm-self-insert)
+    :config
+    (add-to-list 'display-buffer-alist
+                 `("^\\*vterm\\*$"
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . "VTerm"))))
 #+end_src
