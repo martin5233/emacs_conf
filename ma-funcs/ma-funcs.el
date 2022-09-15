@@ -148,15 +148,15 @@
     (progn
       (add-hook 'cmake-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+;;	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'c-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+;;	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'c++-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+;;	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'js-mode-hook
 	             (lambda ()

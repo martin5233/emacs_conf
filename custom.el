@@ -235,11 +235,8 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(org-agenda-files
-   '("/home/martin/org/2022-01-31_ProtokollUmweltausschuss.org" "/home/martin/org/2022-01-31_notizenumweltausschuss.org" "/home/martin/org/adb.org" "/home/martin/org/charlotte.org" "/home/martin/org/filme.org" "/home/martin/org/heizung.org" "/home/martin/org/ideen.org" "/home/martin/org/kodi.org" "/home/martin/org/kv_sitzung_2020-12-09.org" "/home/martin/org/vortrag_heimautomatisierung.org" "/home/martin/org/zuordnung_sensoren_gethsemane.org"))
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(csv-mode nil))
- '(password-cache-expiry 36000)
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
@@ -301,6 +298,8 @@
  '(vc-display-status t)
  '(vc-git-diff-switches "-w")
  '(vc-handled-backends '(Git))
+ '(vr/command-python
+   "python3 /home/martin/.emacs.d/straight/build/visual-regexp-steroids/regexp.py")
  '(w3m-pop-up-windows t)
  '(warning-suppress-log-types '((comp))))
 (custom-set-faces

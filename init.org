@@ -171,12 +171,12 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** git-timemachine
 #+begin_src emacs-lisp
-  (use-package git-timemachine)
+  (use-package git-timemachine
+    :straight (:repo "https://codeberg.org/pidu/git-timemachine"))
 #+end_src
 *** git-gutter
 #+begin_src emacs-lisp
   (use-package git-gutter
-    :unless work-linux-remote
     :diminish git-gutter-mode
     :config (global-git-gutter-mode 1))
 #+end_src
@@ -256,11 +256,15 @@ Since init.el will be generated from this file, we save customization in a dedic
     "Returns the last part of the project's root directory or nil."
     (with-current-buffer buffer
       (let ((root (projectile-project-root)))
-        (when root
+        (when (and root (not (derived-mode-p 'dired-mode)))
           (file-name-nondirectory (substring root 0 (1- (length root))))))))
 
   (defun ma-part-of-project-p (buffer action)
     (ma-project-tab-name buffer nil))
+
+  (defun ma-print-current-project()
+    (interactive)
+    (message (format "Current project for buffer is %s" (ma-project-tab-name (current-buffer) nil))))
 
   (use-package projectile
     :init
@@ -385,7 +389,6 @@ Since init.el will be generated from this file, we save customization in a dedic
     :config (unicode-fonts-setup))
 
   (global-font-lock-mode 1)
-  (global-hl-line-mode)
 #+end_src
 
 ** Long lines
@@ -411,27 +414,27 @@ Since init.el will be generated from this file, we save customization in a dedic
     :bind
     ("C-c C-S-d" . 'ma-devdocs-lookup-at-point)
     ("C-c C-d" . devdocs-lookup)
-    :config
+    :init
     (add-hook 'c-mode-common-hook
               (lambda()
-                (setq-local devdocs-current-docs '("cpp" "qt~5.12"))
+                (setq devdocs-current-docs '("cpp" "qt~5.12"))
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'cmake-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("cmake~3.17"))
+                (setq devdocs-current-docs '("cmake~3.17"))
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'dockerfile-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("docker~19"))))
+                (setq devdocs-current-docs '("docker~19"))))
     (add-hook 'js-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("node" "javascript"))))
+                (setq devdocs-current-docs '("node" "javascript"))))
     (add-hook 'python-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("python~3.10"))))
+                (setq devdocs-current-docs '("python~3.10"))))
     (add-hook 'perl-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("perl~5.34")))))
+                (setq devdocs-current-docs '("perl~5.34")))))
 #+end_src
 
 ** Info
@@ -555,6 +558,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (shr-color-visible-luminance-min 80)
     :config
     (set-variable 'read-mail-command 'mu4e)
+    (hl-line-mode -1)
     (add-to-list 'display-buffer-alist
                  `("^\\*mu4e-headers\\*$"
                    (display-buffer-in-tab display-buffer-reuse-window)
@@ -587,10 +591,16 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org-msg
 #+begin_src emacs-lisp
-  (defconst ma-org-msg-greeting-fmt-de "\nHallo%s,\n\n")
-  (defconst ma-org-msg-signature-de "\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n\n#+end_signature")
-  (defconst ma-org-msg-greeting-fmt-en "\nHi%s,\n\n")
-  (defconst ma-org-msg-signature-en "\n\n#+begin_signature\n--\nBest Regards,\n\nMartin\n\n#+end_signature")
+  (defun ma-define-snippets-for-mail ()
+    "Define snippets to be used in org-msg-edit-mode."
+
+    (yas-define-snippets 'org-msg-edit-mode
+                         '(("ger"
+                            "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
+                            "MailDeutsch")
+                           ("eng"
+                            "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
+                            "MailEnglisch"))))
 
   (defun ma-make-display-buffer-matcher-function-org-msg()
     (lambda (buffer-name action)
@@ -601,19 +611,20 @@ Since init.el will be generated from this file, we save customization in a dedic
     :custom
     (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
     (org-msg-startup "hidestars indent inlineimages")
-    (org-msg-greeting-fmt ma-org-msg-greeting-fmt-de)
+    (org-msg-greeting-fmt nil)
     (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")))
     (org-msg-greeting-name-limit 3)
     (org-msg-default-alternatives '((new		. (text html))
                                     (reply-to-html	. (text html))
                                     (reply-to-text	. (text))))
     (org-msg-convert-citation t)
-    (org-msg-signature ma-org-msg-signature-de)
+    (org-msg-signature nil)
     :config
     (add-to-list 'display-buffer-alist
                  `(,(ma-make-display-buffer-matcher-function-org-msg)
                    (display-buffer-in-tab display-buffer-reuse-window)
-                 (tab-name . "📧 Mail"))))
+                 (tab-name . "📧 Mail")))
+    (ma-define-snippets-for-mail))
 
   (defun ma-org-msg-get-to-name-advice(orig &rest args)
     "Return first name of addressee or defer to org-msg-get-to-name."
@@ -736,6 +747,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     :bind
     ("C-c a" . 'org-agenda)
     ("C-c C" . 'org-capture)
+    :hook (org . hl-line-mode)
     :config
     (define-key org-mode-map (kbd "C-c C-z") nil))      ;; Free up for global magit-status binding
 #+end_src
@@ -809,6 +821,10 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package idle-highlight-mode
     :hook prog-mode)
+#+end_src
+*** Highlight current line
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook 'hl-line-mode)
 #+end_src
 *** Turn off lock-file mode and turn on smartscan-mode
 #+begin_src emacs-lisp
