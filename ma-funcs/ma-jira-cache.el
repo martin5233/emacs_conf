@@ -25,8 +25,8 @@
       ((cached-result (cdr (assoc key ma-jira-key-to-summary-alist))))
     (if (not cached-result)
       (let* ((issues (jiralib-do-jql-search (concat "key = " key) 1))
-             (summary (cl-mapcar 'org-jira-get-issue-summary issues)))
-        (add-to-list 'ma-jira-key-to-summary-alist (cons key (car summary)))
+             (summary (car (cl-mapcar 'org-jira-get-issue-summary issues))))
+        (add-to-list 'ma-jira-key-to-summary-alist (cons key summary))
         summary)
       cached-result)))
 
