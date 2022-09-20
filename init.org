@@ -5,6 +5,10 @@
 :PROPERTIES:
 :header-args:emacs-lisp: :tangle "~/.emacs.d/early-init.el"
 :END:
+** Lexical Binding
+#+begin_src emacs-lisp
+;;; -*- lexical-binding: t -*-
+#+end_src
 ** Header warning for generated code
 #+begin_src emacs-lisp
   ;; This code is generated from init.org.
@@ -32,6 +36,10 @@
   (setq package-enable-at-startup nil)
 #+end_src
 * Startup
+** Lexical Binding
+#+begin_src emacs-lisp
+;;; -*- lexical-binding: t -*-
+#+end_src
 ** Header warning for generated code
 #+begin_src emacs-lisp
   ;; This code is generated from init.org.
@@ -90,6 +98,12 @@ Since init.el will be generated from this file, we save customization in a dedic
   (server-start)
 #+end_src
 * Basics
+** Utility functions
+#+begin_src emacs-lisp
+  (defun ma-make-display-buffer-matcher-function (major-modes)
+    (lambda (buffer-name action)
+      (with-current-buffer buffer-name (apply #'derived-mode-p major-modes))))
+#+end_src
 ** Editing
 *** Avy
 #+begin_src emacs-lisp
@@ -260,8 +274,9 @@ Since init.el will be generated from this file, we save customization in a dedic
           (file-name-nondirectory (substring root 0 (1- (length root))))))))
 
   (defun ma-part-of-project-p (buffer action)
-    (ma-project-tab-name buffer nil))
-
+    (unless (with-current-buffer buffer
+              (derived-mode-p 'emacs-lisp-mode))
+        (ma-project-tab-name buffer nil)))
   (defun ma-print-current-project()
     (interactive)
     (message (format "Current project for buffer is %s" (ma-project-tab-name (current-buffer) nil))))
@@ -302,8 +317,7 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package deadgrep
     :bind ("C-c C-r" . deadgrep)
     :custom (deadgrep-max-buffers  1)
-    (deadgrep-project-root-function 'ma-deadgrep-root-function)
-    :hook (deadgrep-mode . (lambda () (next-error-follow-minor-mode t))))
+    (deadgrep-project-root-function 'ma-deadgrep-root-function))
 #+end_src
 * Appearance
 ** Icons
@@ -449,6 +463,12 @@ Since init.el will be generated from this file, we save customization in a dedic
   ("C-h v" . helpful-variable)
   ("C-h k" . helpful-key)
   ("C-c C-d" . helpful-at-point))
+  (add-to-list 'display-buffer-alist
+               `(,(ma-make-display-buffer-matcher-function '(helpful-mode))
+                 (display-buffer-in-tab display-buffer-reuse-window display-buffer-in-direction)
+                 (direction . bottom)
+                 (window-height . 0.5)
+                 (tab-name . "Elisp")))
 #+end_src
 * Completion
 ** Company
@@ -545,6 +565,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (mu4e-use-fancy-chars t)
     (mu4e-attachment-dir "/tmp")
     (mu4e-change-filenames-when-moving t)
+    (mu4e-headers-visible-lines 20)
 
     (message-send-mail-function (quote smtpmail-send-it))
 
@@ -558,7 +579,6 @@ Since init.el will be generated from this file, we save customization in a dedic
     (shr-color-visible-luminance-min 80)
     :config
     (set-variable 'read-mail-command 'mu4e)
-    (hl-line-mode -1)
     (add-to-list 'display-buffer-alist
                  `("^\\*mu4e-headers\\*$"
                    (display-buffer-in-tab display-buffer-reuse-window)
@@ -591,59 +611,61 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org-msg
 #+begin_src emacs-lisp
-  (defun ma-define-snippets-for-mail ()
-    "Define snippets to be used in org-msg-edit-mode."
+    (defun ma-define-snippets-for-mail ()
+      "Define snippets to be used in org-msg-edit-mode."
 
-    (yas-define-snippets 'org-msg-edit-mode
-                         '(("ger"
-                            "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
-                            "MailDeutsch")
-                           ("eng"
-                            "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
-                            "MailEnglisch"))))
+      (yas-define-snippets 'org-msg-edit-mode
+                           '(("ger"
+                              "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
+                              "MailDeutsch")
+                             ("eng"
+                              "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
+                              "MailEnglisch"))))
 
-  (defun ma-make-display-buffer-matcher-function-org-msg()
-    (lambda (buffer-name action)
-      (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
+    (defun ma-make-display-buffer-matcher-function-org-msg()
+      (lambda (buffer-name action)
+        (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
 
-  (use-package org-msg
-    :after (mu4e)
-    :custom
-    (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
-    (org-msg-startup "hidestars indent inlineimages")
-    (org-msg-greeting-fmt nil)
-    (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")))
-    (org-msg-greeting-name-limit 3)
-    (org-msg-default-alternatives '((new		. (text html))
-                                    (reply-to-html	. (text html))
-                                    (reply-to-text	. (text))))
-    (org-msg-convert-citation t)
-    (org-msg-signature nil)
-    :config
-    (add-to-list 'display-buffer-alist
-                 `(,(ma-make-display-buffer-matcher-function-org-msg)
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                 (tab-name . "📧 Mail")))
-    (ma-define-snippets-for-mail))
+    (use-package org-msg
+      :after (mu4e)
+      :custom
+      (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
+      (org-msg-startup "hidestars indent inlineimages")
+      (org-msg-greeting-fmt nil)
+      (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
+                                 ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")))
+      (org-msg-greeting-name-limit 3)
+      (org-msg-default-alternatives '((new		. (text html))
+                                      (reply-to-html	. (text html))
+                                      (reply-to-text	. (text))))
+      (org-msg-convert-citation t)
+      (org-msg-signature nil)
 
-  (defun ma-org-msg-get-to-name-advice(orig &rest args)
-    "Return first name of addressee or defer to org-msg-get-to-name."
-    (save-excursion
-      (let ((to (org-msg-message-fetch-field "to")))
-        (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
-            (match-string 2 to)
-          (apply orig args)))))
+      :config
+      (add-to-list 'display-buffer-alist
+                   `(,(ma-make-display-buffer-matcher-function '(org-mode))
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                   (tab-name . "📧 Mail")))
+      (ma-define-snippets-for-mail))
 
-  (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
+    (defun ma-org-msg-get-to-name-advice(orig &rest args)
+      "Return first name of addressee or defer to org-msg-get-to-name."
+      (save-excursion
+        (let ((to (org-msg-message-fetch-field "to")))
+          (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
+              (match-string 2 to)
+            (apply orig args)))))
 
-  (org-msg-mode)
+    (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
 
-  (add-hook 'org-msg-edit-mode-hook
-            (lambda ()
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)))
+    (org-msg-mode)
+
+    (add-hook 'org-msg-edit-mode-hook
+              (lambda ()
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)))
 
 #+end_src
 ** Calendar
@@ -658,6 +680,7 @@ Since init.el will be generated from this file, we save customization in a dedic
   (setq calendar-time-display-form '(24-hours ":" minutes))
   (setq calendar-week-start-day 1)
   (setq appt-display-diary t)
+  (setq appt-display-format 'window)
   (setq org-agenda-include-diary t)
 
   (add-hook 'diary-list-entries-hook #'diary-sort-entries t)
@@ -938,6 +961,13 @@ Since init.el will be generated from this file, we save customization in a dedic
               (local-set-key (kbd "M-.") 'find-function-other-window)))
 #+end_src
 
+*** Tabs
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+               `(,(ma-make-display-buffer-matcher-function '(emacs-lisp-mode))
+                 (display-buffer-in-tab display-buffer-reuse-window display-buffer-pop-up-window)
+                 (tab-name . "Elisp")))
+#+end_src
 ** Shell
 #+begin_src emacs-lisp
   (add-hook 'sh-set-shell-hook
@@ -1065,6 +1095,7 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package vterm
     :if work
     :bind ("C-g" . 'vterm-self-insert)
+    :disabled
     :config
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"

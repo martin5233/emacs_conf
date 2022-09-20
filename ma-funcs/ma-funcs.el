@@ -313,9 +313,8 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-src-trees
   '(("master" . "/scratch/apel/new_arch/")
-    ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
-    ("2022"  . "/scratch/apel/new_arch_2022.Y/")
-    ("Windows" . "/mnt/d/users/apel/new_arch/")))
+    ("2023" . (concat work-remote-url "/scratch/apel/new_arch_2023.Y/"))
+    ("Windows" . "/mnt/e/users/apel/new_arch/")))
 
 
 (defun ma-choose-file-in-other-tree()
