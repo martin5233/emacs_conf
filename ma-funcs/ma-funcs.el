@@ -473,5 +473,32 @@ not, a copyright comment is inserted at the start of the file."
          (keys (cl-mapcar 'org-jira-get-issue-key issues)))
     (completing-read "Select JIRA issue: " keys)))
 
+(defun ma-start-unison (config buffer-name sleep-before)
+  "Start a unison session asynchronously and redirect output to BUFFER-NAME."
+  (let ((cmd (format "sleep %s; for ((i=0; i<100;i++)); do unison %s -repeat watch -logfile /tmp/unison_%s.log; done" (number-to-string sleep-before) config config))
+        (buffer (get-buffer-create buffer-name)))
+    (async-shell-command cmd buffer)))
+
+(defun ma-unison-home()
+  "Start Unison for the home directory as an asynchronous command. Outputs go to a buffer named '*Unison Home*'."
+  (ma-start-unison "home" "*Unison Home*" 0))
+
+(defun ma-unison-src()
+  "Start Unison for the src directory as an asynchronous command. Outputs go to a buffer named '*Unison Src*'."
+  (ma-start-unison "src" "*Unison Src*" 120))
+
+(defun ma-unison-obj()
+  "Start Unison for the obj directory as an asynchronous command. Outputs go to a buffer named '*Unison Obj*'."
+  (ma-start-unison "obj" "*Unison Obj*" 60))
+
+(defun ma-unison-start-all()
+  "Start all unison syncs."
+  (ma-unison-home)
+  (ma-unison-obj)
+  (ma-unison-src))
+
+
+(when work-linux-remote
+  (ma-unison-start-all))
 
 (provide 'ma-funcs)

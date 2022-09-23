@@ -350,7 +350,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                  (tab-name . "new_arch")
                  (direction . bottom)
                  (window-height . 0.3)))
-  (setq switch-to-buffer-obey-display-actions t)
+;;  (setq switch-to-buffer-obey-display-actions t)
 #+end_src
 
 ** Which-key
@@ -611,61 +611,62 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org-msg
 #+begin_src emacs-lisp
-    (defun ma-define-snippets-for-mail ()
-      "Define snippets to be used in org-msg-edit-mode."
+  (defun ma-define-snippets-for-mail ()
+    "Define snippets to be used in org-msg-edit-mode."
 
-      (yas-define-snippets 'org-msg-edit-mode
-                           '(("ger"
-                              "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
-                              "MailDeutsch")
-                             ("eng"
-                              "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
-                              "MailEnglisch"))))
+    (yas-define-snippets 'org-msg-edit-mode
+                         '(("ger"
+                            "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
+                            "MailDeutsch")
+                           ("eng"
+                            "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
+                            "MailEnglisch"))))
 
-    (defun ma-make-display-buffer-matcher-function-org-msg()
-      (lambda (buffer-name action)
-        (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
+  (defun ma-make-display-buffer-matcher-function-org-msg()
+    (lambda (buffer-name action)
+      (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
 
-    (use-package org-msg
-      :after (mu4e)
-      :custom
-      (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
-      (org-msg-startup "hidestars indent inlineimages")
-      (org-msg-greeting-fmt nil)
-      (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
-                                 ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")))
-      (org-msg-greeting-name-limit 3)
-      (org-msg-default-alternatives '((new		. (text html))
-                                      (reply-to-html	. (text html))
-                                      (reply-to-text	. (text))))
-      (org-msg-convert-citation t)
-      (org-msg-signature nil)
+  (use-package org-msg
+    :after (mu4e)
+    :custom
+    (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
+    (org-msg-startup "hidestars indent inlineimages")
+    (org-msg-greeting-fmt nil)
+    (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
+                               ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")))
+    (org-msg-greeting-name-limit 3)
+    (org-msg-default-alternatives '((new		. (text html))
+                                    (reply-to-html	. (text html))
+                                    (reply-to-text	. (text))))
+    (org-msg-convert-citation t)
+    (org-msg-signature nil)
 
-      :config
-      (add-to-list 'display-buffer-alist
-                   `(,(ma-make-display-buffer-matcher-function '(org-mode))
-                     (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . "📧 Mail")))
-      (ma-define-snippets-for-mail))
+    :config
+    (add-to-list 'display-buffer-alist
+                 `(,(ma-make-display-buffer-matcher-function '(org-mode))
+                   (display-buffer-in-tab display-buffer-reuse-window)
+                 (tab-name . "📧 Mail")))
+    (ma-define-snippets-for-mail))
 
-    (defun ma-org-msg-get-to-name-advice(orig &rest args)
-      "Return first name of addressee or defer to org-msg-get-to-name."
-      (save-excursion
-        (let ((to (org-msg-message-fetch-field "to")))
-          (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
-              (match-string 2 to)
-            (apply orig args)))))
+  (defun ma-org-msg-get-to-name-advice(orig &rest args)
+    "Return first name of addressee or defer to org-msg-get-to-name."
+    (save-excursion
+      (let ((to (org-msg-message-fetch-field "to")))
+        (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
+            (match-string 2 to)
+          (apply orig args)))))
 
-    (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
+  (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
 
-    (org-msg-mode)
+  (org-msg-mode)
 
-    (add-hook 'org-msg-edit-mode-hook
-              (lambda ()
-                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
-                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
-                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
-                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)))
+  (add-hook 'org-msg-edit-mode-hook
+            (lambda ()
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
+              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)
+              (flyspell-mode)))
 
 #+end_src
 ** Calendar
@@ -1094,11 +1095,19 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package vterm
     :if work
-    :bind ("C-g" . 'vterm-self-insert)
-    :disabled
+    :bind (:map vterm-mode-map
+    ("C-g" . vterm--self-insert)
+    ("<f4>" . ma-switch-to-mu4e))
     :config
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"
                    (display-buffer-in-tab display-buffer-reuse-window)
                    (tab-name . "VTerm"))))
+  (use-package vterm-toggle
+    :if work
+    :after vterm
+    :bind (:map vterm-mode-map ("<f5>" . vterm-toggle))
+    :init
+    (global-set-key (kbd "<f5>") 'vterm-toggle)
+    (global-set-key (kbd "C-<f5>") 'vterm-toggle-cd))
 #+end_src
