@@ -4,6 +4,7 @@
     (require 'uuid))
 (require 'jiralib)
 (require 'org-jira)
+(require 'ma-jira-cache)
 
 (defgroup ma nil
   "Martins customizations"
@@ -34,17 +35,6 @@
                  )
   :group 'ma
 )
-
-(defun show-frame (&optional frame)
-  "Show the current Emacs frame or the FRAME given as argument.
-   And make sure that it really shows up!"
-  (raise-frame)
-  ; yes, you have to call this twice. Don’t ask me why…
-  ; select-frame-set-input-focus calls x-focus-frame and does a bit of
-  ; additional magic.
-  (select-frame-set-input-focus (selected-frame))
-  (select-frame-set-input-focus (selected-frame)))
-
 
 (defun ma-kill-old-buffers ()
   "Kill buffers from end of buffer list (not used recently) until no more than 50 buffers are left. Remove temporary buffers and org mode files first."
@@ -91,32 +81,6 @@
        (interactive)
        (switch-to-buffer (get-buffer-create "*scratch*"))
        (lisp-interaction-mode))
-
-(defun ma-assistant ()
-  "runs qt assistant"
-  (interactive)
-  (let ((p (get-process "assistant")))
-    (if p
-        (process-send-string p (concat "activateKeyword " (current-word) "\n"))
-      (progn
-        (setenv "QT_SELECT" "5")
-        (let ((q (start-process "assistant" nil "/usr/bin/assistant" "-enableRemoteControl")))
-          (process-send-string q (concat "activateKeyword " (current-word) "\n")))
-        ))
-    )
-)
-(global-set-key [f11] 'ma-assistant)
-
-
-(defun ma-occur-at-point ()
-  "Run occur for word at point"
-  (interactive)
-  (if (not (use-region-p))
-      (er/mark-word))
-  (occur (buffer-substring (region-beginning) (region-end)))
-  (select-window (get-buffer-window "*Occur*"))
-)
-(global-set-key "\M-O" 'ma-occur-at-point)
 
 (defun ma-update-ebrowse-db ()
   "Update the database for Ebrowse"
@@ -170,22 +134,6 @@
     (compile comp-command))
   )
 
-(defun ma-compile-file ()
-  "Run compilation of current file"
-  (interactive)
-  (setq comp-command (ma-compile-command))
-  (when (not (boundp 'ma-build-dir))
-    (error "Build directory is not set"))
-  (let* ((rel-name (file-relative-name (buffer-file-name) "/scratch/apel/new_arch/develop"))
-         (filename-in-build-dir (concat ma-build-dir "/" rel-name))
-         (obj-dir (file-name-directory filename-in-build-dir)))
-    (while (not (file-exists-p (concat obj-dir "CMakeFiles")))
-      (setq obj-dir (file-name-directory (directory-file-name obj-dir))))
-    (setq rel-name (concat (file-name-sans-extension (file-relative-name filename-in-build-dir obj-dir)) ".o"))
-      (setq comp-command (concat comp-command " " obj-dir " " rel-name))
-      (print comp-command)
-      (compile comp-command)))
-
 (defun ma-run-sjs ()
   "Run sjs script."
   (interactive)
@@ -200,15 +148,15 @@
     (progn
       (add-hook 'cmake-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+;;	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'c-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+;;	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'c++-mode-hook
 	             (lambda ()
-	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
+;;	               (local-set-key [?\C-c ?m]    'ma-run-cmake-and-compile)
 	               (local-set-key [?\C-c ?\C-c] 'ma-run-compile)))
       (add-hook 'js-mode-hook
 	             (lambda ()
@@ -294,16 +242,6 @@
   (c-indent-line)
 )
 
-(defface ma-magit-highlight-remote-face
-  '((t :inherit magit-branch-remote
-       :underline t))
-  "Face for highlighting remote branches with specific text in them."
-  :group 'ma)
-
-(add-hook 'magit-refs-mode-hook
-          (lambda ()
-            (add-to-list 'magit-ref-namespaces '("\\`refs/remotes/origin/\\(SPCK-[0-9]+-MAL1-.*\\)" . ma-magit-highlight-remote-face))))
-
 (defun ma-lowercase-args (&rest args)
   "Convert all arguments to lowercase"
   (let ((arg1 (nth 0 args)))
@@ -375,8 +313,7 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-src-trees
   '(("master" . "/scratch/apel/new_arch/")
-    ("2021x" . "/scratch/apel/new_arch_2021x.Y/")
-    ("2022"  . "/scratch/apel/new_arch_2022.Y/")
+    ("2023" . (concat work-remote-url "/scratch/apel/new_arch_2023.Y/"))
     ("Windows" . "/mnt/e/users/apel/new_arch/")))
 
 
@@ -462,10 +399,10 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-devs-basedir "/ssh:MAL1@dell1254cem:devs/")
 
-(defun ma-set-current-dev ()
+(defun ma-set-current-dev (&optional all-cached-issues)
   "Set current dev issue."
-  (interactive)
-  (let* ((issue-key (ma-select-jira-issue)))
+  (interactive "P")
+  (let* ((issue-key (ma-select-jira-issue all-cached-issues)))
     (unless (string-match "^SPCK-\\([0-9]+\\)$" issue-key)
       (error "Unexpected SPCK issue number format"))
     (setq ma-current-dev (string-to-number (match-string 1 issue-key)))))
@@ -528,11 +465,40 @@ not, a copyright comment is inserted at the start of the file."
           (delete-region start end)
           (insert (concat "\n//" (make-string (- longest 2) ?*) "\n\n")))))))
 
-(defun ma-select-jira-issue()
-  "Select a jira issue using completion from the list of JIRA development issues, which are currently marked as 'in progress'."
-  (let* ((issues (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND status = \"In Progress\" AND assignee in (currentUser())"))
+(defun ma-select-jira-issue(all-cached-issues)
+  "Select a jira issue using completion."
+  (let* ((issues (if all-cached-issues
+                     (ma-jira-cache-keys)
+                   (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND status = \"In Progress\" AND assignee in (currentUser())")))
          (keys (cl-mapcar 'org-jira-get-issue-key issues)))
     (completing-read "Select JIRA issue: " keys)))
 
+(defun ma-start-unison (config buffer-name sleep-before)
+  "Start a unison session asynchronously and redirect output to BUFFER-NAME."
+  (let ((cmd (format "sleep %s; for ((i=0; i<100;i++)); do unison %s -repeat watch -logfile /tmp/unison_%s.log; done" (number-to-string sleep-before) config config))
+        (buffer (get-buffer-create buffer-name)))
+    (async-shell-command cmd buffer)))
+
+(defun ma-unison-home()
+  "Start Unison for the home directory as an asynchronous command. Outputs go to a buffer named '*Unison Home*'."
+  (ma-start-unison "home" "*Unison Home*" 0))
+
+(defun ma-unison-src()
+  "Start Unison for the src directory as an asynchronous command. Outputs go to a buffer named '*Unison Src*'."
+  (ma-start-unison "src" "*Unison Src*" 120))
+
+(defun ma-unison-obj()
+  "Start Unison for the obj directory as an asynchronous command. Outputs go to a buffer named '*Unison Obj*'."
+  (ma-start-unison "obj" "*Unison Obj*" 60))
+
+(defun ma-unison-start-all()
+  "Start all unison syncs."
+  (ma-unison-home)
+  (ma-unison-obj)
+  (ma-unison-src))
+
+
+(when work-linux-remote
+  (ma-unison-start-all))
 
 (provide 'ma-funcs)
