@@ -493,6 +493,7 @@ not, a copyright comment is inserted at the start of the file."
 
 (defun ma-unison-start-all()
   "Start all unison syncs."
+  (interactive)
   (ma-unison-home)
   (ma-unison-obj)
   (ma-unison-src))

@@ -12,9 +12,6 @@
         (:name markdown-mode)
         (:name graphviz-dot-mode)
         (:name "dap-mode")
-        (:name guess-language
-               :type github
-               :pkgname "tmalsburg/guess-language.el")
         ))
 
 (if work

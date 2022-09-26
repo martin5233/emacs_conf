@@ -115,11 +115,31 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package expand-region
 	       :bind ("M-o" . er/expand-region))
 #+end_src
-*** Flycheck
+*** Flyspell
 #+begin_src emacs-lisp
-  (use-package flycheck
-    :diminish flycheck-mode
-    :hook (c-mode-common-hook . flyspell-prog-mode))
+  (use-package flyspell
+    :straight (:type built-in)
+    :diminish flyspell-mode
+    :hook (prog-mode-hook . flyspell-prog-mode))
+#+end_src
+*** Guess-language
+#+begin_src emacs-lisp
+  (defun ma-after-language-guess (lang beginning end)
+    "Perform multiple settings after the language of a buffer has been guessed:
+  - Switch the input method depending on the guessed language.
+     Argument LANG: Language code."
+    (message (format "Switching input language to %s" lang))
+    (if (string-equal lang "de")
+        (progn
+          (activate-input-method "german-postfix")
+          (ispell-change-dictionary "german"))
+      (deactivate-input-method)
+      (ispell-change-dictionary "american")))
+
+  (use-package guess-language
+    :custom (guess-language-languages '(en de))
+    :config
+    (add-hook 'guess-language-after-detection-functions #'ma-after-language-guess))
 #+end_src
 *** Multiple cursors
 #+begin_src emacs-lisp
@@ -211,9 +231,11 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 ** Password cache
 #+begin_src emacs-lisp
-    (use-package password-cache
-      :straight (:type built-in)
-      :custom (password-cache-expiry 36000))
+  (use-package password-cache
+    :straight (:type built-in)
+    :custom (password-cache-expiry 36000)
+    :after flyspell
+    )
 #+end_src
 ** Navigation
 *** Link-Hint
@@ -350,7 +372,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                  (tab-name . "new_arch")
                  (direction . bottom)
                  (window-height . 0.3)))
-;;  (setq switch-to-buffer-obey-display-actions t)
+  (setq switch-to-buffer-obey-display-actions t)
 #+end_src
 
 ** Which-key
@@ -599,6 +621,10 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Mu4e Alert
 #+begin_src emacs-lisp
+  (defun ma-view-previous-next-advice(orig &rest args)
+    (let ((switch-to-buffer-obey-display-actions nil))
+      (apply orig args)))
+
   (use-package mu4e-alert
     :after (mu4e)
     :custom
@@ -607,66 +633,75 @@ Since init.el will be generated from this file, we save customization in a dedic
     (mu4e-alert-interesting-mail-query "maildir:/INBOX AND NOT flag:trashed AND flag:unread")
     :init
     (mu4e-alert-enable-mode-line-display)
-    (mu4e-alert-enable-notifications))
+    (mu4e-alert-enable-notifications)
+    :config
+    (advice-add 'mu4e-view-headers-next :around #'ma-view-previous-next-advice)
+    (advice-add 'mu4e-view-headers-prev :around #'ma-view-previous-next-advice))
+
 #+end_src
 *** Org-msg
 #+begin_src emacs-lisp
-  (defun ma-define-snippets-for-mail ()
-    "Define snippets to be used in org-msg-edit-mode."
+    (defun ma-define-snippets-for-mail ()
+      "Define snippets to be used in org-msg-edit-mode."
 
-    (yas-define-snippets 'org-msg-edit-mode
-                         '(("ger"
-                            "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
-                            "MailDeutsch")
-                           ("eng"
-                            "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
-                            "MailEnglisch"))))
+      (yas-define-snippets 'org-msg-edit-mode
+                           '(("ger"
+                              "\nHallo `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
+                              "MailDeutsch")
+                             ("eng"
+                              "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
+                              "MailEnglisch"))))
 
-  (defun ma-make-display-buffer-matcher-function-org-msg()
-    (lambda (buffer-name action)
-      (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
+    (defun ma-make-display-buffer-matcher-function-org-msg()
+      (lambda (buffer-name action)
+        (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
 
-  (use-package org-msg
-    :after (mu4e)
-    :custom
-    (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
-    (org-msg-startup "hidestars indent inlineimages")
-    (org-msg-greeting-fmt nil)
-    (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
-                               ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")))
-    (org-msg-greeting-name-limit 3)
-    (org-msg-default-alternatives '((new		. (text html))
-                                    (reply-to-html	. (text html))
-                                    (reply-to-text	. (text))))
-    (org-msg-convert-citation t)
-    (org-msg-signature nil)
+    (use-package org-msg
+      :after (mu4e)
+      :custom
+      (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
+      (org-msg-startup "hidestars indent inlineimages")
+      (org-msg-greeting-fmt nil)
+      (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
+                                 ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")
+                                 ("Edward.WATRAS@3ds.com" . "Ed")))
+      (org-msg-greeting-name-limit 3)
+      (org-msg-default-alternatives '((new		. (html))
+                                      (reply-to-html	. (html))
+                                      (reply-to-text	. (html))))
+      (org-msg-convert-citation t)
+      (org-msg-signature nil)
 
-    :config
-    (add-to-list 'display-buffer-alist
-                 `(,(ma-make-display-buffer-matcher-function '(org-mode))
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                 (tab-name . "📧 Mail")))
-    (ma-define-snippets-for-mail))
+      :config
+      (add-to-list 'display-buffer-alist
+                   `(,(ma-make-display-buffer-matcher-function '(org-mode))
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "📧 Mail")))
+      (ma-define-snippets-for-mail))
 
-  (defun ma-org-msg-get-to-name-advice(orig &rest args)
-    "Return first name of addressee or defer to org-msg-get-to-name."
-    (save-excursion
-      (let ((to (org-msg-message-fetch-field "to")))
-        (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <[[:alpha:]]+\.[[:alpha:]]+@3ds\.com>$" to)
-            (match-string 2 to)
-          (apply orig args)))))
+    (defun ma-org-msg-get-to-name-advice(orig &rest args)
+      "Return first name of addressee or defer to org-msg-get-to-name."
+      (save-excursion
+        (let ((to (org-msg-message-fetch-field "to")))
+          (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <\\([[:alpha:]]+\.[[:alpha:]]+@3ds\.com\\)>$" to)
+              (let ((mail-addr (match-string 3 to)))
+                (or (assoc-default mail-addr org-msg-recipient-names)
+                    (match-string 2 to)))
+            (apply orig args)))))
 
-  (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
+    (advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
 
-  (org-msg-mode)
+    (org-msg-mode)
 
-  (add-hook 'org-msg-edit-mode-hook
-            (lambda ()
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
-              (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)
-              (flyspell-mode)))
+    (add-hook 'org-msg-edit-mode-hook
+              (lambda ()
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
+                (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)
+                (flyspell-mode 1)
+                (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
+                (guess-language-mode 1)))
 
 #+end_src
 ** Calendar
