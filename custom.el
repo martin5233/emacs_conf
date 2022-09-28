@@ -298,8 +298,6 @@
  '(vc-display-status t)
  '(vc-git-diff-switches "-w")
  '(vc-handled-backends '(Git))
- '(vr/command-python
-   "python3 /home/martin/.emacs.d/straight/build/visual-regexp-steroids/regexp.py")
  '(w3m-pop-up-windows t)
  '(warning-suppress-log-types '((comp))))
 (custom-set-faces

@@ -166,6 +166,8 @@ Since init.el will be generated from this file, we save customization in a dedic
 *** Visual Regexp
 #+begin_src emacs-lisp
   (use-package visual-regexp
+    :custom
+    (vr/command-python (concat "python3 " user-emacs-directory "straight/build/visual-regexp-steroids/regexp.py"))
     :bind ("M-%" . 'vr/query-replace)
           ("C-M-%" . 'vr/replace))
 #+end_src
@@ -547,77 +549,78 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Mail
 *** Mu4e
 #+begin_src emacs-lisp
-  (defun ma-switch-to-mu4e ()
-    "Switch to unread mail in mu4e"
-    (interactive)
-    (unless (mu4e-running-p)
-      (mu4e t))
-    (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
-    (mu4e-headers-change-sorting :date 'ascending))
+  (when work-linux-remote
+    (defun ma-switch-to-mu4e ()
+      "Switch to unread mail in mu4e"
+      (interactive)
+      (unless (mu4e-running-p)
+        (mu4e t))
+      (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
+      (mu4e-headers-change-sorting :date 'ascending))
 
-  (use-package mu4e
-    :straight (:branch "release/1.8")
-    :load-path "straight/repos/mu/build/mu4e"
-    :commands mu4e-running-p
-    :custom
-    (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
-    (mu4e-bookmarks
-     (quote
-      (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
-       ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
-       ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
-       ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
-    (mu4e-headers-fields
-     '( (:human-date . 12)
-        (:flags . 6)
-        (:from-or-to . 30)
-        (:subject)))
-    (mu4e-compose-signature-auto-include nil)
-    (mu4e-compose-dont-reply-to-self t)
-    (mu4e-compose-complete-only-after "2020-01-01")
-    (mu4e-drafts-folder "/Drafts")
-    (mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
-    (mu4e-completing-read-function 'completing-read)
-    (mu4e-headers-include-related nil)
-    (mu4e-index-update-error-warning nil)
-    (mu4e-hide-index-messages t)
-    (mu4e-sent-folder "/Sent")
-    (mu4e-trash-folder "/Trash")
-    (mu4e-update-interval 120)
-    (mu4e-use-fancy-chars t)
-    (mu4e-attachment-dir "/tmp")
-    (mu4e-change-filenames-when-moving t)
-    (mu4e-headers-visible-lines 20)
+    (use-package mu4e
+      :straight (:branch "release/1.8")
+      :load-path "straight/repos/mu/build/mu4e"
+      :commands mu4e-running-p
+      :custom
+      (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
+      (mu4e-bookmarks
+       (quote
+        (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
+         ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+         ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
+         ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
+      (mu4e-headers-fields
+       '( (:human-date . 12)
+          (:flags . 6)
+          (:from-or-to . 30)
+          (:subject)))
+      (mu4e-compose-signature-auto-include nil)
+      (mu4e-compose-dont-reply-to-self t)
+      (mu4e-compose-complete-only-after "2020-01-01")
+      (mu4e-drafts-folder "/Drafts")
+      (mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
+      (mu4e-completing-read-function 'completing-read)
+      (mu4e-headers-include-related nil)
+      (mu4e-index-update-error-warning nil)
+      (mu4e-hide-index-messages t)
+      (mu4e-sent-folder "/Sent")
+      (mu4e-trash-folder "/Trash")
+      (mu4e-update-interval 120)
+      (mu4e-use-fancy-chars t)
+      (mu4e-attachment-dir "/tmp")
+      (mu4e-change-filenames-when-moving t)
+      (mu4e-headers-visible-lines 20)
 
-    (message-send-mail-function (quote smtpmail-send-it))
+      (message-send-mail-function (quote smtpmail-send-it))
 
-    (smtpmail-debug-info nil)
-    (smtpmail-local-domain "3ds.com")
-    (smtpmail-smtp-server "smtps.emea.3ds.com")
-    (smtpmail-smtp-service 587)
-    (smtpmail-stream-type (quote starttls))
+      (smtpmail-debug-info nil)
+      (smtpmail-local-domain "3ds.com")
+      (smtpmail-smtp-server "smtps.emea.3ds.com")
+      (smtpmail-smtp-service 587)
+      (smtpmail-stream-type (quote starttls))
 
-    (mail-user-agent 'mu4e-user-agent)
-    (shr-color-visible-luminance-min 80)
-    :config
-    (set-variable 'read-mail-command 'mu4e)
-    (add-to-list 'display-buffer-alist
-                 `("^\\*mu4e-headers\\*$"
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . "📧 Mail")
-                   (window-min-height . 0.25)))
+      (mail-user-agent 'mu4e-user-agent)
+      (shr-color-visible-luminance-min 80)
+      :config
+      (set-variable 'read-mail-command 'mu4e)
+      (add-to-list 'display-buffer-alist
+                   `("^\\*mu4e-headers\\*$"
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "📧 Mail")
+                     (window-min-height . 0.25)))
 
-    (add-to-list 'display-buffer-alist
-                 `("^\\*mu4e"
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . "📧 Mail")))
+      (add-to-list 'display-buffer-alist
+                   `("^\\*mu4e"
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "📧 Mail")))
 
-    (add-to-list 'display-buffer-alist
-                 `("^\\*Article\\*"
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . "📧 Mail")))
+      (add-to-list 'display-buffer-alist
+                   `("^\\*Article\\*"
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "📧 Mail")))
 
-    :bind ("<f4>" . ma-switch-to-mu4e))
+      :bind ("<f4>" . ma-switch-to-mu4e)))
 #+end_src
 *** Mu4e Alert
 #+begin_src emacs-lisp
