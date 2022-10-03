@@ -442,6 +442,20 @@ Since init.el will be generated from this file, we save customization in a dedic
   (defalias 'yes-or-no-p 'y-or-n-p)
 #+end_src
 * Documentation
+** Tab Bar
+#+begin_src emacs-lisp
+  (defun ma-tab-name-format (tab tab-num)
+    (let* ((current-p (eq (car tab) 'current-tab))
+           (name (alist-get 'name tab))
+           (prefix (cond ((string-equal name "Mail")     (all-the-icons-icon-octicon "mail")            )
+                         ((string-equal name ".emacs.d") (all-the-icons-icon-for-mode 'emacs-lisp-mode) )
+                         ((string-equal name "Elisp")    (all-the-icons-icon-for-mode 'emacs-lisp-mode) )
+                         ((string-equal name "new_arch") (all-the-icons-icon-for-mode 'c++-mode)        )
+                         ((string-equal name "VTerm")    (all-the-icons-icon-for-mode 'vterm-mode)      )
+                         (t ""))))
+           (concat prefix (propertize name'face (funcall tab-bar-tab-face-function tab)))))
+  (setq tab-bar-tab-name-format-function 'ma-tab-name-format)
+#+end_src
 ** Devdocs
 #+begin_src emacs-lisp
   (defun ma-devdocs-lookup-at-point()
@@ -607,18 +621,18 @@ Since init.el will be generated from this file, we save customization in a dedic
       (add-to-list 'display-buffer-alist
                    `("^\\*mu4e-headers\\*$"
                      (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "📧 Mail")
+                     (tab-name . "Mail")
                      (window-min-height . 0.25)))
 
       (add-to-list 'display-buffer-alist
                    `("^\\*mu4e"
                      (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "📧 Mail")))
+                     (tab-name . "Mail")))
 
       (add-to-list 'display-buffer-alist
                    `("^\\*Article\\*"
                      (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "📧 Mail")))
+                     (tab-name . "Mail")))
 
       :bind ("<f4>" . ma-switch-to-mu4e)))
 #+end_src
@@ -679,7 +693,7 @@ Since init.el will be generated from this file, we save customization in a dedic
       (add-to-list 'display-buffer-alist
                    `(,(ma-make-display-buffer-matcher-function '(org-mode))
                      (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "📧 Mail")))
+                     (tab-name . "Mail")))
       (ma-define-snippets-for-mail))
 
     (defun ma-org-msg-get-to-name-advice(orig &rest args)
