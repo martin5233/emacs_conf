@@ -254,7 +254,6 @@
  '(save-abbrevs nil)
  '(scroll-bar-mode 'right)
  '(send-mail-function nil)
- '(show-paren-mode t nil (paren))
  '(show-paren-style 'expression)
  '(smartscan-symbol-selector "symbol")
  '(split-height-threshold 40)
@@ -279,6 +278,7 @@
      ("MDL2" . "DM")))
  '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
  '(svn-log-edit-show-diff-for-commit t)
+ '(tab-bar-mode t)
  '(tab-width 3)
  '(tex-close-quote "\"")
  '(tex-command nil t)
@@ -770,6 +770,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#000000" :foreground "#ffffff" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "UKWN" :family "Nimbus Roman"))))
  '(aw-leading-char-face ((t (:background "deep sky blue" :foreground "white" :height 3.0))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))

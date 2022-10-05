@@ -226,6 +226,17 @@
     (progn
       (run-with-idle-timer 600 t 'ma-show-agenda-if-hidden)))
 
+(defun ma-power-off-remote()
+  "Power off remote machine after asking user."
+  (interactive)
+  (when (y-or-n-p (concat "Do you want to power off " work-remote-machine))
+    (message (concat "Sending poweroff to " work-remote-machine))
+    (shell-command (format "ssh mal1@%s sudo poweroff" work-remote-machine)))
+  t)
+
+(when work-linux-remote
+  (add-hook 'kill-emacs-query-functions 'ma-power-off-remote))
+
 (defun ma-instrument-func ()
   "Adds a Logger statement to the current function displaying its name upon entry and exit"
   (interactive)
@@ -259,7 +270,10 @@
   "Scans the current buffer for a copyright string.
 If one exists, it is updated to the correct formatting, if necessary.  If
 not, a copyright comment is inserted at the start of the file."
-  (when (and (string= major-mode "c++-mode") (not ma-skip-copyright))
+  ;; When sending a mail using org-msg-mode, the temporary buffer seems to have an arbitrary major mode, which may also be
+  ;; c++-mode. Therefore this is explicitly excluded to avoid copyright messages showing up in mails
+  (when (and (string= major-mode "c++-mode") (not ma-skip-copyright) (not (string-match "^org.*\.html" (buffer-name))))
+    (message (format "Buffer name is %s" (buffer-name)))
     (save-excursion
       (goto-char (point-min))
       (let ((pos (re-search-forward "Copyright " 1000 t)))
@@ -410,7 +424,7 @@ not, a copyright comment is inserted at the start of the file."
 
 (defun ma--current-dev-dir()
   "Return the directory belonging to the current directory for the dev issue stored in ma-current-dev"
-  (concat ma-devs-basedir ma-current-dev))
+  (concat ma-devs-basedir (number-to-string ma-current-dev)))
 
 (defun ma-dired-current-dev()
   "Open dired in the directory for the current dev issue."
@@ -420,8 +434,9 @@ not, a copyright comment is inserted at the start of the file."
   (let ((dir (ma--current-dev-dir)))
     (unless (file-exists-p dir)
       (progn
-        (message (concat "Downloading data for SPCK-" ma-current-dev))
-        (shell-command (concat "ssh MAL1@dell1254cem /home/home_dev/MAL1/perl/download_jira_attachments.pl " ma-current-dev) (generate-new-buffer (concat "*Download " ma-current-dev "*")))))
+        (message (concat "Downloading data for SPCK-" (number-to-string ma-current-dev)))
+        (shell-command (concat "ssh MAL1@dell1254cem /home/home_dev/MAL1/perl/download_jira_attachments.pl " (number-to-string ma-current-dev))
+                       (generate-new-buffer (concat "*Download " ma-current-dev "*")))))
     (dired (file-truename (ma--current-dev-dir)))))
 (global-set-key (kbd "C-c m d") 'ma-dired-current-dev)
 
