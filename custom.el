@@ -224,8 +224,6 @@
  '(magit-refs-primary-column-width '(16 . 60))
  '(magit-refs-sections-hook
    '(magit-insert-error-header magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches))
- '(magit-repo-dirs
-   '("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation"))
  '(magit-repository-directories '(("/scratch/apel" . 1) ("~/.emacs.d" . 2)))
  '(magit-restore-window-configuration t)
  '(magit-rewrite-inclusive nil)
@@ -235,8 +233,6 @@
  '(mo-git-blame-blame-window-width 30)
  '(mouse-yank-at-point t)
  '(nxml-child-indent 3)
- '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
- '(package-selected-packages '(csv-mode nil))
  '(perl-indent-level 3)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
@@ -770,8 +766,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#000000" :foreground "#ffffff" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "UKWN" :family "Nimbus Roman"))))
  '(aw-leading-char-face ((t (:background "deep sky blue" :foreground "white" :height 3.0))))
  '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
  '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
+ '(org-default ((t (:inherit variable-pitch))))
  '(stash-section-title ((t (:background "blue" :slant italic :height 1.5)))))
