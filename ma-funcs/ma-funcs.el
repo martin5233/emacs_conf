@@ -220,7 +220,7 @@
     )
 )
 (add-hook 'kill-emacs-query-functions
-          'ma-show-agenda-if-hidden)
+          'ma-show-agenda-if-hidden -50)
 
 (if work
     (progn
@@ -328,6 +328,7 @@ not, a copyright comment is inserted at the start of the file."
 (defconst ma-src-trees
   '(("master" . "/scratch/apel/new_arch/")
     ("2023" . (concat work-remote-url "/scratch/apel/new_arch_2023.Y/"))
+    ("2023x" . (concat work-remote-url "/scratch/apel/new_arch_2023x.Y/"))
     ("Windows" . "/mnt/e/users/apel/new_arch/")))
 
 
@@ -419,7 +420,10 @@ not, a copyright comment is inserted at the start of the file."
   (let* ((issue-key (ma-select-jira-issue all-cached-issues)))
     (unless (string-match "^SPCK-\\([0-9]+\\)$" issue-key)
       (error "Unexpected SPCK issue number format"))
-    (setq ma-current-dev (string-to-number (match-string 1 issue-key)))))
+    (setq ma-current-dev (string-to-number (match-string 1 issue-key)))
+    (delete-file (concat ma-devs-basedir "current"))
+    (when (file-exists-p (concat ma-devs-basedir (number-to-string ma-current-dev)))
+      (make-symbolic-link (number-to-string ma-current-dev) (concat ma-devs-basedir "current")))))
 (global-set-key (kbd "C-c m s") 'ma-set-current-dev)
 
 (defun ma--current-dev-dir()

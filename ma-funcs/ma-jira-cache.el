@@ -17,6 +17,8 @@
 
 (defun ma-jira-cache-keys()
   "Returns a list of all Jira issue keys stored in the cache."
+  (unless ma-jira-key-to-summary-alist
+    (ma-jira-cache--fill-cache))
   (mapcar 'car ma-jira-key-to-summary-alist))
 
 (defun ma-jira-cache-summary-for-key (key)

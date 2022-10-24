@@ -61,7 +61,7 @@
 ;; Local variables belonging to this mode
 (defvar stash-mode-line-string "" "This variable contains the status of open pull requests from Stash")
 (defvar stash-last-repo-update nil "This variable contains the last time the repository list has been updated")
-(defvar stash-repo-list nil "List of Stash projects and repositories")
+(defconst stash-repo-list '(("SPCK" "spckxxxx" "spcktest" "devscripts" "dockerservicesjirabb" "dockerservicessimdev" "hooks" "htcondor" "documentation" "windloadcasetool")) "List of repositories to watch for pull requests")
 (defvar stash-access-headers nil "Headers needed to access Stash")
 (defvar stash-open-pr-count 0 "Number of open pull-requests to review")
 (defvar stash-own-pr-count 0 "Number of own pull-requests to review")
@@ -160,24 +160,6 @@ for all open pull requests")
     )
   )
 
-(defun stash-update-repositories (project)
-  "Returns the list of repositories for the given project"
-  (request (concat stash-url (format "/rest/api/1.0/projects/%s/repos?limit=100" project))
-           :headers stash-access-headers
-           :parser 'json-read
-           :sync t
-           :success (function*
-                     (lambda (&key data &allow-other-keys)
-                       (let ((values (assoc-default 'values data))
-                             (result nil))
-                         (progn
-                           (dotimes (i (length values))
-                             (push (assoc-default 'slug (aref values i)) result))
-                           (add-to-list 'stash-repo-list (cons project result)))
-                         )))
-           )
-  )
-
 (defun stash-decompose-stash-info (data)
   "Decompose information delivered by Stash and put the result info stash-mode-line-string"
   (let ((values (assoc-default 'values data)))
@@ -220,7 +202,6 @@ for all open pull requests")
 (defun stash-update-stash-info ()
   "Provide information about the current state of Stash pull requests"
   (stash-init-headers)
-  (stash-update-projects-if-necessary)
   (setq stash-open-pr-count 0)
   (setq stash-own-pr-count 0)
   (setq stash-num-repos-to-update 0)
@@ -569,7 +550,7 @@ Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a
          (key (org-jira-get-issue-key issue))
          (branch-name (read-string "Branch name: " (concat key "-MAL1-" summary-adjusted)))
          (repo (completing-read "Repository: " '("spckxxxx" "spcktest") nil nil "spckxxxx"))
-         (branch-base (completing-read "Branch to fork from: " '("master" "SIMPACK_2023.Y" "SIMPACK_2022x.Y") nil nil "master"))
+         (branch-base (completing-read "Branch to fork from: " '("master" "release/SIMPACK_2023.Y" "release/SIMPACK_2023x.Y") nil nil "master"))
          (url (concat stash-url (format "/rest/api/1.0/projects/SPCK/repos/%s/branches" repo)))
          (body `(("name"       . ,branch-name)
                  ("startPoint" . ,branch-base)))
@@ -584,8 +565,8 @@ Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a
                 (lambda (&key data &allow-other-keys)
                   (message "Creating branch succeeded")))
       :error (function*
-                (lambda (&key data &allow-other-keys)
-                  (message "Creating branch failed"))))))
+              (lambda (&key data &allow-other-keys)
+                (message "Creating branch failed"))))))
 (global-set-key (kbd "C-c m c") 'stash-create-branch)
 
 (define-derived-mode stash-mode special-mode "Stash"
