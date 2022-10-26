@@ -1028,6 +1028,10 @@ Since init.el will be generated from this file, we save customization in a dedic
   (add-hook 'after-save-hook
             'executable-make-buffer-file-executable-if-script-p)
 #+end_src
+** REST API
+#+begin_src emacs-lisp
+(use-package restclient)
+#+end_src
 * Other specialized modes
 ** Generic
 #+begin_src emacs-lisp
