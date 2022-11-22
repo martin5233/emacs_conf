@@ -231,7 +231,8 @@
   (interactive)
   (when (y-or-n-p (concat "Do you want to power off " work-remote-machine))
     (message (concat "Sending poweroff to " work-remote-machine))
-    (shell-command (format "ssh mal1@%s sudo poweroff" work-remote-machine)))
+    (let ((default-directory user-emacs-directory))
+      (shell-command (format "ssh mal1@%s sudo poweroff" work-remote-machine))))
   t)
 
 (when work-linux-remote
@@ -326,15 +327,15 @@ not, a copyright comment is inserted at the start of the file."
 (add-hook 'grep-setup-hook 'ma-grep-setup-erase-date)
 
 (defconst ma-src-trees
-  '(("master" . "/scratch/apel/new_arch/")
-    ("2023" . (concat work-remote-url "/scratch/apel/new_arch_2023.Y/"))
-    ("2023x" . (concat work-remote-url "/scratch/apel/new_arch_2023x.Y/"))
+  `(("master" . "/scratch/apel/new_arch/")
+    ("2023" . ,(concat work-remote-url "/scratch/apel/new_arch_2023.Y/"))
+    ("2023x" . ,(concat work-remote-url "/scratch/apel/new_arch_2023x.Y/"))
     ("Windows" . "/mnt/e/users/apel/new_arch/")))
 
 
 (defun ma-choose-file-in-other-tree()
   "Takes the file displayed in the current buffer and choose the same file in another tree.
-   This uses trees defined via ma-src-trees and offers each one of them to the user.
+This uses trees defined via ma-src-trees and offers each one of them to the user.
    Returns the filename in the other tree."
   (let* ((cur-file (buffer-file-name))
          (entry (cl-find-if (lambda(item)
@@ -517,8 +518,22 @@ not, a copyright comment is inserted at the start of the file."
   (ma-unison-obj)
   (ma-unison-src))
 
-
 (when work-linux-remote
   (ma-unison-start-all))
+
+(defun ma-ssh-connect-with-tmux-support()
+  (interactive)
+  (let* ((host-filename ".hostfile")
+         (hosts (with-temp-buffer
+                  (insert-file-contents (if work-linux-remote (concat work-remote-url host-filename) host-filename))
+                  (split-string (buffer-string))))
+         (target (completing-read "Choose target machine: " hosts))
+         (user   (completing-read "as user: " '("mal1" "simbuild" "root" "rndpriv")))
+         (window-title (if (string-equal user "mal1") target (concat user "@" target)))
+         (inner-ssh-command (format "ssh %s -l %s" target user))
+         (tmux-command (format "tmux new-window -n %s '%s'" window-title inner-ssh-command))
+         (outer-ssh-command (format "ssh mal1@%s %s" work-remote-machine tmux-command))
+         (command (if work-linux-remote (split-string outer-ssh-command) (split-string tmux-command))))
+        (apply #'start-process "ssh-tmux" nil (car command) (cdr command))))
 
 (provide 'ma-funcs)

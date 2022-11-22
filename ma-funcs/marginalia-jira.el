@@ -3,9 +3,10 @@
 (require 'ma-jira-cache)
 
 (defun ma-marginalia-jira--annotator (cand)
-  (let ((summary (ma-jira-cache-summary-for-key cand)))
+  (let ((summary (ma-jira-cache-summary-for-key cand))
+        (fix-version (ma-jira-cache-fix-version-for-key cand)))
     (if summary
-        (marginalia--fields (summary :truncate 1.0 :face 'marginalia-value))
+        (marginalia--fields (summary :truncate 1.0 :face 'marginalia-value) (fix-version :truncate 1.0 :face 'marginalia-value))
       (marginalia--fields ("Unknown" :truncate 1.0 :face 'marginalia-value)))))
 
 (eval-after-load 'marginalia

@@ -222,17 +222,18 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 ** Remote work
 #+begin_src emacs-lisp
-(if work-linux-remote
-    (progn
-      (setq work-remote-machine "dell1254cem")
-      (setq work-remote-url "/ssh:MAL1@dell1254cem:")
-      (setq enable-remote-dir-locals nil)
-  ;; Avoid version-control checks for tramp buffers
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
-  (setq work-remote-url ""))
+  (if work-linux-remote
+      (progn
+        (setq work-remote-machine "dell1254cem")
+        (setq work-remote-url "/ssh:MAL1@dell1254cem:")
+        (setq enable-remote-dir-locals nil)
+        (setq remote-file-name-inhibit-locks t)
+        ;; Avoid version-control checks for tramp buffers
+        (setq vc-ignore-dir-regexp
+              (format "\\(%s\\)\\|\\(%s\\)"
+                      vc-ignore-dir-regexp
+                      tramp-file-name-regexp)))
+    (setq work-remote-url ""))
 #+end_src
 ** Password cache
 #+begin_src emacs-lisp
@@ -439,6 +440,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Miscellaneous
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
+  (setq frame-inhibit-implied-resize t)
 #+end_src
 * Documentation
 ** Devdocs
@@ -462,7 +464,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'dockerfile-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("docker~19"))))
+                (setq devdocs-current-docs '("docker"))))
     (add-hook 'js-mode-hook
               (lambda()
                 (setq devdocs-current-docs '("node" "javascript"))))
@@ -514,7 +516,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                                        (company-dabbrev-code company-keywords)
                                        company-dabbrev))
      (company-idle-delay 2.0)
-     :bind ("<f3>" . company-complete))
+     :bind ("C-M-S-s-c" . company-complete))
 #+end_src
 ** Company Box Mode
 #+begin_src emacs-lisp
@@ -654,7 +656,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                             "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
                             "MailDeutsch")
                            ("eng"
-                            "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nThanks,\n\nMartin\n#+end_signature\n"
+                            "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nBest Regards,\n\nMartin\n#+end_signature\n"
                             "MailEnglisch"))))
 
   (defun ma-make-display-buffer-matcher-function-org-msg()
@@ -800,7 +802,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (org-agenda-skip-deadline-prewarning-if-scheduled t)
     (org-agenda-skip-scheduled-if-deadline-is-shown t)
     (org-agenda-start-on-weekday nil)
-    (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t))))
+    (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t) (shell . t))))
     (org-export-backends (quote (ascii html icalendar latex md pandoc)))
     (org-capture-templates
      (quote
@@ -987,10 +989,15 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Javascript
 #+begin_src emacs-lisp
   (use-package js2-mode
-  :mode ("\\.js$" "\\.sjs$")
+  :mode ("\\.js$" "\\.sjs$" "\\.qs$")
   :custom
   (js2-include-node-externs t)
-  (js2-mode-assume-strict t))
+  (js2-mode-assume-strict t)
+  (js2-include-browser-externs nil))
+#+end_src
+** Jenkinsfile
+#+begin_src emacs-lisp
+  (use-package jenkinsfile-mode)
 #+end_src
 ** Elisp
 *** Auto-compile
@@ -1114,6 +1121,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/ma-funcs")
   (require 'ma-funcs)
+  (require 'ma-js-lsp-support)
 #+end_src
 ** Bitbucket interface
 #+begin_src emacs-lisp
@@ -1146,7 +1154,8 @@ Since init.el will be generated from this file, we save customization in a dedic
     :if work
     :bind (:map vterm-mode-map
     ("C-g" . vterm--self-insert)
-    ("<f4>" . ma-switch-to-mu4e))
+    ("<f4>" . ma-switch-to-mu4e)
+    ("<f3>" . ma-ssh-connect-with-tmux-support))
     :config
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"

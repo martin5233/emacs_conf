@@ -267,6 +267,7 @@ is returned.  If the reviewer is not found, the original string is returned."
          (reviewer-list (assoc-default 'reviewers pr))
          (reviewers-accepted nil)
          (reviewers-waiting nil)
+         (target-branch (string-replace "release/SIMPACK_" "" (assoc-default 'displayId (assoc-default 'toRef pr))))
          (line "")
          )
     (dotimes (i (length reviewer-list))
@@ -278,8 +279,9 @@ is returned.  If the reviewer is not found, the original string is returned."
         (if approved
             (push text reviewers-accepted)
           (push text reviewers-waiting))))
-    (setq line (format "%-13s #%-5d %-8s %-75s  Waiting: %-20s  Accepted: %-s"
+    (setq line (format "%-13s #%-5d %-8s %-75s  Target: %-10s Waiting: %-20s  Accepted: %-s"
                        repo id author shortened-title
+                       target-branch
                        (mapconcat 'identity (sort reviewers-waiting 'string<) ",")
                        (mapconcat 'identity (sort reviewers-accepted 'string<) ",")))
     (if (and (not short) descr)
@@ -546,10 +548,11 @@ Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a
   (let* ((issue-id (concat "SPCK-" (if ask-for-issue-id (read-string "Please input issue id (without SPCK- prefix):" (number-to-string ma-current-dev)) (number-to-string ma-current-dev))))
          (issue (car (org-jira-get-issue-by-id issue-id)))
          (summary (org-jira-get-issue-summary issue))
-         (summary-adjusted (downcase (replace-regexp-in-string "[^a-zA-Z0-9]" "-" summary)))
+         (summary-adjusted (downcase (replace-regexp-in-string "[^a-zA-Z0-9]+" "-" summary)))
          (key (org-jira-get-issue-key issue))
          (branch-name (read-string "Branch name: " (concat key "-MAL1-" summary-adjusted)))
          (repo (completing-read "Repository: " '("spckxxxx" "spcktest") nil nil "spckxxxx"))
+         (local-copy (assoc-default repo stash-repos))
          (branch-base (completing-read "Branch to fork from: " '("master" "release/SIMPACK_2023.Y" "release/SIMPACK_2023x.Y") nil nil "master"))
          (url (concat stash-url (format "/rest/api/1.0/projects/SPCK/repos/%s/branches" repo)))
          (body `(("name"       . ,branch-name)
@@ -563,7 +566,11 @@ Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a
       :data body-encoded
       :success (function*
                 (lambda (&key data &allow-other-keys)
-                  (message "Creating branch succeeded")))
+                  (message "Creating branch succeeded")
+                  (let ((default-directory local-copy))
+                   (magit-fetch-branch "origin" branch-name nil)
+                   (magit-checkout branch-name)
+                  )))
       :error (function*
               (lambda (&key data &allow-other-keys)
                 (message "Creating branch failed"))))))
