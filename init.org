@@ -233,7 +233,8 @@ Since init.el will be generated from this file, we save customization in a dedic
               (format "\\(%s\\)\\|\\(%s\\)"
                       vc-ignore-dir-regexp
                       tramp-file-name-regexp)))
-    (setq work-remote-url ""))
+    (setq work-remote-url "")
+    (setq work-remote-machine nil))
 #+end_src
 ** Password cache
 #+begin_src emacs-lisp
