@@ -268,13 +268,11 @@
      ("WTG1" . "WT")
      ("HKP1" . "PK")
      ("MAL1" . "MA")
-     ("MFH1" . "MF")
      ("MDE7" . "MD")
-     ("FMK1" . "FM")
      ("MDL2" . "DM")))
  '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
  '(svn-log-edit-show-diff-for-commit t)
- '(tab-bar-mode t)
+ '(tab-bar-mode nil)
  '(tab-width 3)
  '(tex-close-quote "\"")
  '(tex-command nil t)
@@ -285,6 +283,7 @@
  '(tramp-default-method "scp")
  '(tramp-default-proxies-alist nil)
  '(tramp-smb-conf nil)
+ '(tramp-use-ssh-controlmaster-options nil)
  '(truncate-lines t)
  '(unicode-fonts-block-font-mapping
    '(("Aegean Numbers"

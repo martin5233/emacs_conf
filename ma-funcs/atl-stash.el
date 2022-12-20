@@ -133,69 +133,27 @@ for all open pull requests")
             (funcall save-func))
           (setq stash-access-headers (list '("Content-Type" . "application/json") (cons "Authorization" auth))))))))
 
-(defun stash-update-projects-if-necessary ()
-  "Update the list of projects and repositories for stash"
-  (if (or stash-force-update (not (and (floatp stash-last-repo-update) (< (- (float-time) stash-last-repo-update) 10000))))
-      (progn
-        (message "Updating Stash project and repository list")
-        (setq stash-repo-list nil)
-        (request (concat stash-url "/rest/api/1.0/projects")
-                 :headers stash-access-headers
-                 :parser 'json-read
-                 :sync t
-                 :success (function*
-                           (lambda (&key data &allow-other-keys)
-                             (let* ((values (assoc-default 'values data)))
-                               (dotimes (i (length values))
-                                 (stash-update-repositories (assoc-default 'key (aref values i)))
-                                 )
-                               )
-                             ))
-                 :error (function*
-                         (lambda (&key error-thrown &allow-other-keys)
-                           (message (concat "Error is " (cdr error-thrown)))))
-                 )
-        (setq stash-last-repo-update (float-time))
-        )
-    )
-  )
-
 (defun stash-decompose-stash-info (data)
-  "Decompose information delivered by Stash and put the result info stash-mode-line-string"
+  "Decompose information delivered by Stash and put the result into stash-mode-line-string"
   (let ((values (assoc-default 'values data)))
     (progn
       (dotimes (i (length values))
-        (let* ((value (aref values i))
-               (author (assoc-default 'name (assoc-default 'user (assoc-default 'author value))))
-               (reviewers (assoc-default 'reviewers value))
-               (saw-myself-in-reviewers nil))
-          (progn
-            (if (string-equal author (stash-effective-user-name))
-                (setq stash-own-pr-count (1+ stash-own-pr-count)))
-            (dotimes (j (length reviewers))
-              (let* ((reviewer (aref reviewers j))
-                     (name (assoc-default 'name (assoc-default 'user reviewer)))
-                     (approved (assoc-default 'approved reviewer)))
-                (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false))
-                    (setq saw-myself-in-reviewers t))
-                ))
-            (if saw-myself-in-reviewers
-                (setq stash-open-pr-count (1+ stash-open-pr-count)))
-            )
-          )
+        (let* ((pr (aref values i)))
+          (if (stash-am-i-author pr)
+            (setq stash-own-pr-count (1+ stash-own-pr-count))
+            (when (stash-am-i-reviewer pr)
+              (setq stash-open-pr-count (1+ stash-open-pr-count))))))))
+
+  (setq stash-num-repos-to-update (1- stash-num-repos-to-update))
+  (if (= stash-num-repos-to-update 0)
+      (progn
+        (setq stash-mode-line-string (format "%d/%d" stash-own-pr-count stash-open-pr-count))
+        (force-mode-line-update)
+        (if stash-show-pending
+            (progn
+              (setq stash-show-pending nil)
+              (stash-show-pull-requests-internal)))
         )
-      (setq stash-num-repos-to-update (1- stash-num-repos-to-update))
-      (if (= stash-num-repos-to-update 0)
-          (progn
-            (setq stash-mode-line-string (format "%d/%d" stash-own-pr-count stash-open-pr-count))
-            (force-mode-line-update)
-            (if stash-show-pending
-                (progn
-                  (setq stash-show-pending nil)
-                  (stash-show-pull-requests-internal)))
-            )
-        )
-      )
     )
   )
 
@@ -290,13 +248,17 @@ is returned.  If the reviewer is not found, the original string is returned."
 
 (defun stash-am-i-reviewer (pr)
   "Returns true, if the current user is listed as a reviewer in the given pull request and he has not approved yet."
+  (when (> (assoc-default 'openTaskCount (assoc-default 'properties pr)) 0)
+    nil)
+
   (let ((reviewers (assoc-default 'reviewers pr))
         (saw-myself-in-reviewers nil))
     (dotimes (i (length reviewers))
       (let* ((reviewer (aref reviewers i))
              (name (assoc-default 'name (assoc-default 'user reviewer)))
-             (approved (assoc-default 'approved reviewer)))
-        (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false))
+             (approved (assoc-default 'approved reviewer))
+             (needs-work (string-equal (assoc-default 'status reviewer) "NEEDS_WORK")))
+        (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false) (not needs-work))
             (setq saw-myself-in-reviewers t))
         ))
     saw-myself-in-reviewers))

@@ -332,12 +332,11 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (defun ma-deadgrep-root-function()
     "Determine root directory for current buffer."
-    (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa")
-        "/scratch/apel/new_arch/develop/src/ooa"
-      (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
-          "/scratch/apel/new_arch/develop/src"
-        (deadgrep--project-root))))
-
+      (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa"))
+          "/scratch/apel/new_arch/develop/src/ooa"
+        (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src"))
+            "/scratch/apel/new_arch/develop/src"
+          (deadgrep--project-root))))
   (use-package deadgrep
     :bind ("C-c C-r" . deadgrep)
     :custom (deadgrep-max-buffers  1)
@@ -406,6 +405,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 
 ** Fonts
+#+begin_src emacs-lisp
   (use-package unicode-fonts
     :config (unicode-fonts-setup))
 
@@ -413,7 +413,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 
   (set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 80)
   (set-face-attribute 'fixed-pitch nil :font "DejaVu Sans Mono")
-  (set-face-attribute 'variable-pitch nil :font "Nimbus Roman" :height 120)
+  (set-face-attribute 'variable-pitch nil :font "Nimbus Roman" :height 100)
 #+end_src
 
 ** Long lines
@@ -461,14 +461,14 @@ Since init.el will be generated from this file, we save customization in a dedic
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'cmake-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("cmake~3.17"))
+                (setq devdocs-current-docs '("cmake~3.23"))
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'dockerfile-mode-hook
               (lambda()
                 (setq devdocs-current-docs '("docker"))))
     (add-hook 'js-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("node" "javascript"))))
+                (setq devdocs-current-docs '("node~16_lts" "javascript"))))
     (add-hook 'python-mode-hook
               (lambda()
                 (setq devdocs-current-docs '("python~3.10"))))
@@ -552,86 +552,86 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Mail
 *** Mu4e
 #+begin_src emacs-lisp
-    (when work-linux-remote
-      (defun ma-switch-to-mu4e ()
-        "Switch to unread mail in mu4e"
-        (interactive)
-        (unless (mu4e-running-p)
-          (mu4e t))
-        (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
-        (mu4e-headers-change-sorting :date 'ascending))
+  (when work-linux-remote
+    (defun ma-switch-to-mu4e ()
+      "Switch to unread mail in mu4e"
+      (interactive)
+      (unless (mu4e-running-p)
+        (mu4e t))
+      (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
+      (mu4e-headers-change-sorting :date 'ascending))
 
-      (defun ma-view-previous-next-advice(orig &rest args)
-        (let ((switch-to-buffer-obey-display-actions nil))
-          (apply orig args)))
+    (defun ma-view-previous-next-advice(orig &rest args)
+      (let ((switch-to-buffer-obey-display-actions nil))
+        (apply orig args)))
 
-      (use-package mu4e
-        :straight (:branch "release/1.8")
-        :load-path "straight/repos/mu/build/mu4e"
-        :commands mu4e-running-p mu4e
-        :custom
-        (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
-        (mu4e-bookmarks
-         (quote
-          (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
-           ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
-           ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
-           ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
-        (mu4e-headers-fields
-         '( (:human-date . 12)
-            (:flags . 6)
-            (:from-or-to . 30)
-            (:subject)))
-        (mu4e-compose-signature-auto-include nil)
-        (mu4e-compose-dont-reply-to-self t)
-        (mu4e-compose-complete-only-after "2020-01-01")
-        (mu4e-drafts-folder "/Drafts")
-        (mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
-        (mu4e-completing-read-function 'completing-read)
-        (mu4e-headers-include-related nil)
-        (mu4e-index-update-error-warning nil)
-        (mu4e-hide-index-messages t)
-        (mu4e-sent-folder "/Sent")
-        (mu4e-trash-folder "/Trash")
-        (mu4e-update-interval 120)
-        (mu4e-use-fancy-chars t)
-        (mu4e-attachment-dir "/tmp")
-        (mu4e-change-filenames-when-moving t)
-        (mu4e-headers-visible-lines 20)
+    (use-package mu4e
+      :straight (:branch "release/1.8")
+      :load-path "straight/repos/mu/build/mu4e"
+      :commands mu4e-running-p mu4e
+      :custom
+      (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
+      (mu4e-bookmarks
+       (quote
+        (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
+         ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+         ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
+         ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
+      (mu4e-headers-fields
+       '( (:human-date . 12)
+          (:flags . 6)
+          (:from-or-to . 30)
+          (:subject)))
+      (mu4e-compose-signature-auto-include nil)
+      (mu4e-compose-dont-reply-to-self t)
+      (mu4e-compose-complete-only-after "2020-01-01")
+      (mu4e-drafts-folder "/Drafts")
+      (mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
+      (mu4e-completing-read-function 'completing-read)
+      (mu4e-headers-include-related nil)
+      (mu4e-index-update-error-warning nil)
+      (mu4e-hide-index-messages t)
+      (mu4e-sent-folder "/Sent")
+      (mu4e-trash-folder "/Trash")
+      (mu4e-update-interval 120)
+      (mu4e-use-fancy-chars t)
+      (mu4e-attachment-dir "/tmp")
+      (mu4e-change-filenames-when-moving t)
+      (mu4e-headers-visible-lines 20)
+      (mu4e-org-link-query-in-headers-mode t)
+      (message-send-mail-function (quote smtpmail-send-it))
 
-        (message-send-mail-function (quote smtpmail-send-it))
+      (smtpmail-debug-info nil)
+      (smtpmail-local-domain "3ds.com")
+      (smtpmail-smtp-server "smtps.emea.3ds.com")
+      (smtpmail-smtp-service 587)
+      (smtpmail-stream-type (quote starttls))
 
-        (smtpmail-debug-info nil)
-        (smtpmail-local-domain "3ds.com")
-        (smtpmail-smtp-server "smtps.emea.3ds.com")
-        (smtpmail-smtp-service 587)
-        (smtpmail-stream-type (quote starttls))
+      (mail-user-agent 'mu4e-user-agent)
+      (shr-color-visible-luminance-min 80)
+      :config
+      (set-variable 'read-mail-command 'mu4e)
+      (advice-add 'mu4e-view-headers-next :around #'ma-view-previous-next-advice)
+      (advice-add 'mu4e-view-headers-prev :around #'ma-view-previous-next-advice)
+      (advice-add 'mu4e-headers-mark-and-next :around #'ma-view-previous-next-advice)
 
-        (mail-user-agent 'mu4e-user-agent)
-        (shr-color-visible-luminance-min 80)
-        :config
-        (set-variable 'read-mail-command 'mu4e)
-        (advice-add 'mu4e-view-headers-next :around #'ma-view-previous-next-advice)
-        (advice-add 'mu4e-view-headers-prev :around #'ma-view-previous-next-advice)
-        (advice-add 'mu4e-headers-mark-and-next :around #'ma-view-previous-next-advice)
+      (add-to-list 'display-buffer-alist
+                   `("^\\*mu4e-headers\\*$"
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "Mail")
+                     (window-min-height . 0.25)))
 
-        (add-to-list 'display-buffer-alist
-                     `("^\\*mu4e-headers\\*$"
-                       (display-buffer-in-tab display-buffer-reuse-window)
-                       (tab-name . "Mail")
-                       (window-min-height . 0.25)))
+      (add-to-list 'display-buffer-alist
+                   `("^\\*mu4e"
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "Mail")))
 
-        (add-to-list 'display-buffer-alist
-                     `("^\\*mu4e"
-                       (display-buffer-in-tab display-buffer-reuse-window)
-                       (tab-name . "Mail")))
+      (add-to-list 'display-buffer-alist
+                   `("^\\*Article\\*"
+                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (tab-name . "Mail")))
 
-        (add-to-list 'display-buffer-alist
-                     `("^\\*Article\\*"
-                       (display-buffer-in-tab display-buffer-reuse-window)
-                       (tab-name . "Mail")))
-
-        :bind ("<f4>" . ma-switch-to-mu4e)))
+      :bind ("<f4>" . ma-switch-to-mu4e)))
 #+end_src
 *** Mu4e Alert
 #+begin_src emacs-lisp
@@ -804,7 +804,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (org-agenda-skip-scheduled-if-deadline-is-shown t)
     (org-agenda-start-on-weekday nil)
     (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t) (shell . t))))
-    (org-export-backends (quote (ascii html icalendar latex md pandoc)))
+    (org-export-backends (quote (ascii html icalendar latex md pandoc jira)))
     (org-capture-templates
      (quote
       (
@@ -835,7 +835,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     :custom
     (jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443")
     (org-jira-working-dir "~/org/jira")
-;;                            other         dev 2023               dev 2023x    in progress       testing             ready
+    ;;                            other         dev 2023               dev 2023x    in progress       testing             ready
     (org-jira-default-jql "filter = 33100 OR filter = 62300 OR filter = 33400 OR filter = 10903 OR filter = 14101 ORDER BY status asc")
     (org-jira-use-status-as-todo t)
     :config
@@ -843,6 +843,8 @@ Since init.el will be generated from this file, we save customization in a dedic
               (lambda()
                 (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
                     (org-jira-mode 1)))))
+
+  (use-package ox-jira)
 #+end_src
 *** Org Bullets
 #+begin_src emacs-lisp
