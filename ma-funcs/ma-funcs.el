@@ -489,7 +489,7 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
   "Select a jira issue using completion."
   (let* ((issues (if all-cached-issues
                      (ma-jira-cache-keys)
-                   (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND status = \"In Progress\" AND assignee in (currentUser())")))
+                   (jiralib-do-jql-search "project = SPCK AND issuetype = Development AND (status = \"In Progress\" OR status = \"Assigned\") AND assignee in (currentUser())")))
          (keys (cl-mapcar 'org-jira-get-issue-key issues)))
     (completing-read "Select JIRA issue: " keys)))
 
@@ -503,23 +503,28 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
   "Start Unison for the home directory as an asynchronous command. Outputs go to a buffer named '*Unison Home*'."
   (ma-start-unison "home" "*Unison Home*" 0))
 
-(defun ma-unison-src()
+(defun ma-unison-src(start-now)
   "Start Unison for the src directory as an asynchronous command. Outputs go to a buffer named '*Unison Src*'."
-  (ma-start-unison "src" "*Unison Src*" 120))
+  (ma-start-unison "src" "*Unison Src*" (if start-now 0 120)))
 
-(defun ma-unison-obj()
+(defun ma-unison-obj(start-now)
   "Start Unison for the obj directory as an asynchronous command. Outputs go to a buffer named '*Unison Obj*'."
-  (ma-start-unison "obj" "*Unison Obj*" 60))
+  (ma-start-unison "obj" "*Unison Obj*" (if start-now 0 60)))
 
-(defun ma-unison-start-all()
-  "Start all unison syncs."
+(defun ma-unison-win()
+  "Start Unison for the src directory as an asynchronous command. Outputs go to a buffer named '*Unison Win*'."
   (interactive)
+  (ma-start-unison "win" "*Unison Win*" 0))
+
+(defun ma-unison-start-all(start-now)
+  "Start all unison syncs."
+  (interactive "P")
   (ma-unison-home)
-  (ma-unison-obj)
-  (ma-unison-src))
+  (ma-unison-obj start-now)
+  (ma-unison-src start-now))
 
 (when work-linux-remote
-  (ma-unison-start-all))
+  (ma-unison-start-all nil))
 
 (defun ma-ssh-connect-with-tmux-support()
   (interactive)
@@ -540,5 +545,10 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
              (tmux-command (format "tmux new-window -n %s %s" window-title ssh-command))
              (command (split-string tmux-command)))
         (apply #'start-process "ssh-tmux" nil (car command) (cdr command))))))
+
+(defun ma-query-trigram(trigram)
+  "Print name of user belonging to the given trigram."
+  (interactive "MTrigram: ")
+  (message "User is %s" (cadr (assoc "displayName" (car (ldap-search (format "(&(Uid=%s))" trigram)))))))
 
 (provide 'ma-funcs)

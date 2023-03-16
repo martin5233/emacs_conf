@@ -424,20 +424,6 @@ Since init.el will be generated from this file, we save customization in a dedic
       (whitespace-style '(face lines-tail))
       :hook (prog-mode . whitespace-mode))
 #+end_src
-** Tab Bar
-#+begin_src emacs-lisp
-  (defun ma-tab-name-format (tab tab-num)
-    (let* ((current-p (eq (car tab) 'current-tab))
-           (name (alist-get 'name tab))
-           (prefix (cond ((string-equal name "Mail")     (all-the-icons-octicon "mail" :height 1.2 :v-adjust 0.05))
-                         ((string-equal name ".emacs.d") (all-the-icons-icon-for-mode  'emacs-lisp-mode) )
-                         ((string-equal name "Elisp")    (all-the-icons-icon-for-mode  'emacs-lisp-mode) )
-                         ((string-equal name "new_arch") (all-the-icons-icon-for-mode  'c++-mode)        )
-                         ((string-equal name "VTerm")    (all-the-icons-icon-for-mode  'vterm-mode :height 1.2 :v-adjust -0.1))
-                         (t ""))))
-           (concat prefix (propertize name 'face (funcall tab-bar-tab-face-function tab)))))
-  (setq tab-bar-tab-name-format-function 'ma-tab-name-format)
-#+end_src
 ** Miscellaneous
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -457,24 +443,24 @@ Since init.el will be generated from this file, we save customization in a dedic
     :init
     (add-hook 'c-mode-common-hook
               (lambda()
-                (setq devdocs-current-docs '("cpp" "qt~5.12"))
+                (setq-local devdocs-current-docs '("cpp" "qt~5.12"))
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'cmake-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("cmake~3.23"))
+                (setq-local devdocs-current-docs '("cmake~3.23"))
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'dockerfile-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("docker"))))
+                (setq-local devdocs-current-docs '("docker"))))
     (add-hook 'js-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("node~16_lts" "javascript"))))
+                (setq-local devdocs-current-docs '("node~16_lts" "javascript"))))
     (add-hook 'python-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("python~3.10"))))
+                (setq-local devdocs-current-docs '("python~3.10"))))
     (add-hook 'perl-mode-hook
               (lambda()
-                (setq devdocs-current-docs '("perl~5.34")))))
+                (setq-local devdocs-current-docs '("perl~5.34")))))
 #+end_src
 
 ** Info
@@ -512,7 +498,7 @@ Since init.el will be generated from this file, we save customization in a dedic
    :custom
      (company-dabbrev-downcase nil)
      (company-transformers '(ma-cmake-upcase-completion-list company-sort-by-occurrence))
-     (company-cmake-executable "/scratch/apel/new_arch/develop/extern/linux64/cmake-3.21/bin/cmake")
+     (company-cmake-executable "/scratch/apel/new_arch/develop/extern/linux64/cmake-3.23/bin/cmake")
      (company-backends '(company-cmake company-capf company-files
                                        (company-dabbrev-code company-keywords)
                                        company-dabbrev))
@@ -1159,6 +1145,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     ("C-g" . vterm--self-insert)
     ("<f4>" . ma-switch-to-mu4e)
     ("<f3>" . ma-ssh-connect-with-tmux-support))
+    :custom (vterm-copy-exclude-prompt  t)
     :config
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"

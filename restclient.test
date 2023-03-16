@@ -4,13 +4,13 @@
 #
 GET http://messi:8080/rest/things
 Content-Type: application/json
-Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+Authorization: Basic
 #
 # XML is supported - highlight, pretty-print
 #
 POST http://messi:8080/rest/things
 Content-Type: application/json
-Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+Authorization: Basic
   {
     "channels": [
       {
@@ -98,11 +98,11 @@ Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
 #
 GET http://messi:8080/rest/items
 Content-Type: application/json
-Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+Authorization: Basic
 #
 PUT http://messi:8080/rest/items
 Content-Type: application/json
-Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+Authorization: Basic
 [
   {
     "members": [],
@@ -246,11 +246,11 @@ Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
 #
 GET http://messi:8080/rest/links
 Content-Type: application/json
-Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+Authorization: Basic
 #
  http://messi:8080/rest/links
 Content-Type: application/json
-Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+Authorization: Basic
 
 
 
@@ -312,3 +312,7 @@ Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
     "itemName": "Sensor1_LastSeen"
   }
 ]
+
+
+GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/group/member?groupname=stash-users&startAt=50
+Authorization: Basic
