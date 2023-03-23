@@ -413,7 +413,7 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
   :type '(string)
   :group 'ma)
 
-(defconst ma-devs-basedir "/ssh:MAL1@dell1254cem:devs/")
+(defconst ma-devs-basedir (if work-linux-remote "/ssh:MAL1@dell1254cem:devs/" "~/devs/"))
 
 (defun ma-set-current-dev (&optional all-cached-issues)
   "Set current dev issue."

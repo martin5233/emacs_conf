@@ -1,4 +1,4 @@
-#+auto_tangle: t
+ #+auto_tangle: t
 #+PROPERTY: header-args :tangle "~/.emacs.d/init.el"
 
 * Early init
@@ -864,6 +864,72 @@ Since init.el will be generated from this file, we save customization in a dedic
     :hook (org-mode . org-auto-tangle-mode))
 #+end_src
 
+** ERC/Skype
+#+begin_src emacs-lisp
+  (when work-linux-local
+    (defun ma-bitlbee-identify ()
+      "Auto-identify for Bitlbee channels using authinfo"
+      (interactive)
+      (when (string= (buffer-name) "&bitlbee")
+        (let* ((entry (nth 0 (auth-source-search :max 1
+                                                 :host "dell1254cem"
+                                                 :user "MAL1"
+                                                 :port 6667)))
+               (secret (plist-get entry :secret))
+               (user (plist-get entry :user))
+               (password (if (functionp secret)
+                             (funcall secret)
+                           secret)))
+          (erc-message "PRIVMSG" (concat (erc-default-target) " account add sipe martin.apel@3ds.com,dsone\\\\" user " " password))
+          (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe set useragent \"UCCAPI/16.0.6001.1073 OC/16.0.6001.1073 (Skype for Business)\""))
+          (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe on"))
+          (erc-log-mode 1)
+          )
+        ))
+
+    (defun ma-bitlbee-ignore-unimportant (msg)
+      "less noise from bitlbee"
+      (if (string-match "localhost has changed mode for " msg)
+          (setq erc-insert-this nil)))
+
+    (defun ma-erc-format-nick (&optional user _channel-data)
+      "Format the nick name."
+      (when user
+        (progn
+          (message "User is %s" user)
+          (message "Nickname is %s" (erc-server-user-nickname user))
+          (erc-server-user-nickname user))))
+    )
+
+  (use-package erc
+    :if work-linux-local
+    :custom
+    (erc-autoaway-idle-seconds 1800)
+    (erc-autoaway-message "Away")
+    (erc-notifications-mode t)
+    (erc-track-showcount t)
+    (erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
+    (erc-nick "martin")
+    (erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
+    (erc-server "dell1254cem")
+    (erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
+    (erc-user-full-name "Martin Apel")
+    :config
+    (add-to-list 'erc-modules 'autoaway)
+    (add-to-list 'erc-modules 'dcc)
+    (add-to-list 'erc-modules 'notifications)
+    (add-to-list 'erc-modules 'smiley)
+    (add-to-list 'erc-modules 'spelling)
+    (erc-update-modules)
+    :requires 'auth-source)
+
+  (when work-linux-local
+    (progn
+      (add-hook 'erc-insert-pre-hook 'ma-bitlbee-ignore-unimportant)
+      (add-hook 'erc-join-hook 'ma-bitlbee-identify)
+      (erc :server "localhost" :nick "martin" :password "")))
+#+end_src
+
 * Programming languages
 ** All programming languages
 *** Subword mode
@@ -974,6 +1040,10 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Dockerfile
 #+begin_src emacs-lisp
   (use-package dockerfile-mode)
+#+end_src
+** docker-compose-mode
+#+begin_src emacs-lisp
+  (use-package docker-compose-mode)
 #+end_src
 ** Javascript
 #+begin_src emacs-lisp
