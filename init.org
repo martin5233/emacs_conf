@@ -559,8 +559,9 @@ Since init.el will be generated from this file, we save customization in a dedic
       (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
       (mu4e-bookmarks
        (quote
-        (("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
+        (("maildir:/INBOX AND NOT flag:trashed" "INBOX only" 73)
          ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+         ("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
          ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
          ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
       (mu4e-headers-fields
@@ -1181,7 +1182,8 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/ma-funcs")
   (require 'ma-funcs)
-  (require 'ma-js-lsp-support)
+  (require 'ma-simpack-js-mode)
+  (add-hook 'js2-mode-hook 'ma-simpack-js-mode)
 #+end_src
 ** Bitbucket interface
 #+begin_src emacs-lisp
