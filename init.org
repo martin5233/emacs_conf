@@ -552,7 +552,7 @@ Since init.el will be generated from this file, we save customization in a dedic
         (apply orig args)))
 
     (use-package mu4e
-      :straight (:branch "release/1.8")
+      :straight (:branch "release/1.10")
       :load-path "straight/repos/mu/build/mu4e"
       :commands mu4e-running-p mu4e
       :custom
@@ -659,6 +659,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
                                ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")
                                ("Rajanagaprasad.KODALI@3ds.com" . "Prasad")
+                               ("David.BLUMENTHAL@3ds.com" . "Dave")
                                ("Edward.WATRAS@3ds.com" . "Ed")))
     (org-msg-greeting-name-limit 3)
     (org-msg-default-alternatives '((new		. (html))
