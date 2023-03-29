@@ -295,21 +295,6 @@ Since init.el will be generated from this file, we save customization in a dedic
     "Generates a projectile mode line"
     (format " Proj[%s]" (projectile-project-name)))
 
-  (defun ma-project-tab-name (buffer alist)
-    "Returns the last part of the project's root directory or nil."
-    (with-current-buffer buffer
-      (let ((root (projectile-project-root)))
-        (when (and root (not (derived-mode-p 'dired-mode)))
-          (file-name-nondirectory (substring root 0 (1- (length root))))))))
-
-  (defun ma-part-of-project-p (buffer action)
-    (unless (with-current-buffer buffer
-              (derived-mode-p 'emacs-lisp-mode))
-        (ma-project-tab-name buffer nil)))
-  (defun ma-print-current-project()
-    (interactive)
-    (message (format "Current project for buffer is %s" (ma-project-tab-name (current-buffer) nil))))
-
   (use-package projectile
     :init
     (projectile-mode 1)
@@ -479,8 +464,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                `(,(ma-make-display-buffer-matcher-function '(helpful-mode))
                  (display-buffer-in-tab display-buffer-reuse-window display-buffer-in-direction)
                  (direction . bottom)
-                 (window-height . 0.5)
-                 (tab-name . "Elisp")))
+                 (window-height . 0.5)))
 #+end_src
 * Completion
 ** Company
@@ -559,8 +543,7 @@ Since init.el will be generated from this file, we save customization in a dedic
       (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
       (mu4e-bookmarks
        (quote
-        (("maildir:/INBOX AND NOT flag:trashed" "INBOX only" 73)
-         ("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+        (("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
          ("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
          ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
          ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
@@ -586,6 +569,7 @@ Since init.el will be generated from this file, we save customization in a dedic
       (mu4e-change-filenames-when-moving t)
       (mu4e-headers-visible-lines 20)
       (mu4e-org-link-query-in-headers-mode t)
+      (mu4e-modeline-support nil)
       (message-send-mail-function (quote smtpmail-send-it))
 
       (smtpmail-debug-info nil)
@@ -605,18 +589,15 @@ Since init.el will be generated from this file, we save customization in a dedic
       (add-to-list 'display-buffer-alist
                    `("^\\*mu4e-headers\\*$"
                      (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "Mail")
                      (window-min-height . 0.25)))
 
       (add-to-list 'display-buffer-alist
                    `("^\\*mu4e"
-                     (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "Mail")))
+                     (display-buffer-in-tab display-buffer-reuse-window)))
 
       (add-to-list 'display-buffer-alist
                    `("^\\*Article\\*"
-                     (display-buffer-in-tab display-buffer-reuse-window)
-                     (tab-name . "Mail")))
+                     (display-buffer-in-tab display-buffer-reuse-window)))
 
       :bind ("<f4>" . ma-switch-to-mu4e)))
 #+end_src
@@ -672,8 +653,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     :config
     (add-to-list 'display-buffer-alist
                  `(,(ma-make-display-buffer-matcher-function '(org-mode))
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . "Mail")))
+                   (display-buffer-in-tab display-buffer-reuse-window)))
     (ma-define-snippets-for-mail))
 
   (defun ma-org-msg-get-to-name-advice(orig &rest args)
@@ -1075,13 +1055,6 @@ Since init.el will be generated from this file, we save customization in a dedic
               (local-set-key (kbd "M-.") 'find-function-other-window)))
 #+end_src
 
-*** Tabs
-#+begin_src emacs-lisp
-  (add-to-list 'display-buffer-alist
-               `(,(ma-make-display-buffer-matcher-function '(emacs-lisp-mode))
-                 (display-buffer-in-tab display-buffer-reuse-window display-buffer-pop-up-window)
-                 (tab-name . "Elisp")))
-#+end_src
 ** Shell
 #+begin_src emacs-lisp
   (add-hook 'sh-set-shell-hook
@@ -1222,8 +1195,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     :config
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"
-                   (display-buffer-in-tab display-buffer-reuse-window)
-                   (tab-name . "VTerm"))))
+                   (display-buffer-reuse-window))))
   (use-package vterm-toggle
     :if work
     :after vterm

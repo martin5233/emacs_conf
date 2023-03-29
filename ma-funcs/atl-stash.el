@@ -531,7 +531,7 @@ Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a
                   (message "Creating branch succeeded")
                   (let ((default-directory local-copy))
                    (magit-fetch-branch "origin" branch-name nil)
-                   (magit-checkout branch-name)
+                   (magit-branch-and-checkout branch-name (concat "origin/" branch-name))
                   )))
       :error (function*
               (lambda (&key data &allow-other-keys)
