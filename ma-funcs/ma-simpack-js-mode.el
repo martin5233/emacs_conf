@@ -1,7 +1,7 @@
 (defconst ma-simpack-js-typescript-files '("SpckGUI" "SpckModel" "SpckWizard" "SpckCompat"))
 (defconst ma-simpack-js--insertion-text
 "import { Spck, Script, System } from \"./SpckModel\";\n
-import { Dir, File, } from \"./SpckCompat\";\n
+import { Dir, File } from \"./SpckCompat\";\n
 import { MessageBox, Tree } from \"./SpckGUI\";\n")
 (defconst ma-simpack-js--insertion-marker "\n// Automatically added marker added by Emacs mode ma-simpack-js-model\n\n")
 
@@ -23,6 +23,35 @@ import { MessageBox, Tree } from \"./SpckGUI\";\n")
       (insert "   ]\n")
       (insert "}\n"))))
 
+(defun ma-simpack-js--insert-header()
+  "Insert a header into the current buffer, so the Typescript engine finds the relevant completion info."
+    (goto-char (point-min))
+    (insert ma-simpack-js--insertion-text)
+    (insert ma-simpack-js--insertion-marker)
+    (narrow-to-region (point) (point-max)))
+
+(defun ma-simpack-js--undo-insert-header()
+  "Remove header inserted by `ma-simpack-js--insert-header'."
+  (widen)
+  (goto-char (point-min))
+  (let* ((region-end (search-forward ma-simpack-js--insertion-marker))
+         (region-start (point-min)))
+    (kill-region region-start region-end)))
+
+(defun ma-simpack-js--before-save()
+  "Hook run before saving the buffer."
+  (setq-local ma-simpack-js--local-file (buffer-file-name))
+  (set-visited-file-name ma-simpack-js--orig-file t)
+  (setq-local visited-file-pos (point))
+  (ma-simpack-js--undo-insert-header))
+
+(defun ma-simpack-js--after-save()
+  "Hook run after saving the buffer."
+  (set-visited-file-name ma-simpack-js--local-file t)
+  (ma-simpack-js--insert-header)
+  (set-buffer-modified-p nil)
+  (goto-char visited-file-pos))
+
 (defun ma-simpack-js--create-local-copy(orig-file)
   "Creates a copy of the current sjs file in a local directory, inserts statements to enable Javascript completion and edits the local file.
 The copy is also put into ma-simpack-js-mode, but with a local variable indicating it to be the slave buffer."
@@ -30,39 +59,17 @@ The copy is also put into ma-simpack-js-mode, but with a local variable indicati
          (local-file (concat local-dir (file-name-nondirectory orig-file))))
     (when (not (file-accessible-directory-p local-dir))
       (make-directory local-dir))
-    (set-visited-file-name local-file t)
-    (goto-char (point-min))
-    (insert ma-simpack-js--insertion-text)
-    (insert ma-simpack-js--insertion-marker)
     (setq-local ma-simpack-js--orig-file orig-file)
-    (narrow-to-region (point) (point-max))
+    (set-visited-file-name local-file t)
+    (ma-simpack-js--insert-header)
     (save-buffer)
+    (make-variable-buffer-local 'before-save-hook)
+    (add-hook 'before-save-hook 'ma-simpack-js--before-save)
     (make-variable-buffer-local 'after-save-hook)
-    (add-hook 'after-save-hook 'ma-simpack-js--copy-back)
+    (add-hook 'after-save-hook 'ma-simpack-js--after-save)
     (ma-simpack-js--gen-tsconfig local-dir)
     (lsp)
     ))
-
-(defun ma-simpack-js--copy-back()
-  "Copies the contents of the current buffer back to its original file, after stripping the extra additions."
-  (goto-char (point-min))
-  (let* ((region-start (search-forward ma-simpack-js--insertion-marker))
-         (region-end (point-max))
-         (text-to-copy (buffer-substring-no-properties region-start region-end))
-         (buffer (find-file-noselect ma-simpack-js--orig-file)))
-    (with-current-buffer buffer
-      (erase-buffer)
-      (insert text-to-copy)
-      (save-buffer))
-    (kill-buffer buffer)))
-
-
-;; (defun ma-js-lsp-support-prepare-lsp ()
-;;   "Prepare editing in current buffer by copying the necessary TypeScript files into the same directory and starting LSP."
-;;   (ma-js-lsp-support--gen-tsconfig (buffer-file-name))
-;;   (lsp))
-
-;; (add-hook 'js2-mode-hook 'ma-js-lsp-support-prepare-lsp)
 
 (define-minor-mode ma-simpack-js-mode
   "Toggles ma-simpack-js minor mode."

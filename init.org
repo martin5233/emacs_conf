@@ -1,4 +1,4 @@
- #+auto_tangle: t
+#+auto_tangle: t
 #+PROPERTY: header-args :tangle "~/.emacs.d/init.el"
 
 * Early init
@@ -118,13 +118,12 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package expand-region
 	       :bind ("M-o" . er/expand-region))
 #+end_src
-*** Flyspell
+*** Flycheck
 #+begin_src emacs-lisp
-  (use-package flyspell
-    :straight (:type built-in)
-    :diminish flyspell-mode
-    :hook (prog-mode-hook . flyspell-prog-mode))
+  (use-package flycheck)
+  (global-flycheck-mode)
 #+end_src
+
 *** Guess-language
 #+begin_src emacs-lisp
   (defun ma-after-language-guess (lang beginning end)
@@ -399,9 +398,27 @@ Since init.el will be generated from this file, we save customization in a dedic
 
   (global-font-lock-mode 1)
 
-  (set-face-attribute 'default nil :font "DejaVu Sans Mono" :height 80)
-  (set-face-attribute 'fixed-pitch nil :font "DejaVu Sans Mono")
-  (set-face-attribute 'variable-pitch nil :font "Nimbus Roman" :height 100)
+  (use-package fontaine
+    :custom (fontaine-presets
+             '((home
+                :default-family "DejaVu Sans Mono"
+                :default-height 80
+                :fixed-pitch-family "DejaVu Sans Mono"
+                :fixed-pitch-height 100
+                :variable-pitch-family "Nimbus Roman"
+                :variable-pitch-height 100)
+               (work
+                :inherit home)
+               (screen-sharing
+                :inherit home
+                :default-height 100
+                :fixed-pitch-family "DejaVu Sans Mono"
+                :fixed-pitch-height 120
+                :variable-pitch-family "Nimbus Roman"
+                :variable-pitch-height 120))))
+  (if (or home work-linux-remote)
+      (fontaine-set-preset 'home)
+    (fontaine-set-preset 'work))
 #+end_src
 
 ** Long lines
@@ -442,13 +459,16 @@ Since init.el will be generated from this file, we save customization in a dedic
                 (setq-local devdocs-current-docs '("docker"))))
     (add-hook 'js-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("node~16_lts" "javascript"))))
+                (setq-local devdocs-current-docs '("node~18_lts" "javascript"))))
     (add-hook 'python-mode-hook
               (lambda()
                 (setq-local devdocs-current-docs '("python~3.10"))))
     (add-hook 'perl-mode-hook
               (lambda()
-                (setq-local devdocs-current-docs '("perl~5.34")))))
+                (setq-local devdocs-current-docs '("perl~5.34"))))
+    (add-hook 'yaml-mode-hook
+              (lambda()
+                (setq-local devdocs-current-docs '("ansible")))))
 #+end_src
 
 ** Info
@@ -465,7 +485,7 @@ Since init.el will be generated from this file, we save customization in a dedic
   ("C-c C-d" . helpful-at-point))
   (add-to-list 'display-buffer-alist
                `(,(ma-make-display-buffer-matcher-function '(helpful-mode))
-                 (display-buffer-in-tab display-buffer-reuse-window display-buffer-in-direction)
+                 (display-buffer-reuse-window display-buffer-in-direction)
                  (direction . bottom)
                  (window-height . 0.5)))
 #+end_src
@@ -591,16 +611,16 @@ Since init.el will be generated from this file, we save customization in a dedic
 
       (add-to-list 'display-buffer-alist
                    `("^\\*mu4e-headers\\*$"
-                     (display-buffer-in-tab display-buffer-reuse-window)
+                     (display-buffer-reuse-window)
                      (window-min-height . 0.25)))
 
       (add-to-list 'display-buffer-alist
                    `("^\\*mu4e"
-                     (display-buffer-in-tab display-buffer-reuse-window)))
+                     (display-buffer-reuse-window)))
 
       (add-to-list 'display-buffer-alist
                    `("^\\*Article\\*"
-                     (display-buffer-in-tab display-buffer-reuse-window)))
+                     (display-buffer-reuse-window)))
 
       :bind ("<f4>" . ma-switch-to-mu4e)))
 #+end_src
@@ -656,7 +676,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     :config
     (add-to-list 'display-buffer-alist
                  `(,(ma-make-display-buffer-matcher-function '(org-mode))
-                   (display-buffer-in-tab display-buffer-reuse-window)))
+                   (display-buffer-reuse-window)))
     (ma-define-snippets-for-mail))
 
   (defun ma-org-msg-get-to-name-advice(orig &rest args)
@@ -965,9 +985,7 @@ works flawlessly. For reference the identical settings are kept below.
     (lsp-modeline-code-actions-enable nil)
     (lsp-modeline-diagnostics-scope :file)
     (lsp-response-timeout 2)
-    (lsp-restart 'auto-restart)
-    :hook lsp-enable-which-key-integration
-    (c++-mode . lsp-deferred))
+    (lsp-restart 'auto-restart))
 
   (use-package lsp-ui
     :after (lsp)
@@ -1004,6 +1022,7 @@ works flawlessly. For reference the identical settings are kept below.
   (add-hook 'c-mode-common-hook
             (lambda ()
               (imenu-add-to-menubar "Functions")
+              (local-set-key (kbd "C-c C-i") 'imenu)
               (if work
                   (add-hook 'before-save-hook 'ma-create-or-update-copyright))
               (c-toggle-hungry-state 1)
