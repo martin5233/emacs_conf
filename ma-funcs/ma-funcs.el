@@ -328,8 +328,8 @@ not, a copyright comment is inserted at the start of the file."
 
 (defconst ma-src-trees
   `(("master" . "/scratch/apel/new_arch/")
-    ("2023" . ,(concat work-remote-url "/scratch/apel/new_arch_2023.Y/"))
     ("2023x" . ,(concat work-remote-url "/scratch/apel/new_arch_2023x.Y/"))
+    ("2024" . ,(concat work-remote-url "/scratch/apel/new_arch_2024.Y/"))
     ("Windows" . "/mnt/e/users/apel/new_arch/")))
 
 

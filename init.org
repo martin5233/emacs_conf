@@ -847,6 +847,8 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 
 ** ERC/Skype
+For some reason any settings via use-package are not effective for ERC. Therefore all settings are done via the customize interface, which
+works flawlessly. For reference the identical settings are kept below.
 #+begin_src emacs-lisp
   (when work-linux-local
     (defun ma-bitlbee-identify ()
@@ -885,24 +887,24 @@ Since init.el will be generated from this file, we save customization in a dedic
 
   (use-package erc
     :if work-linux-local
-    :custom
-    (erc-autoaway-idle-seconds 1800)
-    (erc-autoaway-message "Away")
-    (erc-notifications-mode t)
-    (erc-track-showcount t)
-    (erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
-    (erc-nick "martin")
-    (erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
-    (erc-server "dell1254cem")
-    (erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
-    (erc-user-full-name "Martin Apel")
-    :config
-    (add-to-list 'erc-modules 'autoaway)
-    (add-to-list 'erc-modules 'dcc)
-    (add-to-list 'erc-modules 'notifications)
-    (add-to-list 'erc-modules 'smiley)
-    (add-to-list 'erc-modules 'spelling)
-    (erc-update-modules)
+  ;;  :custom
+  ;;   (erc-autoaway-idle-seconds 1800)
+  ;;   (erc-autoaway-message "Away")
+  ;;   (erc-notifications-mode t)
+  ;;   (erc-track-showcount t)
+  ;;   (erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
+  ;;   (erc-nick "martin")
+  ;;   (erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
+  ;;   (erc-server "dell1254cem")
+  ;;   (erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
+  ;;   (erc-user-full-name "Martin Apel")
+  ;;  :config
+  ;;   (add-to-list 'erc-modules 'autoaway)
+  ;;   (add-to-list 'erc-modules 'dcc)
+  ;;   (add-to-list 'erc-modules 'notifications)
+  ;;   (add-to-list 'erc-modules 'smiley)
+  ;;   (add-to-list 'erc-modules 'spelling)
+  ;;   (erc-update-modules)
     :requires 'auth-source)
 
   (when work-linux-local

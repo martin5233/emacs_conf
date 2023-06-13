@@ -515,7 +515,7 @@ Optional argument ASK-FOR-ISSUE-ID is non-nil, if the function was called with a
          (branch-name (read-string "Branch name: " (concat key "-MAL1-" summary-adjusted)))
          (repo (completing-read "Repository: " '("spckxxxx" "spcktest") nil nil "spckxxxx"))
          (local-copy (assoc-default repo stash-repos))
-         (branch-base (completing-read "Branch to fork from: " '("master" "release/SIMPACK_2023.Y" "release/SIMPACK_2023x.Y") nil nil "master"))
+         (branch-base (completing-read "Branch to fork from: " '("master" "release/SIMPACK_2024.Y" "release/SIMPACK_2023x.Y") nil nil "master"))
          (url (concat stash-url (format "/rest/api/1.0/projects/SPCK/repos/%s/branches" repo)))
          (body `(("name"       . ,branch-name)
                  ("startPoint" . ,branch-base)))
