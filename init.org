@@ -20,7 +20,7 @@
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
   (let ((bootstrap-file
-   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
    (bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
@@ -48,13 +48,16 @@
 #+end_src
 ** Environment detection (Work or home, OS)
 #+begin_src emacs-lisp
-(setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
-(setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
-(setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "LP15-MAL1-CEM")))
-(setq work-linux (or work-linux-local work-linux-remote))
-(setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
-(setq work (or work-linux work-win))
-(setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
+  (setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
+  (setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
+  (setq work-linux-remote (and (string-match "^martin$" (user-login-name)) (string-equal system-type "gnu/linux") (string-equal (system-name) "LP15-MAL1-CEM")))
+  (setq work-linux (or work-linux-local work-linux-remote))
+  (setq work-win (and (string-match "^mal1$" (user-login-name)) (or (string-equal system-type "windows-nt") (string-equal system-type "cygwin"))))
+  (setq work (or work-linux work-win))
+  (setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
+
+  (if work
+      (setq browse-url-firefox-program "/home/home_dev/MAL1/tools/firefox/firefox"))
 #+end_src
 ** use-package
 #+begin_src emacs-lisp

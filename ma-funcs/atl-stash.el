@@ -248,20 +248,18 @@ is returned.  If the reviewer is not found, the original string is returned."
 
 (defun stash-am-i-reviewer (pr)
   "Returns true, if the current user is listed as a reviewer in the given pull request and he has not approved yet."
-  (when (> (assoc-default 'openTaskCount (assoc-default 'properties pr)) 0)
-    nil)
-
-  (let ((reviewers (assoc-default 'reviewers pr))
-        (saw-myself-in-reviewers nil))
-    (dotimes (i (length reviewers))
-      (let* ((reviewer (aref reviewers i))
-             (name (assoc-default 'name (assoc-default 'user reviewer)))
-             (approved (assoc-default 'approved reviewer))
-             (needs-work (string-equal (assoc-default 'status reviewer) "NEEDS_WORK")))
-        (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false) (not needs-work))
-            (setq saw-myself-in-reviewers t))
-        ))
-    saw-myself-in-reviewers))
+  (unless (/= (assoc-default 'openTaskCount (assoc-default 'properties pr)) 0)
+    (let ((reviewers (assoc-default 'reviewers pr))
+          (saw-myself-in-reviewers nil))
+      (dotimes (i (length reviewers))
+        (let* ((reviewer (aref reviewers i))
+               (name (assoc-default 'name (assoc-default 'user reviewer)))
+               (approved (assoc-default 'approved reviewer))
+               (needs-work (string-equal (assoc-default 'status reviewer) "NEEDS_WORK")))
+          (if (and (string-equal name (stash-effective-user-name)) (eq approved :json-false) (not needs-work))
+              (setq saw-myself-in-reviewers t))
+          ))
+      saw-myself-in-reviewers)))
 
 (defun stash-am-i-author (pr)
   "Returns true, if the current user is the author of this pull request."
