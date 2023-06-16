@@ -40,17 +40,21 @@ import { MessageBox, Tree } from \"./SpckGUI\";\n")
 
 (defun ma-simpack-js--before-save()
   "Hook run before saving the buffer."
-  (setq-local ma-simpack-js--local-file (buffer-file-name))
-  (set-visited-file-name ma-simpack-js--orig-file t)
-  (setq-local visited-file-pos (point))
-  (ma-simpack-js--undo-insert-header))
+  (if (and (boundp 'ma-simpack-js-mode) ma-simpack-js-mode)
+      (progn
+        (setq-local ma-simpack-js--local-file (buffer-file-name))
+        (set-visited-file-name ma-simpack-js--orig-file t)
+        (setq-local visited-file-pos (point))
+        (ma-simpack-js--undo-insert-header))))
 
 (defun ma-simpack-js--after-save()
   "Hook run after saving the buffer."
-  (set-visited-file-name ma-simpack-js--local-file t)
-  (ma-simpack-js--insert-header)
-  (set-buffer-modified-p nil)
-  (goto-char visited-file-pos))
+  (if (and (boundp 'ma-simpack-js-mode) ma-simpack-js-mode)
+      (progn
+        (set-visited-file-name ma-simpack-js--local-file t)
+        (ma-simpack-js--insert-header)
+        (set-buffer-modified-p nil)
+        (goto-char visited-file-pos))))
 
 (defun ma-simpack-js--create-local-copy(orig-file)
   "Creates a copy of the current sjs file in a local directory, inserts statements to enable Javascript completion and edits the local file.
@@ -63,9 +67,7 @@ The copy is also put into ma-simpack-js-mode, but with a local variable indicati
     (set-visited-file-name local-file t)
     (ma-simpack-js--insert-header)
     (save-buffer)
-    (make-variable-buffer-local 'before-save-hook)
     (add-hook 'before-save-hook 'ma-simpack-js--before-save)
-    (make-variable-buffer-local 'after-save-hook)
     (add-hook 'after-save-hook 'ma-simpack-js--after-save)
     (ma-simpack-js--gen-tsconfig local-dir)
     (lsp)

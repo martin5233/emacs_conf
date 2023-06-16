@@ -985,11 +985,22 @@ works flawlessly. For reference the identical settings are kept below.
     (lsp-modeline-code-actions-enable nil)
     (lsp-modeline-diagnostics-scope :file)
     (lsp-response-timeout 2)
-    (lsp-restart 'auto-restart))
+    (lsp-restart 'auto-restart)
+    :hook (prog-mode . #'lsp-deferred)
+          (lsp-mode . lsp-enable-which-key-integration))
 
   (use-package lsp-ui
     :after (lsp)
-    :hook (c++-mode . yas-minor-mode))
+    :hook (c++-mode . yas-minor-mode)
+          (c++ts-mode . yas-minor-mode))
+#+end_src
+*** Treesitter
+#+begin_src emacs-lisp
+  (use-package treesit-auto
+    :straight (:repo "https://github.com/renzmann/treesit-auto/")
+    :disabled t
+    :config
+    (global-treesit-auto-mode))
 #+end_src
 ** C++
 *** Modern-cpp-font-lock
@@ -1003,19 +1014,32 @@ works flawlessly. For reference the identical settings are kept below.
 #+end_src
 *** Keybindings
 #+begin_src emacs-lisp
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
-              (local-set-key (kbd "C-c C-s") 'hs-show-block)
-              (local-set-key (kbd "C-M-a") 'beginning-of-defun)
-              (local-set-key (kbd "C-M-e") 'end-of-defun)
-              (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
-              (local-set-key (kbd "C-c =") 'align-regexp)
-              (local-set-key (kbd "C-c *") 'ma-insert-separator)
-              (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
-              (local-unset-key (kbd "C-c C-n"))
-              (local-unset-key (kbd "C-c C-p"))
-              (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+   (add-hook 'c-mode-common-hook
+             (lambda ()
+               (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+               (local-set-key (kbd "C-c C-s") 'hs-show-block)
+               (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+               (local-set-key (kbd "C-M-e") 'end-of-defun)
+               (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+               (local-set-key (kbd "C-c =") 'align-regexp)
+               (local-set-key (kbd "C-c *") 'ma-insert-separator)
+               (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+               (local-unset-key (kbd "C-c C-n"))
+               (local-unset-key (kbd "C-c C-p"))
+               (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+  ;; (add-hook 'c-ts-base-mode-hook
+  ;;            (lambda ()
+  ;;              (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+  ;;              (local-set-key (kbd "C-c C-s") 'hs-show-block)
+  ;;              (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+  ;;              (local-set-key (kbd "C-M-e") 'end-of-defun)
+  ;;              (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+  ;;              (local-set-key (kbd "C-c =") 'align-regexp)
+  ;;              (local-set-key (kbd "C-c *") 'ma-insert-separator)
+  ;;              (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+  ;;              (local-unset-key (kbd "C-c C-n"))
+  ;;              (local-unset-key (kbd "C-c C-p"))
+  ;;              (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
 #+end_src
 *** Misc
 #+begin_src emacs-lisp
