@@ -844,6 +844,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org Roam
 #+begin_src emacs-lisp
+  (use-package emacsql)
   (use-package org-roam
     :custom
     (org-roam-directory "~/org-roam")
@@ -855,10 +856,12 @@ Since init.el will be generated from this file, we save customization in a dedic
         :target (file "%<%Y-%m-%d_%H:%M:%S>-SPCK-${slug}.org")
         :unnarrowed t)
        ))
+    (org-roam-database-connector 'sqlite-builtin)
     :bind
     ("C-c n l" . 'org-roam-buffer-toggle)
     ("C-c n f" . 'org-roam-node-find)
     ("C-c n i" . 'org-roam-node-insert)
+    :after emacsql
     :config
     (org-roam-db-autosync-mode))
 #+end_src
