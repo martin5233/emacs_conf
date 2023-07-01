@@ -65,8 +65,10 @@
 #+end_src
 ** straight
 #+begin_src emacs-lisp
-   (use-package straight
-   :custom (straight-use-package-by-default t))
+  (use-package straight
+  :custom
+  (straight-use-package-by-default t)
+  (straight-recipe-overrides '((nil . ((scad-mode :type git :flavor melpa :files ("scad-mode.el" "ob-scad.el") :host github :repo "openscad/emacs-scad-mode"))))))
 #+end_src
 ** Customization
 Since init.el will be generated from this file, we save customization in a dedicated file.
@@ -328,6 +330,11 @@ Since init.el will be generated from this file, we save customization in a dedic
     :bind ("C-c C-r" . deadgrep)
     :custom (deadgrep-max-buffers  1)
     (deadgrep-project-root-function 'ma-deadgrep-root-function))
+#+end_src
+*** Hydra
+#+begin_src emacs-lisp
+  (use-package hydra
+    :straight (:host github :repo "abo-abo/hydra"))
 #+end_src
 * Appearance
 ** Icons
@@ -1201,6 +1208,14 @@ works flawlessly. For reference the identical settings are kept below.
     :after (skeleton)
     :hook (find-file-hook . auto-insert)
     :config (define-auto-insert "\\.h\\'" 'header-skeleton))
+#+end_src
+** OpenSCAD
+#+begin_src emacs-lisp
+  (use-package scad-mode
+    :if home)
+  (use-package scad-dbus
+    :straight (:type git :flavor melpa :files ("scad-dbus.el") :host github :repo "Lenbok/scad-dbus" :depends "hydra")
+    :if home)
 #+end_src
 * Martin's specials
 #+begin_src emacs-lisp
