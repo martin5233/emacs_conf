@@ -102,11 +102,11 @@
   "Check if the given buffer belongs to a file stored on a Windows disk accessed via WSL."
   (string-match "^/mnt/[ce]/" (buffer-file-name buffer)))
 
-(setq compilation-transform-file-match-alist '(("^D:\\\\users\\\\apel\\\\new_arch\\\\develop\\\\\\([a-zA-Z\\\\]*\\.cpp\\)"  "/mnt/d/users/apel/new_arch/develop/\\1")))
+(setq compilation-transform-file-match-alist '(("^E:\\\\users\\\\apel\\\\new_arch\\\\develop\\\\\\([a-zA-Z\\\\\\.]*\\.cpp\\)"  "/mnt/e/users/apel/new_arch/develop/\\1")))
 
 (defun ma-transform-compilation-file-name (filename)
   "Transform Windows filename to filename as accessible through WSL."
-  (replace-regexp-in-string "^D:/users/apel/new_arch/" "/mnt/d/users/apel/new_arch/develop/" (string-replace "\\" "/" filename)))
+  (replace-regexp-in-string "^E:/users/apel/new_arch/" "/mnt/e/users/apel/new_arch/develop/" (string-replace "\\" "/" filename)))
 
 (setq compilation-parse-errors-filename-function 'ma-transform-compilation-file-name)
 
