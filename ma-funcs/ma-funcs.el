@@ -167,10 +167,10 @@
     (progn
       (add-hook 'c-mode-hook
                 (lambda()
-                  (local-set-key (kbd "C-c C-c") 'compile)))
+                  (local-set-key (kbd "C-c C-c") 'ma-run-compile)))
       (add-hook 'c++-mode-hook
                 (lambda()
-                  (local-set-key (kbd "C-c C-c") 'compile)))
+                  (local-set-key (kbd "C-c C-c") 'ma-run-compile)))
       ))
 
 (require 'notifications)

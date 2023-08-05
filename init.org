@@ -394,8 +394,7 @@ Since init.el will be generated from this file, we save customization in a dedic
       (modus-themes-headings '((t variable-pitch)))
     :config
     (progn
-      (modus-themes-load-themes)
-      (modus-themes-load-vivendi)))
+      (load-theme 'modus-vivendi :no-confirm)))
 #+end_src
 
 ** Fonts
@@ -842,7 +841,8 @@ Since init.el will be generated from this file, we save customization in a dedic
                 (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
                     (org-jira-mode 1)))))
 
-  (use-package ox-jira)
+  (use-package ox-jira
+    :if work)
 #+end_src
 *** Org Bullets
 #+begin_src emacs-lisp
@@ -851,8 +851,10 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Org Roam
 #+begin_src emacs-lisp
-  (use-package emacsql)
+  (use-package emacsql
+    :if work)
   (use-package org-roam
+    :if work
     :custom
     (org-roam-directory "~/org-roam")
     (org-roam-capture-templates
