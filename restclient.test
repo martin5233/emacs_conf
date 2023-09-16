@@ -2,80 +2,93 @@
 # Gets user timeline, formats JSON, shows response status and headers underneath
 #
 #
-GET http://messi:8080/rest/things
+GET http://cube:31080/rest/things
 Content-Type: application/json
 Authorization: Basic
 #
-# XML is supported - highlight, pretty-print
 #
-POST http://messi:8080/rest/things
+#
+POST http://cube:31080/rest/things
 Content-Type: application/json
 Authorization: Basic
   {
     "channels": [
       {
         "linkedItems": [
-          "Sensor6_Luftfeuchtigkeit"
+          "Heizkorper1Keller_Batterie"
         ],
-        "uid": "mqtt:topic:bedd4f97ef:Sensor6:Humidity",
-        "id": "Humidity",
+        "uid": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Batterie",
+        "id": "Batterie",
         "channelTypeUID": "mqtt:number",
-        "itemType": "Number",
+        "itemType": "Dimmer",
         "kind": "STATE",
-        "label": "Luftfeuchtigkeit",
+        "label": "Batterie",
+        "description": "",
         "defaultTags": [],
         "properties": {},
         "configuration": {
-          "stateTopic": "zigbee2mqtt/Sensor6/humidity"
+          "stateTopic": "zigbee2mqtt/Heizkörper1Keller/battery",
+          "max": 100.0,
+          "min": 0.0
         }
       },
       {
         "linkedItems": [
-          "Sensor6_Empfangsqualitaet"
+          "Heizkorper1Keller_Empfangsqualitat"
         ],
-        "uid": "mqtt:topic:bedd4f97ef:Sensor6:LinkQuality",
+        "uid": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:LinkQuality",
         "id": "LinkQuality",
         "channelTypeUID": "mqtt:number",
         "itemType": "Number",
         "kind": "STATE",
         "label": "Empfangsqualität",
+        "description": "",
         "defaultTags": [],
         "properties": {},
         "configuration": {
-          "stateTopic": "zigbee2mqtt/Sensor6/linkquality"
+          "stateTopic": "zigbee2mqtt/Heizkörper1Keller/linkquality"
         }
       },
       {
         "linkedItems": [
-          "Sensor6_Batterie"
+          "Heizkorper1Keller_LetzteAktualisierung",
+          "Heizkorper1Keller_Isttemperatur"
         ],
-        "uid": "mqtt:topic:bedd4f97ef:Sensor6:Battery",
-        "id": "Battery",
+        "uid": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Isttemperatur",
+        "id": "Isttemperatur",
         "channelTypeUID": "mqtt:number",
         "itemType": "Number",
         "kind": "STATE",
-        "label": "Batterie",
+        "label": "Isttemperatur",
+        "description": "",
         "defaultTags": [],
         "properties": {},
         "configuration": {
-          "stateTopic": "zigbee2mqtt/Sensor6/battery"
+          "stateTopic": "zigbee2mqtt/Heizkörper1Keller/local_temperature",
+          "max": 35.0,
+          "min": 5.0
         }
       },
       {
         "linkedItems": [
-          "Sensor6_Temperatur",
-          "Sensor6_LastSeen"
+          "Heizkorper1Keller_Solltemperatur"
         ],
-        "uid": "mqtt:topic:bedd4f97ef:Sensor6:Temperature",
-        "id": "Temperature",
+        "uid": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Solltemperatur",
+        "id": "Solltemperatur",
         "channelTypeUID": "mqtt:number",
         "itemType": "Number",
         "kind": "STATE",
-        "label": "Temperatur",
+        "label": "Solltemperatur",
+        "description": "",
         "defaultTags": [],
         "properties": {},
         "configuration": {
-          "stateTopic": "zigbee2mqtt/Sensor6/temperature"
+          "commandTopic": "zigbee2mqtt/Heizkörper1Keller/set",
+          "unit": "°C",
+          "min": 5.0,
+          "formatBeforePublish": "{ \"occupied_heating_setpoint\": %d }",
+          "stateTopic": "zigbee2mqtt/Heizkörper1Keller/occupied_heating_setpoint",
+          "max": 35.0
         }
       }
     ],
@@ -84,43 +97,30 @@ Authorization: Basic
       "statusDetail": "NONE"
     },
     "editable": true,
-    "label": "Sensor 6",
+    "label": "Heizkörper1 Keller",
     "bridgeUID": "mqtt:broker:bedd4f97ef",
-    "configuration": {
-      "payloadNotAvailable": "offline",
-      "availabilityTopic": "zigbee2mqtt/Sensor6/availability",
-      "payloadAvailable": "online"
-    },
+    "configuration": {},
     "properties": {},
-    "UID": "mqtt:topic:bedd4f97ef:Sensor6",
-    "thingTypeUID": "mqtt:topic"
+    "UID": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller",
+    "thingTypeUID": "mqtt:topic",
+    "location": "Keller"
   }
 #
-GET http://messi:8080/rest/items
+#
+#
+GET http://cube:31080/rest/items
 Content-Type: application/json
 Authorization: Basic
 #
-PUT http://messi:8080/rest/items
+#
+#
+PUT http://cube:31080/rest/items
 Content-Type: application/json
 Authorization: Basic
 [
   {
-    "members": [],
-    "link": "http://messi:8080/rest/items/Sensor6",
-    "state": "NULL",
-    "editable": true,
-    "type": "Group",
-    "name": "Sensor6",
-    "label": "Sensor 6",
-    "category": "",
-    "tags": [
-      "Sensor"
-    ],
-    "groupNames": []
-  },
-  {
-    "link": "http://messi:8080/rest/items/Sensor6_Empfangsqualitaet",
-    "state": "30",
+    "link": "http://cube:31080/rest/items/Heizkorper1Keller_Empfangsqualitat",
+    "state": "33",
     "stateDescription": {
       "step": 1,
       "pattern": "%s",
@@ -128,69 +128,24 @@ Authorization: Basic
       "options": []
     },
     "editable": true,
-    "type": "Number:Dimensionless",
-    "name": "Sensor6_Empfangsqualitaet",
-    "label": "Empfangsqualität Sensor 6",
-    "category": "",
+    "type": "Number",
+    "name": "Heizkorper1Keller_Empfangsqualitat",
+    "label": "Empfangsqualität HK1 Keller",
+    "category": "qualityofservice",
     "tags": [
-      "Measurement",
-      "SNZB-02"
+      "Measurement"
     ],
     "groupNames": [
       "gInflux",
-      "Sensor6"
+      "ObererGemeindesaal"
     ]
   },
   {
-    "link": "http://messi:8080/rest/items/Sensor6_Temperatur",
-    "state": "21.9 °C",
+    "link": "http://cube:31080/rest/items/Heizkorper1Keller_LetzteAktualisierung",
+    "state": "2022-10-15T18:09:37.104809+0200",
     "stateDescription": {
-      "step": 1,
-      "pattern": "%s",
-      "readOnly": true,
-      "options": []
-    },
-    "editable": true,
-    "type": "Number:Temperature",
-    "name": "Sensor6_Temperatur",
-    "label": "Temperatur Sensor 6",
-    "category": "",
-    "tags": [
-      "Measurement",
-      "Temperature"
-    ],
-    "groupNames": [
-      "gInflux",
-      "Sensor6"
-    ]
-  },
-  {
-    "link": "http://messi:8080/rest/items/Sensor6_Batterie",
-    "state": "100",
-    "stateDescription": {
-      "step": 1,
-      "pattern": "%s",
-      "readOnly": true,
-      "options": []
-    },
-    "editable": true,
-    "type": "Number:Dimensionless",
-    "name": "Sensor6_Batterie",
-    "label": "Batterie Sensor 6",
-    "category": "",
-    "tags": [
-      "LowBattery"
-    ],
-    "groupNames": [
-      "Batterielevel",
-      "gInflux",
-      "Sensor6"
-    ]
-  },
-  {
-    "link": "http://messi:8080/rest/items/Sensor6_LastSeen",
-    "state": "2022-02-07T20:19:26.295528+0100",
-    "stateDescription": {
+      "minimum": 5.0,
+      "maximum": 35.0,
       "step": 1,
       "pattern": "%1$te.%1$tm.%1$ty %1$tH:%1$tM",
       "readOnly": true,
@@ -198,121 +153,218 @@ Authorization: Basic
     },
     "editable": true,
     "type": "DateTime",
-    "name": "Sensor6_LastSeen",
-    "label": "Letzte Aktualisierung Sensor 6",
+    "name": "Heizkorper1Keller_LetzteAktualisierung",
+    "label": "Letzte Aktualisierung HK1 Keller",
     "category": "",
     "tags": [
       "Measurement",
       "Timestamp"
     ],
-    "groupNames": [
-      "Sensor6"
-    ]
-  },
-  {
-    "link": "http://messi:8080/rest/items/LastSeenSensor6",
-    "state": "NULL",
-    "editable": true,
-    "type": "DateTime",
-    "name": "LastSeenSensor6",
-    "label": "Letzte Aktualisierung Sensor 6",
-    "category": "",
-    "tags": [],
     "groupNames": []
   },
   {
-    "link": "http://messi:8080/rest/items/Sensor6_Luftfeuchtigkeit",
-    "state": "44",
+    "link": "http://cube:31080/rest/items/Heizkorper1Keller_Isttemperatur",
+    "state": "18.67 °C",
     "stateDescription": {
+      "minimum": 5.0,
+      "maximum": 35.0,
       "step": 1,
       "pattern": "%s",
       "readOnly": true,
       "options": []
     },
     "editable": true,
-    "type": "Number:Dimensionless",
-    "name": "Sensor6_Luftfeuchtigkeit",
-    "label": "Luftfeuchtigkeit Sensor 6",
+    "type": "Number:Temperature",
+    "name": "Heizkorper1Keller_Isttemperatur",
+    "label": "Isttemperatur HK1 Keller",
     "category": "",
     "tags": [
-      "Humidity",
-      "Point"
+      "Measurement",
+      "Temperature"
     ],
     "groupNames": [
-      "Sensor6"
+      "gInflux",
+      "IsttemperaturObererGemeindesaal"
+    ]
+  },
+  {
+    "link": "http://cube:31080/rest/items/Heizkorper1Keller_Solltemperatur",
+    "state": "16 °C",
+    "stateDescription": {
+      "minimum": 5.0,
+      "maximum": 35.0,
+      "step": 1,
+      "pattern": "%s °C",
+      "readOnly": false,
+      "options": []
+    },
+    "editable": true,
+    "type": "Number:Temperature",
+    "name": "Heizkorper1Keller_Solltemperatur",
+    "label": "Solltemperatur HK1 Keller",
+    "category": "",
+    "tags": [
+      "Temperature",
+      "Setpoint"
+    ],
+    "groupNames": [
+      "gInflux",
+      "SolltemperaturObererGemeindesaal"
+    ]
+  },
+  {
+    "link": "http://cube:31080/rest/items/Heizkorper1Keller_Batterie",
+    "state": "92",
+    "stateDescription": {
+      "minimum": 0.0,
+      "maximum": 100.0,
+      "step": 1,
+      "pattern": "%s",
+      "readOnly": true,
+      "options": []
+    },
+    "editable": true,
+    "type": "Number",
+    "name": "Heizkorper1Keller_Batterie",
+    "label": "Batterie HK1 Keller",
+    "category": "battery",
+    "tags": [
+      "Measurement"
+    ],
+    "groupNames": [
+      "Keller",
+      "Batterielevel"
     ]
   }
 ]
 #
-GET http://messi:8080/rest/links
+#
+#
+GET http://cube:31080/rest/links
 Content-Type: application/json
 Authorization: Basic
 #
- http://messi:8080/rest/links
+#
+#
+PUT http://cube:31080/rest/links/Heizkorper1Keller_Isttemperatur/mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Isttemperatur
 Content-Type: application/json
+<<<<<<< Updated upstream
 Authorization: Basic
 
 
 
 [
+=======
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+>>>>>>> Stashed changes
   {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Temperatursensor1:Humidity",
+    "channelUID": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Isttemperatur",
     "configuration": {},
-    "itemName": "Temperatursensor1_Luftfeuchtigkeit"
-  },
+    "itemName": "Heizkorper1Keller_Isttemperatur"
+  }
+#
+#
+#
+PUT http://cube:31080/rest/links/Heizkorper1Keller_Batterie/mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Batterie
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
   {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Temperatursensor1:LinkQuality",
+    "channelUID": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Batterie",
     "configuration": {},
-    "itemName": "Temperatursensor1_LinkQuality"
-  },
+    "itemName": "Heizkorper1Keller_Batterie"
+  }
+#
+#
+#
+PUT http://cube:31080/rest/links/Heizkorper1Keller_Empfangsqualitat/mqtt:topic:bedd4f97ef:Heizkoerper1Keller:LinkQuality
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
   {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:LinkQuality",
+    "channelUID": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:LinkQuality",
     "configuration": {},
-    "itemName": "Sensor1_Empfangsqualitaet"
-  },
+    "itemName": "Heizkorper1Keller_Empfangsqualitat"
+  }
+#
+#
+#
+PUT http://cube:31080/rest/links/Heizkorper1Keller_Solltemperatur/mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Solltemperatur
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
   {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Humidity",
+    "channelUID": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Solltemperatur",
     "configuration": {},
-    "itemName": "Sensor1_Luftfeuchtigkeit"
-  },
+    "itemName": "Heizkorper1Keller_Solltemperatur"
+  }
+#
+#
+#
+PUT http://cube:31080/rest/links/Heizkorper1Keller_LetzteAktualisierung/mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Isttemperatur
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
   {
     "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:LinkQuality",
-    "configuration": {},
-    "itemName": "Sensor1_Empfangsqualitat"
-  },
-  {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Battery",
-    "configuration": {},
-    "itemName": "Sensor1_Batterie"
-  },
-  {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Temperature",
-    "configuration": {},
-    "itemName": "Sensor1_Temperatur"
-  },
-  {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor2:Battery",
-    "configuration": {},
-    "itemName": "Sensor2_Batterie"
-  },
-  {
-    "editable": true,
-    "channelUID": "mqtt:topic:bedd4f97ef:Sensor1:Temperature",
+    "channelUID": "mqtt:topic:bedd4f97ef:Heizkoerper1Keller:Isttemperatur",
     "configuration": {
       "profile": "system:timestamp-update"
     },
-    "itemName": "Sensor1_LastSeen"
+    "itemName": "Heizkorper1Keller_LetzteAktualisierung"
   }
+<<<<<<< Updated upstream
 ]
 
 
 GET https://spck-jira.ux.dsone.3ds.com:8443/rest/api/2/group/member?groupname=stash-users&startAt=50
 Authorization: Basic
+=======
+#
+#
+#
+GET http://cube:31080/rest/items/Heizkoerper1ObererGemeindesaal
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+PUT http://cube:31080/rest/items/Heizkoerper1Buero
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+{
+  "type": "Group",
+  "name": "Heizkoerper1Buero",
+  "label": "Heizkörper1 Büro",
+  "category": "",
+  "tags": [
+    "Equipment"
+  ],
+  "groupNames": [
+    "Buero"
+  ]
+}
+#
+#
+PUT http://cube:31080/rest/items/Heizkoerper1Buero/members/Heizkorper2Buero_Batterie
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+#
+#
+PUT http://cube:31080/rest/items/Heizkoerper1Buero/members/Heizkorper2Buero_Empfangsqualitat
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+#
+#
+PUT http://cube:31080/rest/items/Heizkoerper1Buero/members/Heizkorper2Buero_LetzteAktualisierung
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+#
+#
+PUT http://cube:31080/rest/items/Heizkoerper1Buero/members/Heizkorper2Buero_Solltemperatur
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+#
+#
+#
+PUT http://cube:31080/rest/items/Heizkoerper1Buero/members/Heizkorper2Buero_Isttemperatur
+Content-Type: application/json
+Authorization: Basic YWRtaW46c0BUXnpZOHZ4Qm1nU15NOU4mNDk=
+>>>>>>> Stashed changes

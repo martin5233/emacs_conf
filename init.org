@@ -626,8 +626,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 
       (add-to-list 'display-buffer-alist
                    `("^\\*Article\\*"
-                     (display-buffer-reuse-window)
-                     (window-min-height . 0.25))))
+                     (display-buffer-reuse-window)))
 
       :bind ("<f4>" . ma-switch-to-mu4e)))
 #+end_src
@@ -997,7 +996,6 @@ works flawlessly. For reference the identical settings are kept below.
     (lsp-keymap-prefix "C-r")
     (lsp-modeline-code-actions-enable nil)
     (lsp-modeline-diagnostics-scope :file)
-    (lsp-warn-no-matched-clients nil)
     (lsp-response-timeout 2)
     (lsp-restart 'auto-restart)
     :hook (prog-mode . #'lsp-deferred)
@@ -1008,60 +1006,10 @@ works flawlessly. For reference the identical settings are kept below.
     :hook (c++-mode . yas-minor-mode)
           (c++ts-mode . yas-minor-mode))
 #+end_src
-*** Treesitter
-#+begin_src emacs-lisp
-  (use-package treesit
-    :if featurep 'treesit
-    :disabled
-    :config
-    (treesit-language-source-alist
-     '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-       (c "https://github.com/tree-sitter/tree-sitter-c")
-       (c-sharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
-       (clojure "https://github.com/sogaiu/tree-sitter-clojure")
-       (cmake "https://github.com/uyha/tree-sitter-cmake")
-       (commonlisp "https://github.com/theHamsta/tree-sitter-commonlisp")
-       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-       (css "https://github.com/tree-sitter/tree-sitter-css")
-       (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-       (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-       (json "https://github.com/tree-sitter/tree-sitter-json")
-       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-       (python "https://github.com/tree-sitter/tree-sitter-python")
-       (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-       (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-       (yaml "https://github.com/ikatyang/tree-sitter-yaml"))))
-#+end_src
 ** C++
-*** Treesitter C++
-#+begin_src emacs-lisp
-        (defun ma-c++-indent-style()
-          "Override the default BSD indentation style"
-          `(
-            ((and (node-is "expression_statement")
-                          (or (parent-is "if_statement")
-                              (parent-is "for_statement")
-                              (parent-is "while_statement")
-                              (parent-is "do_statement"))) parent-bol c-ts-mode-indent-offset)
-            ((parent-is "declaration_list") parent-bol 0)      ;; no indentation for namespace bodies
-
-             ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
-
-        (use-package c-ts-mode
-          :if (and (featurep 'treesit) (treesit-language-available-p 'cpp))
-          :custom
-          (c-ts-mode-indent-offset 3)
-          (c-ts-mode-indent-style #'ma-c++-indent-style)
-          :init
-          (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-          (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-          (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode)))
-#+end_src
 *** Modern-cpp-font-lock
 #+begin_src emacs-lisp
   (use-package modern-cpp-font-lock
-    :if (not (and (featurep 'treesit) (treesit-language-available-p 'cpp)))
     :config (modern-c++-font-lock-global-mode t))
 #+end_src
 *** Start SMerge session, if necessary
@@ -1070,35 +1018,59 @@ works flawlessly. For reference the identical settings are kept below.
 #+end_src
 *** Keybindings
 #+begin_src emacs-lisp
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
-              (local-set-key (kbd "C-c C-s") 'hs-show-block)
-              (local-set-key (kbd "C-M-a") 'beginning-of-defun)
-              (local-set-key (kbd "C-M-e") 'end-of-defun)
-              (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
-              (local-set-key (kbd "C-c =") 'align-regexp)
-              (local-set-key (kbd "C-c *") 'ma-insert-separator)
-              (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
-              (local-unset-key (kbd "C-c C-n"))
-              (local-unset-key (kbd "C-c C-p"))
-              (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+   (add-hook 'c-mode-common-hook
+             (lambda ()
+               (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+               (local-set-key (kbd "C-c C-s") 'hs-show-block)
+               (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+               (local-set-key (kbd "C-M-e") 'end-of-defun)
+               (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+               (local-set-key (kbd "C-c =") 'align-regexp)
+               (local-set-key (kbd "C-c *") 'ma-insert-separator)
+               (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+               (local-unset-key (kbd "C-c C-n"))
+               (local-unset-key (kbd "C-c C-p"))
+               (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+  ;; (add-hook 'c-ts-base-mode-hook
+  ;;            (lambda ()
+  ;;              (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+  ;;              (local-set-key (kbd "C-c C-s") 'hs-show-block)
+  ;;              (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+  ;;              (local-set-key (kbd "C-M-e") 'end-of-defun)
+  ;;              (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+  ;;              (local-set-key (kbd "C-c =") 'align-regexp)
+  ;;              (local-set-key (kbd "C-c *") 'ma-insert-separator)
+  ;;              (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+  ;;              (local-unset-key (kbd "C-c C-n"))
+  ;;              (local-unset-key (kbd "C-c C-p"))
+  ;;              (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+#+end_src
+*** Treesitter for C++
+#+begin_src emacs-lisp
+  (defun ma-indent-style()
+    "Override the built-in BSD indentation style with some additional rules"
+    `(;; Here are your custom rules
+  ;;     ((node-is ")") parent-bol 0)
+  ;;     ((match nil "argument_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+  ;;     ((parent-is "argument_list") prev-sibling 0)
+  ;;     ((match nil "parameter_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+  ;;     ((parent-is "parameter_list") prev-sibling 0)
+      ((and (parent-is "if_statement") (not (node-is "compound_statement"))) parent-bol 3)
 
-  (when (and (featurep 'treesit) (treesit-language-available-p 'cpp))
-    (add-hook 'c-ts-base-mode-hook
-              (lambda ()
-                (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
-                (local-set-key (kbd "C-c C-s") 'hs-show-block)
-                (local-set-key (kbd "C-M-a") 'beginning-of-defun)
-                (local-set-key (kbd "C-M-e") 'end-of-defun)
-                (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
-                (local-set-key (kbd "C-c =") 'align-regexp)
-                (local-set-key (kbd "C-c *") 'ma-insert-separator)
-                (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
-                (local-unset-key (kbd "C-c C-n"))
-                (local-unset-key (kbd "C-c C-p"))
-                (local-unset-key (kbd "C-c C-z")))))                     ;; Free keybinding for magit-status
+      ;; Append here the indent style you want as base
+      ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
 
+  (use-package c-ts-mode
+    :if (treesit-language-available-p 'c)
+    :disabled t
+    :custom
+    (c-ts-mode-indent-offset 3)
+    (c-ts-mode-indent-style #'ma-indent-style)
+    :init
+    ;; Remap the standard C/C++ modes
+    (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+    (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+    (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode)))
 #+end_src
 *** Misc
 #+begin_src emacs-lisp
@@ -1164,13 +1136,6 @@ works flawlessly. For reference the identical settings are kept below.
 
 ** Shell
 #+begin_src emacs-lisp
-  (add-hook 'sh-set-shell-hook
-            (lambda()
-              (when (string-equal sh-shell "tcsh")
-                (progn
-                  (require 'csh-mode)
-                  (setq-local indent-line-function 'csh-indent-line)
-                  (setq-local indent-region-function 'csh-indent-region)))))
   (add-hook 'shell-mode-hook
             'dirtrack-mode)
   (add-hook 'after-save-hook

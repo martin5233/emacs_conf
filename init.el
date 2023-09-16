@@ -1,4 +1,7 @@
-(package-initialize)
+;;; -*- lexical-binding: t -*-
+
+;; This code is generated from init.org.
+;; Do not modify, modify the source instead
 
 (setq home (and (string-match "^martin$" (user-login-name)) (string-equal (system-name) "merlin")))
 (setq work-linux-local (and (string-match "^MAL1$" (user-login-name)) (string-equal system-type "gnu/linux")))
@@ -8,743 +11,902 @@
 (setq work (or work-linux work-win))
 (setq work-vnc (and work-linux-local (string-equal (getenv "DISPLAY") ":1.0")))
 
+(if work
+    (setq browse-url-firefox-program "/home/home_dev/MAL1/tools/firefox/firefox"))
+
+(straight-use-package 'use-package)
+
+(use-package straight
+:custom
+(straight-use-package-by-default t)
+(straight-recipe-overrides '((nil . ((scad-mode :type git :flavor melpa :files ("scad-mode.el" "ob-scad.el") :host github :repo "openscad/emacs-scad-mode"))))))
+
+(setq custom-file (concat user-emacs-directory "custom.el"))
+
+(when (file-exists-p custom-file)
+  (load custom-file nil t))
+
+(use-package desktop
+  :straight (:type built-in)
+  :config (desktop-save-mode t))
+
+(global-set-key (kbd "<delete>") 'c-electric-delete-forward)
+(global-set-key (kbd "C-c C-g") 'goto-line)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+(global-unset-key (kbd "C-x C-c"))
+(global-set-key (kbd "C-x C-c C-x") 'save-buffers-kill-terminal)
+(global-unset-key (kbd "M-SPC"))     ;; Originally just-one-space
+(global-set-key (kbd "M-SPC") 'dabbrev-expand)
+(global-set-key (kbd "<f2>") 'customize-group)
+(global-unset-key (kbd "C-z"))       ;; Who needs suspend-frame?
+
+(server-start)
+
+(defun ma-make-display-buffer-matcher-function (major-modes)
+  (lambda (buffer-name action)
+    (with-current-buffer buffer-name (apply #'derived-mode-p major-modes))))
+
+(use-package avy
+  :bind ("C-M-j" . 'avy-goto-char-timer))
+
+(use-package expand-region
+	     :bind ("M-o" . er/expand-region))
+
+(use-package flycheck)
+(global-flycheck-mode)
+
+(defun ma-after-language-guess (lang beginning end)
+  "Perform multiple settings after the language of a buffer has been guessed:
+- Switch the input method depending on the guessed language.
+   Argument LANG: Language code."
+  (message (format "Switching input language to %s" lang))
+  (if (string-equal lang "de")
+      (progn
+        (activate-input-method "german-postfix")
+        (ispell-change-dictionary "german"))
+    (deactivate-input-method)
+    (ispell-change-dictionary "american")))
+
+(use-package guess-language
+  :custom (guess-language-languages '(en de))
+  :config
+  (add-hook 'guess-language-after-detection-functions #'ma-after-language-guess))
+
+(use-package multiple-cursors
+	     :bind (("C-c C-n" . mc/mark-next-like-this)
+		    ("C-c C-p" . mc/mark-previous-like-this)
+		    ("C-c C-a" . mc/mark-all-like-this-in-defun)
+		    ("C-c C-|" . mc/edit-lines)))
+
+(use-package swiper
+  :bind ("C-s" . swiper-isearch))
+
+(use-package smartscan)
+
+(use-package browse-kill-ring)
+
+(use-package visual-regexp
+  :custom
+  (vr/command-python (concat "python3 " user-emacs-directory "straight/build/visual-regexp-steroids/regexp.py"))
+  :bind ("M-%" . 'vr/query-replace)
+        ("C-M-%" . 'vr/replace))
+
+(use-package visual-regexp-steroids)
+
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :hook
+  (prog-mode . yas-minor-mode)
+  (org-mode . yas-minor-mode))
+(use-package yasnippet-snippets)
+
+(add-hook 'before-save-hook
+          'delete-trailing-whitespace)
+
+(defface ma-magit-highlight-remote-face
+  '((t :inherit magit-branch-remote
+       :underline t))
+  "Face for highlighting remote branches with specific text in them."
+  :group 'ma)
+
+(use-package magit
+  :bind ("C-c C-z" . magit-status)
+  :config
+  (add-hook 'magit-refs-mode-hook
+            (lambda ()
+              (add-to-list 'magit-ref-namespaces '("\\`refs/remotes/origin/\\(SPCK-[0-9]+-MAL1-.*\\)" . ma-magit-highlight-remote-face)))))
+
+(use-package git-timemachine
+  :straight (:repo "https://codeberg.org/pidu/git-timemachine"))
+
+(use-package git-gutter
+  :diminish git-gutter-mode
+  :config
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (unless (and (buffer-file-name) (file-remote-p (buffer-file-name)))
+                (git-gutter-mode)))))
+
 (if work-linux-remote
     (progn
       (setq work-remote-machine "dell1254cem")
       (setq work-remote-url "/ssh:MAL1@dell1254cem:")
       (setq enable-remote-dir-locals nil)
-      (setq tramp-use-ssh-controlmaster-options nil)
-  ;; Avoid version-control checks for tramp buffers
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
-  (setq work-remote-url ""))
+      (setq remote-file-name-inhibit-locks t)
+      ;; Avoid version-control checks for tramp buffers
+      (setq vc-ignore-dir-regexp
+            (format "\\(%s\\)\\|\\(%s\\)"
+                    vc-ignore-dir-regexp
+                    tramp-file-name-regexp)))
+  (setq work-remote-url "")
+  (setq work-remote-machine nil))
 
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-(setq el-get-user-package-directory "~/.emacs.d")
-(setq Info-directory-list '("/usr/local/share/info/" "/usr/share/info/"))
+(use-package password-cache
+  :straight (:type built-in)
+  :custom (password-cache-expiry 36000)
+  :after flyspell
+  )
 
-(unless (require 'el-get nil 'noerror)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
+(defun ma-spck-next-link (end)
+  "Return position of next SPCK-{ID} link or nil if there is none."
+  (save-excursion
+    (when (looking-at "\\(SPCK-[0-9.]+\\)")
+      (progn
+        (skip-chars-forward "SPCK-")
+        (skip-chars-forward "[:digit:]")))
+    (when (re-search-forward "\\(SPCK-[[:digit:]]+\\)" end t)
+      (progn
+        (skip-chars-backward "[SPCK\\-][:digit:]")
+        (point)))))
 
-;; These two have to be set, before el-get starts
-(setq el-get-emacswiki-base-url "http://www.emacswiki.org/emacs/download/")
-(setq el-get-github-default-url-type (quote https))
 
-(setq el-get-sources
-      '((:name expand-region
-               :after (global-set-key "\M-o" 'er/expand-region))
-        (:name multiple-cursors
-               :after (progn
-                        (global-set-key (kbd "C-c C-n") 'mc/mark-next-like-this)
-                        (global-set-key (kbd "C-c C-p") 'mc/mark-previous-like-this)
-                        (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this-in-defun)
-                        (global-set-key (kbd "C-c C-|") 'mc/edit-lines)))
-        (:name org-mode
-               :type builtin)
-        (:name ox-pandoc
-               :depends org-mode)
-        (:name org-jira
-               :depends org-mode)
-        (:name org-bullets
-               :depends org-mode
-               :after (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-	     (:name filenotify-recursive
-	       :type github
-	       :pkgname "jethrokuan/filenotify-recursive")
-        (:name org-roam
-	       :type github
-	       :pkgname "org-roam/org-roam"
-	       :depends (dash f s emacsql magit filenotify-recursive))
-        (:name http-post-simple
-               :type http
-               :url "http://www.emacswiki.org/emacs/download/http-post-simple.el"
-               :features http-post-simple)
-        (:name uniquify
-               :type builtin
-               :features uniquify
-               :after (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
-        (:name dash)
-        (:name ghub)
-        (:name graphql)
-        (:name magit-popup)
-        (:name treepy)
-        (:name with-editor)
-        (:name transient)
-        (:name calendar
-               :type builtin)
-        (:name german-holidays
-               :type github
-               :pkgname "rudolfochrist/german-holidays"
-               :after (progn
-                         (require 'german-holidays)
-                         (setq calendar-holidays holiday-german-BY-holidays)))
-        (:name magit
-               :depends (dash ghub graphql magit-popup treepy with-editor transient)
-               :after
-               (progn
-                 (when work-win (setq magit-git-executable "C:/Program Files (x86)/SmartGit/git/bin/git.exe"))
-                 (global-set-key (kbd "C-c C-z") 'magit-status)))
-        (:name swiper)
-        (:name hydra)
-        (:name gdb-mi
-               :type github
-               :pkgname "weirdNox/emacs-gdb"
-               :depends hydra
-               :after (progn
-                        (fmakunbound 'gdb)
-                        (fmakunbound 'gdb-enable-debug)
-                        (setq gdb-ignore-gdbinit nil)
-                        (defhydra hydra-gdb ()
-                          "gdb"
-                          ("g"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-gui") "simpack-gui")
-                          ("s"  (gdb-executable "/scratch/apel/new_arch/obj/dbg64/run/bin/linux64/simpack-slv") "simpack-slv"))
-                        ))
-        (:name smartscan)
-        (:name git-timemachine)
-        (:name git-gutter
-               :after (if (not work-linux-remote)
-                          (global-git-gutter-mode 1)))
-        (:name llvm-mode)
-        (:name ascii-table)
-        (:name crontab-mode)
-        (:name browse-kill-ring)
-        (:name wgrep)
-        (:name generic
-               :type builtin)
-        (:name skeleton
-               :type builtin)
-        (:name request)
-        (:name auto-insert
-               :type builtin
-               :depends skeleton
-               :after (progn
-                        (add-hook 'find-file-hook 'auto-insert)
-                        (define-auto-insert "\\.h\\'" 'header-skeleton)
-                        ))
-        (:name smerge-mode
-               :type builtin
-               :after (add-hook 'c-mode-common-hook 'smerge-start-session))
-        (:name files
-               :type builtin)
-        (:name password-cache
-               :type builtin)
-        (:name subword
-               :type builtin
-               :after (add-hook 'prog-mode-hook
-                                (lambda()
-                                  (local-set-key (kbd "M-<left>") 'subword-backward)
-                                  (local-set-key (kbd "M-<right>") 'subword-forward)
-                                  (subword-mode t))))
-        (:name desktop
-               :type builtin
-               :after (desktop-save-mode t))
-        (:name cmake-mode
-               :after (setq cmake-tab-width 3))
-        (:name idle-highlight-mode)
-        (:name json-snatcher)
-        (:name json-reformat)
-        (:name json-mode
-               :depends (json-snatcher json-reformat))
-        (:name js2-mode
-               :type github
-               :pkgname "mooz/js2-mode"
-               :after (progn
-                        (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-                        (add-to-list 'auto-mode-alist '("\\.sjs$" . js2-mode))
-                        (add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
-                        (setq js2-include-node-externs t)
-                        (setq js2-mode-assume-strict t)))
+(defun ma-spck-link-at-point-p ()
+  "Return SPCK-{ID} link at point or nil if there is none."
+  (save-excursion
+    (skip-chars-backward "[SPCK\\-][:digit:]")
+    (and
+     (looking-at "\\(SPCK-[0-9.]+\\)")
+     (concat "https://spck-jira.ux.dsone.3ds.com:8443/browse/" (match-string 1)))))
 
-        (:name json-navigator
-               :type github
-               :pkgname "DamienCassou/json-navigator")
-        (:name markdown-mode)
-        (:name visual-regexp
-               :after (progn
-                        (global-set-key (kbd "M-%") 'vr/query-replace)
-                        (global-set-key (kbd "C-M-%") 'vr/replace)))
-        (:name visual-regexp-steroids)
-        (:name which-key
-               :after (progn
-                        (which-key-mode)
-                        (setq which-key-max-description-length 35)))
-        (:name yasnippet)
-        (:name ace-window
-               :after
-               (progn
-                 (global-set-key (kbd "C-x o") 'ace-window)
-                 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
-        (:name link-hint)
-        (:name packed)
-        (:name auto-compile
-               :depends (packed)
-               :after (progn
-                        (setq load-prefer-newer t)
-                        (require 'auto-compile)
-                        (auto-compile-on-load-mode 1)
-                        (auto-compile-on-save-mode 1)))
-        (:name graphviz-dot-mode)
-        (:name modern-cpp-font-lock
-               :type github
-               :pkgname "ludwigpacifici/modern-cpp-font-lock"
-               :after (modern-c++-font-lock-global-mode t))
-        (:name unicode-fonts
-               :after (unicode-fonts-setup))
-        (:name diminish
-               :after (progn
-                        (eval-after-load "cwarn" '(diminish 'cwarn-mode))
-                        (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
-                        (eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
-                        (eval-after-load "flymake" '(diminish 'flymake-mode))
-                        (eval-after-load "flycheck" '(diminish 'flycheck-mode))
-                        (eval-after-load "company" '(diminish 'company-mode))
-                        (eval-after-load "company-box" '(diminish 'company-box-mode))
-                        (eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
-                        (eval-after-load "which-key" '(diminish 'which-key-mode))
-                        (eval-after-load "abbrev" '(diminish 'abbrev-mode))))
-        (:name projectile)
-        (:name company-mode)
-        (:name company-box-mode
-		         :type github
-		         :pkgname "sebastiencs/company-box"
-               :after (add-hook 'company-mode-hook 'company-box-mode)
-               :depends (company-mode frame-local))
-        (:name vertico
-               :type github
-               :pkgname "minad/vertico")
-        (:name orderless
-               :type github
-               :pkgname "oantolin/orderless"
-               :after
-               (setq completion-styles '(orderless basic)))
-        (:name marginalia
-               :type github
-               :pkgname "minad/marginalia"
-               :after (marginalia-mode))
-        (:name frame-local
-	       :type github
-	       :pkgname "sebastiencs/frame-local")
-        (:name flycheck)
-        (:name doom-modeline)
-        (:name modus-themes
-               :type github
-               :pkgname "protesilaos/modus-themes"
-               :after (progn
-                        (modus-themes-load-themes)
-                        (setq modus-themes-deuteranopia t)
-                        (setq modus-themes-bold-constructs t)
-                        (setq modus-themes-italic-constructs t)
-                        (setq modus-themes-paren-match '(bold))
-                        (setq modus-themes-mode-line '(3d))
-                        (setq modus-themes-hl-line '(intense))
-                        (modus-themes-load-vivendi)))
-        (:name avy
-         :type github
-         :pkgname "abo-abo/avy")
-        (:name "devdocs"
-         :type github
-         :pkgname "astoff/devdocs.el")
-        (:name "dap-mode")
-        (:name keyfreq
-               :type github
-               :pkgname "dacap/keyfreq"
-               :after (progn
-                        (setq keyfreq-excluded-commands
-                              '(lsp-ui-doc--handle-mouse-movement
-                                gud-tooltip-mouse-motion))
-                        (keyfreq-mode 1)
-                        (keyfreq-autosave-mode 1)))
-        (:name deadgrep
-               :after
-               (progn
-                 (global-set-key [?\C-c ?\C-r] 'deadgrep)
-                 (setq deadgrep-project-root-function (lambda ()
-                                                        (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa")
-                                                            "/scratch/apel/new_arch/develop/src/ooa"
-                                                        (if (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src")
-                                                            "/scratch/apel/new_arch/develop/src"
-                                                          (deadgrep--project-root)))))
-                 (add-hook 'deadgrep-mode-hook (lambda () (next-error-follow-minor-mode t)))
-                 (setq deadgrep-max-buffers 1)))
-        (:name vterm
-               :after
-               (add-hook 'vterm-mode-hook
-                         (lambda ()
-                           (local-set-key (kbd "C-g") 'vterm--self-insert))))
-        (:name mu4e
-               :branch "release/1.8"
-               :post-init (setq mu4e-mu-binary (expand-file-name "mu" (expand-file-name "mu" (expand-file-name "build" (el-get-package-directory 'mu4e)))))
-               :load-path "build/mu4e"
-               :info nil)
-        (:name mu4e-alert)
-        (:name emacs-htmlize
-               :type github
-               :pkgname "hniksic/emacs-htmlize")
-        (:name org-msg
-               :type github
-               :pkgname "jeremy-compostella/org-msg"
-               :depends (emacs-htmlize mu4e))
-        (:name guess-language
-               :type github
-               :pkgname "tmalsburg/guess-language.el")
-        (:name org-auto-tangle
-               :type github
-               :pkgname "yilkalargaw/org-auto-tangle"
-               :after
-               (add-hook 'org-mode-hook 'org-auto-tangle-mode))
-        ))
+  (use-package link-hint
+    :config
+    (link-hint-define-type 'spck-url
+                           :next 'ma-spck-next-link
+                           :at-point-p 'ma-spck-link-at-point-p
+                           :open #'browse-url)
+    (push 'link-hint-spck-url link-hint-types)
+    :bind ("C-c o" . 'link-hint-open-link))
 
-(if work
-    (setq el-get-sources
-     (append el-get-sources
-        '((:name restclient
-           :type github
-           :pkgname "pashky/restclient.el")
-          (:name language-detection
-                 :type github
-                 :pkgname "andreasjansson/language-detection.el")
-          (:name dockerfile-mode
-                 :type github
-                 :pkgname "spotify/dockerfile-mode"
-                 :after
-                 (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
-          (:name groovy-emacs-mode)
-          ))))
+(cond
+ (work-linux-local
+  (progn (setq projectile-project-search-path '("/scratch/apel"))
+         (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))))
+ (work-linux-remote
+  (progn (setq projectile-project-search-path '("/scratch/apel"))
+         (setq projectile-git-command (concat (getenv "HOME") "/bin/projectile_ls.sh"))
+         (setq projectile-enable-caching t)))
+ (work-win (setq projectile-project-search-path '("D:/users/apel")))
+ (home (setq projectile-project-search-path '("/home/martin"))))
 
-(if work-linux
-    (setq el-get-sources
-     (append el-get-sources
-             '(
-               (:name popup)
-               (:name erc
-                      :type builtin)
-               (:name lsp-mode)
-               (:name lsp-ui
-                      :depends (lsp-mode))
-               ))))
+(defun ma-projectile-mode-line()
+  "Generates a projectile mode line"
+  (format " Proj[%s]" (projectile-project-name)))
 
-(if home
-    (setq el-get-sources
-     (append el-get-sources
-             '(
-               (:name async
-                :type github
-                :pkgname "jwiegley/emacs-async")
-               (:name platformio-mode
-                :type github
-                :pkgname "ZachMassia/platformio-mode"
-                :depends (projectile async))))))
+(use-package projectile
+  :init
+  (projectile-mode 1)
+  ;; This is needed to avoid slowdown when working with remote files.
+  (defadvice projectile-project-root (around ignore-remote first activate)
+    (unless (file-remote-p default-directory) ad-do-it))
 
-(setq my-packages (mapcar 'el-get-source-name el-get-sources))
+  :bind
+  ("C-c C-f" . projectile-find-file)
+  :bind-keymap
+  ("C-S-p" . projectile-command-map)
+  :custom
+  (projectile-sort-order 'recently-active)
+  (projectile-git-submodule-command nil)
+  (projectile-mode-line-prefix "")
+  (projectile-mode-line-function 'ma-projectile-mode-line))
 
-(el-get 'sync my-packages)
+(defun ma-deadgrep-root-function()
+  "Determine root directory for current buffer."
+    (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa"))
+        "/scratch/apel/new_arch/develop/src/ooa"
+      (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src"))
+          "/scratch/apel/new_arch/develop/src"
+        (deadgrep--project-root))))
+(use-package deadgrep
+  :bind ("C-c C-r" . deadgrep)
+  :custom (deadgrep-max-buffers  1)
+  (deadgrep-project-root-function 'ma-deadgrep-root-function))
 
-(add-to-list 'load-path "~/.emacs.d/ma-funcs")
-(require 'ma-funcs)
+(use-package hydra
+  :straight (:host github :repo "abo-abo/hydra"))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(appt-audible nil)
- '(auth-source-debug nil)
- '(auth-source-save-behavior nil)
- '(auth-sources '("~/.authinfo.gpg"))
- '(auto-revert-check-vc-info nil)
- '(auto-revert-remote-files nil)
- '(auto-revert-verbose nil)
- '(blink-matching-paren-on-screen nil)
- '(browse-kill-ring-no-duplicates t)
- '(c-basic-offset 3)
- '(c-cleanup-list '(scope-operator compact-empty-funcall))
- '(c-default-style
-   '((c-mode . "cc-mode")
-     (c++-mode . "cc-mode")
-     (java-mode . "java")
-     (other . "gnu")))
- '(c-offsets-alist
-   '((incomposition . +)
-     (inmodule . +)
-     (composition-close . 0)
-     (module-close . 0)
-     (composition-open . 0)
-     (module-open . 0)
-     (cpp-define-intro c-lineup-cpp-define +)
-     (substatement-label . 2)
-     (string . c-lineup-dont-change)
-     (c . c-lineup-C-comments)
-     (defun-open . 0)
-     (defun-close . 0)
-     (defun-block-intro . +)
-     (class-open . 0)
-     (class-close . 0)
-     (inline-close . 0)
-     (func-decl-cont . +)
-     (knr-argdecl-intro . +)
-     (knr-argdecl . 0)
-     (topmost-intro . 0)
-     (topmost-intro-cont . 0)
-     (member-init-intro . +)
-     (member-init-cont . c-lineup-multi-inher)
-     (inher-intro . +)
-     (inher-cont . c-lineup-multi-inher)
-     (block-open . 0)
-     (block-close . 0)
-     (brace-list-open . 0)
-     (brace-list-close . 0)
-     (brace-list-intro . +)
-     (brace-list-entry . 0)
-     (brace-entry-open . 0)
-     (statement . 0)
-     (statement-cont . +)
-     (statement-block-intro . +)
-     (statement-case-intro . +)
-     (statement-case-open . 0)
-     (substatement . +)
-     (substatement-open . 0)
-     (case-label . 0)
-     (access-label . -)
-     (label . 2)
-     (do-while-closure . 0)
-     (else-clause . 0)
-     (catch-clause . 0)
-     (comment-intro . c-lineup-comment)
-     (arglist-intro . +)
-     (arglist-cont . 0)
-     (arglist-cont-nonempty . c-lineup-arglist)
-     (arglist-close . +)
-     (stream-op . c-lineup-streamop)
-     (inclass . +)
-     (cpp-macro .
-                [0])
-     (cpp-macro-cont . c-lineup-dont-change)
-     (friend . 0)
-     (objc-method-intro .
-                        [0])
-     (objc-method-args-cont . c-lineup-ObjC-method-args)
-     (objc-method-call-cont . c-lineup-ObjC-method-call)
-     (extern-lang-open . 0)
-     (extern-lang-close . 0)
-     (inextern-lang . +)
-     (namespace-open . 0)
-     (namespace-close . 0)
-     (innamespace . 0)
-     (template-args-cont c-lineup-template-args +)
-     (inlambda . c-lineup-inexpr-block)
-     (lambda-intro-cont . +)
-     (inexpr-statement . 0)
-     (inexpr-class . +)
-     (inline-open . 0)))
- '(c-style-variables-are-local-p nil)
- '(cc-other-file-alist
-   '(("\\.cc\\'"
-      (".hh" ".h"))
-     ("\\.hh\\'"
-      (".cc" ".C"))
-     ("\\.c\\'"
-      (".h"))
-     ("Impl\\.h\\'"
-      ("Impl.cpp" ".h"))
-     ("\\.h\\'"
-      (".c" ".cc" ".C" ".CC" ".cxx" ".cpp" "Impl.h"))
-     ("\\.C\\'"
-      (".H" ".hh" ".h"))
-     ("\\.H\\'"
-      (".C" ".CC"))
-     ("\\.CC\\'"
-      (".HH" ".H" ".hh" ".h"))
-     ("\\.HH\\'"
-      (".CC"))
-     ("\\.c\\+\\+\\'"
-      (".h++" ".hh" ".h"))
-     ("\\.h\\+\\+\\'"
-      (".c++"))
-     ("\\.cpp\\'"
-      (".hpp" ".hh" ".h"))
-     ("\\.hpp\\'"
-      (".cpp"))
-     ("\\.cxx\\'"
-      (".hxx" ".hh" ".h"))
-     ("\\.hxx\\'"
-      (".cxx"))))
- '(cc-search-directories
-   '("." "/usr/include" "/usr/local/include/*" "/scratch/apel/new_arch/develop/src/ooa" "../LocalInterfaces" "../../ProtectedInterfaces" "../src" "../../src" "/scratch/apel/new_arch/develop/src/postproc/include" "/scratch/apel/new_arch/develop/src/postproc/include/*"))
- '(comment-style 'plain)
- '(compilation-ask-about-save nil)
- '(compilation-auto-jump-to-first-error t)
- '(compilation-error-regexp-alist '(bash cmake cmake-info gcc-include gnu msft perl))
- '(compilation-read-command nil)
- '(compilation-scroll-output 'first-error)
- '(compilation-search-path '("/scratch/apel/new_arch"))
- '(compilation-skip-threshold 2)
- '(compilation-skip-visited t)
- '(completion-category-overrides '((file (styles emacs22))))
- '(confirm-kill-emacs 'yes-or-no-p)
- '(cperl-continued-statement-offset 0)
- '(cperl-indent-level 3)
- '(dabbrev-case-fold-search nil)
- '(default-input-method "german-postfix")
- '(desktop-globals-to-save
-   '(desktop-missing-file-warning search-ring regexp-search-ring register-alist file-name-history))
- '(desktop-restore-eager 20)
- '(desktop-save 'ask-if-new)
- '(dired-auto-revert-buffer 'dired-directory-changed-p)
- '(dired-dwim-target t)
- '(dired-omit-files "^\\.?#\\|^\\.")
- '(dirtrack-list '("^MAL1@[a-zA-Z0-9]+ \\[\\(.*\\)\\]" 1))
- '(ediff-keep-variants nil)
- '(ediff-split-window-function 'split-window-horizontally)
- '(ediff-window-setup-function 'ediff-setup-windows-plain)
- '(el-get-byte-compile-at-init t)
- '(eldoc-minor-mode-string nil)
- '(electric-indent-mode t)
- '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode))
- '(erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
- '(erc-modules
-   '(autoaway autojoin button completion dcc fill irccontrols list match menu move-to-prompt netsplit networks noncommands notifications readonly ring smiley stamp spelling track))
- '(erc-nick "martin")
- '(erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
- '(erc-server "localhost")
- '(erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
- '(erc-track-showcount nil t)
- '(erc-user-full-name "Martin Apel")
- '(eudc-protocol 'ldap)
- '(eudc-query-form-attributes '(name firstname email phone Uid))
- '(eudc-server "10.29.111.1")
- '(ff-always-in-other-window t)
- '(ff-always-try-to-create nil)
- '(ff-ignore-include t)
- '(file-cache-filter-regexps
-   '("~$" "\\.o$" "\\.rpo$" "\\.exe$" "\\.a$" "\\.elc$" ",v$" "\\.output$" "\\.$" "#$" "\\.class$" "\\.bak$" "\\.svn-base$" "\\.html$" "\\.svn" "\\.so$" "\\.dll$" "CMakeFiles" "extern/share" "extern/linux" "extern/win" "partners" "/obj/" "^project\\.pj$" "\\.sbr$" "\\.tes$" "\\.intinfo$" "\\.dim$"))
- '(fill-column 120)
- '(focus-follows-mouse t)
- '(gdb-find-source-frame t)
- '(gdb-many-windows t)
- '(gdb-show-main t)
- '(git-commit-summary-max-length 72)
- '(global-auto-revert-mode t)
- '(gnutls-trustfiles
-   '("/etc/ssl/certs/ca-certificates.crt" "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/ca-bundle.pem" "/usr/ssl/certs/ca-bundle.crt" "/usr/local/share/certs/ca-root-nss.crt" "/home/home_dev/MAL1/SIMPACK_CA.cer"))
- '(grep-command "grep --color -nH -e ")
- '(grep-find-command
-   '("find . -type f -exec grep --color -nH -e  \\{\\} +" . 49))
- '(grep-find-template
-   "find <D> <X> -type f <F> -exec grep <C> -nH -e <R> \\{\\} +")
- '(grep-template "grep <X> <C> -nH -e <R> <F>")
- '(grep-use-null-filename-separator nil)
- '(groovy-indent-offset 3)
- '(gud-tooltip-mode t)
- '(imenu-sort-function 'imenu--sort-by-name)
- '(indent-tabs-mode nil)
- '(inhibit-startup-screen t)
- '(js-indent-level 3)
- '(large-file-warning-threshold 20000000)
- '(latex-run-command "pdflatex")
- '(ldap-default-base "ou=dsone,dc=dsone,dc=3ds,dc=com")
- '(ldap-default-host "10.29.111.1")
- '(ldap-host-parameters-alist
-   '(("10.29.111.1" base "ou=dsone,dc=dsone,dc=3ds,dc=com" binddn "cn=SVC_SP_LDAPAUTH,ou=Managed Accounts,ou=DSDEU057,OU=EU,ou=dsone,dc=dsone,dc=3ds,dc=com" passwd "p@wist0psecret!")))
- '(log-edit-hook '(log-edit-insert-cvs-template log-edit-show-files))
- '(lsp-ui-doc-border "deep sky blue")
- '(lsp-ui-doc-enable t)
- '(lsp-ui-doc-include-signature t)
- '(lsp-ui-doc-max-height 10)
- '(lsp-ui-doc-position 'bottom)
- '(lsp-ui-sideline-diagnostic-max-line-length 70)
- '(lsp-ui-sideline-show-code-actions t)
- '(lsp-ui-sideline-show-diagnostics t)
- '(lsp-ui-sideline-show-hover nil)
- '(magit-auto-revert-mode nil)
- '(magit-cherry-pick-arguments '("-x"))
- '(magit-commit-extend-override-date t)
- '(magit-commit-reword-override-date t)
- '(magit-diff-refine-hunk t)
- '(magit-log-arguments '("-n20"))
- '(magit-log-section-arguments '("-n256" "--decorate"))
- '(magit-process-popup-time 3)
- '(magit-pull-arguments '("--rebase"))
- '(magit-qdiff-options '("--ignore-space-change" "--ignore-all-space"))
- '(magit-refs-primary-column-width '(16 . 60))
- '(magit-refs-sections-hook
-   '(magit-insert-error-header magit-insert-branch-description magit-insert-local-branches magit-insert-remote-branches))
- '(magit-repo-dirs
-   '("/scratch/apel/new_arch" "/scratch2/apel/SpckTest" "/scratch2/apel/documentation"))
- '(magit-repository-directories '(("/scratch/apel" . 1) ("~/.emacs.d" . 2)))
- '(magit-restore-window-configuration t)
- '(magit-rewrite-inclusive nil)
- '(magit-show-child-count t)
- '(make-backup-files nil)
- '(minibuffer-message-timeout 2 t)
- '(mo-git-blame-blame-window-width 30)
- '(mouse-yank-at-point t)
- '(nxml-child-indent 3)
- '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
- '(package-selected-packages '(csv-mode nil))
- '(password-cache-expiry 36000)
- '(perl-indent-level 3)
- '(remote-file-name-inhibit-cache nil)
- '(require-final-newline t)
- '(safe-local-variable-values
-   '((ma-make-target)
-     (ma-build-dir)
-     (ma-make-target . "all")
-     (ma-build-dir . "/scratch/apel/embed_nodejs/obj")
-     (ma-make-target . "")
-     (ma-build-dir . "")
-     (ma-build-target)
-     (ma-compile-command . "~/bin/ds/my_mkmk")
-     (ma-compile-command . "~/bin/my_compile")
-     (ma-compile-command . "~/bin/my_remote_compile.sh")))
- '(save-abbrevs nil)
- '(scroll-bar-mode 'right)
- '(send-mail-function nil)
- '(show-paren-mode t nil (paren))
- '(show-paren-style 'expression)
- '(smartscan-symbol-selector "symbol")
- '(split-height-threshold 40)
- '(split-width-threshold 200)
- '(standard-indent 3)
- '(stash-repos
-   '(("spckxxxx" . "/scratch/apel/new_arch/")
-     ("spcktest" . "/scratch/apel/SpckTest/")
-     ("devscripts" . "/scratch/apel/devscripts/")))
- '(stash-reviewer-shortcuts
-   '(("autotest-linux" . "linux")
-     ("autotest-windows" . "win")
-     ("autotest-fortran" . "fort")
-     ("PKR3" . "PKl")
-     ("BBR1" . "BB")
-     ("WTG1" . "WT")
-     ("HKP1" . "PK")
-     ("MAL1" . "MA")
-     ("MFH1" . "MF")
-     ("MDE7" . "MD")
-     ("FMK1" . "FM")
-     ("MDL2" . "DM")))
- '(stash-target-branch-regex "^origin/master\\|origin/release/.*$")
- '(svn-log-edit-show-diff-for-commit t)
- '(tab-width 3)
- '(tex-close-quote "\"")
- '(tex-command nil t)
- '(tex-open-quote "\"")
- '(texinfo-close-quote "''")
- '(texinfo-open-quote "``")
- '(tool-bar-mode nil)
- '(tramp-default-method "scp")
- '(tramp-default-proxies-alist nil)
- '(tramp-smb-conf nil)
- '(truncate-lines t)
- '(use-file-dialog nil)
- '(user-full-name "Martin Apel")
- '(user-mail-address "martin.apel@3ds.com")
- '(vc-command-messages t)
- '(vc-consult-headers nil)
- '(vc-display-status t)
- '(vc-git-diff-switches "-w")
- '(vc-handled-backends '(Git))
- '(w3m-pop-up-windows t)
- '(warning-suppress-log-types '((comp))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(aw-leading-char-face ((t (:background "deep sky blue" :foreground "white" :height 3.0))))
- '(git-gutter:added ((t (:inherit default :foreground "deep sky blue" :weight bold))))
- '(ma-magit-highlight-remote-face ((t (:inherit magit-branch-remote :background "light sea green" :foreground "black" :underline t :slant italic))))
- '(stash-section-title ((t (:background "blue" :slant italic :height 1.5)))))
+(use-package all-the-icons)
 
-;; Avoid version-control checks for tramp buffers
-(setq vc-ignore-dir-regexp
-      (format "\\(%s\\)\\|\\(%s\\)"
-              vc-ignore-dir-regexp
-              tramp-file-name-regexp))
+(use-package diminish)
 
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
+(use-package uniquify
+  :straight (:type built-in)
+  :custom (uniquify-buffer-name-style 'post-forward-angle-brackets))
 
-(if (> (display-pixel-height) 1200)
-    (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-8"))
-    (add-to-list 'default-frame-alist
-                 '(font . "DejaVu Sans Mono-10")))
+(use-package ace-window
+  :bind ("C-x o" . 'ace-window)
+  :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+
+(use-package which-key
+  :diminish which-key-mode
+  :config (which-key-mode)
+  :custom (which-key-max-description-length 35))
+
+(use-package doom-modeline
+  :custom
+  (doom-modeline-modal-icon nil)
+  (doom-modeline-persp-icon nil)
+  (doom-modeline-persp-name nil)
+  (doom-modeline-buffer-file-name-style 'buffer-name)
+  (doom-modeline-vcs-max-length 25)
+  :config
+  (progn
+    (doom-modeline-mode 1)
+    (if home
+        (display-battery-mode t))))
+
+(use-package modus-themes
+  :custom
+    (modus-themes-deuteranopia t)
+    (modus-themes-bold-constructs t)
+    (modus-themes-italic-constructs t)
+    (modus-themes-paren-match '(bold))
+    (modus-themes-mode-line '(3d))
+    (modus-themes-hl-line '(intense))
+    (modus-themes-headings '((t variable-pitch)))
+  :config
+  (progn
+    (load-theme 'modus-vivendi :no-confirm)))
+
+(use-package unicode-fonts
+  :config (unicode-fonts-setup))
+
+(global-font-lock-mode 1)
+
+(use-package fontaine
+  :custom (fontaine-presets
+           '((home
+              :default-family "DejaVu Sans Mono"
+              :default-height 80
+              :fixed-pitch-family "DejaVu Sans Mono"
+              :fixed-pitch-height 100
+              :variable-pitch-family "Nimbus Roman"
+              :variable-pitch-height 100)
+             (work
+              :inherit home)
+             (screen-sharing
+              :inherit home
+              :default-height 100
+              :fixed-pitch-family "DejaVu Sans Mono"
+              :fixed-pitch-height 120
+              :variable-pitch-family "Nimbus Roman"
+              :variable-pitch-height 120))))
+(if (or home work-linux-remote)
+    (fontaine-set-preset 'home)
+  (fontaine-set-preset 'work))
+
+(use-package whitespace
+  :straight (:type built-in)
+  :custom (whitespace-line-column 150)
+  (whitespace-style '(face lines-tail))
+  :hook (prog-mode . whitespace-mode))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
+(setq frame-inhibit-implied-resize t)
 
-(global-set-key [delete] 'delete-char)
-(global-set-key [?\C-c ?\C-g] 'goto-line)
-(global-set-key [?\C-x ?\C-b] 'ibuffer)
-(global-set-key (kbd "C-M-j") 'avy-goto-char-timer)
+(defun ma-devdocs-lookup-at-point()
+  (interactive)
+  (devdocs-lookup nil (thing-at-point 'symbol)))
 
-(global-unset-key [?\C-x ?\C-c])
-(global-set-key [?\C-x ?\C-c ?\C-x] 'save-buffers-kill-terminal)
-(global-set-key "\M- " 'dabbrev-expand)
-(global-set-key (kbd "C-s") 'swiper-isearch)
-;; (global-set-key (kbd "SPC") 'just-one-space)
+(use-package devdocs
+  :bind
+  ("C-c C-S-d" . 'ma-devdocs-lookup-at-point)
+  ("C-c C-d" . devdocs-lookup)
+  :init
+  (add-hook 'c-mode-common-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("cpp" "qt~5.12"))
+              (local-unset-key (kbd "C-c C-d"))))
+  (add-hook 'cmake-mode-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("cmake~3.23"))
+              (local-unset-key (kbd "C-c C-d"))))
+  (add-hook 'dockerfile-mode-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("docker"))))
+  (add-hook 'js-mode-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("node~18_lts" "javascript"))))
+  (add-hook 'python-mode-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("python~3.10"))))
+  (add-hook 'perl-mode-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("perl~5.34"))))
+  (add-hook 'yaml-mode-hook
+            (lambda()
+              (setq-local devdocs-current-docs '("ansible")))))
 
-(add-hook 'c-mode-common-hook
-       (lambda ()
-            (imenu-add-to-menubar "Functions")
-            (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
-            (local-set-key (kbd "C-c C-s") 'hs-show-block)
-            (local-set-key (kbd "C-M-a") 'beginning-of-defun)
-            (local-set-key (kbd "C-M-e") 'end-of-defun)
-            (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
-            (local-set-key (kbd "C-c =") 'align-regexp)
-            (local-set-key (kbd "C-c *") 'ma-insert-separator)
-            (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
-            (local-unset-key (kbd "C-c C-n"))
-            (local-unset-key (kbd "C-c C-p"))
-            (local-unset-key (kbd "C-c C-z"))                       ;; Free keybinding for magit-status
+(setq Info-directory-list '("/usr/local/share/info/" "/usr/share/info/"))
 
-            (if work
-                (add-hook 'before-save-hook 'ma-create-or-update-copyright))
-            (c-toggle-hungry-state 1)
-            (flyspell-prog-mode)
-            (cwarn-mode)
-            (hs-minor-mode)
-            (idle-highlight-mode)
-            (hs-hide-initial-comment-block)))
+(use-package helpful
+:bind
+("C-h f" . helpful-callable)
+("C-h v" . helpful-variable)
+("C-h k" . helpful-key)
+("C-c C-d" . helpful-at-point))
+(add-to-list 'display-buffer-alist
+             `(,(ma-make-display-buffer-matcher-function '(helpful-mode))
+               (display-buffer-reuse-window display-buffer-in-direction)
+               (direction . bottom)
+               (window-height . 0.5)))
 
-(add-hook 'python-mode-hook
+(defun ma-cmake-upcase-completion-list (candidates)
+  "Converts all incoming completion candidates to upper case"
+  (if (string-equal major-mode "cmake-mode")
+ (mapcar 'upcase candidates)
+    candidates))
+
+(use-package company
+ :diminish company-mode
+ :config
+ (global-company-mode)
+ :custom
+   (company-dabbrev-downcase nil)
+   (company-transformers '(ma-cmake-upcase-completion-list company-sort-by-occurrence))
+   (company-cmake-executable "/scratch/apel/new_arch/develop/extern/linux64/cmake-3.23/bin/cmake")
+   (company-backends '(company-cmake company-capf company-files
+                                     (company-dabbrev-code company-keywords)
+                                     company-dabbrev))
+   (company-idle-delay 2.0)
+   :bind ("C-M-S-s-c" . company-complete))
+
+;; (use-package company-box
+;;   :after company
+;;   :diminish company-box-mode
+;;   :hook company-mode)
+
+(use-package vertico
+  :custom
+    (vertico-sort-function #'vertico-sort-history-alpha)
+  :config
+  (progn
+    (vertico-mode)
+    (define-key vertico-map (kbd "TAB") 'minibuffer-complete)
+    (savehist-mode)))
+
+(use-package orderless
+  :custom (completion-styles '(substring orderless basic)))
+
+(use-package marginalia
+  :init
+  (marginalia-mode))
+
+(when work-linux-remote
+  (defun ma-switch-to-mu4e ()
+    "Switch to unread mail in mu4e"
+    (interactive)
+    (unless (mu4e-running-p)
+      (mu4e t))
+    (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
+    (mu4e-headers-change-sorting :date 'ascending))
+
+  (defun ma-view-previous-next-advice(orig &rest args)
+    (let ((switch-to-buffer-obey-display-actions nil))
+      (apply orig args)))
+
+  (use-package mu4e
+    :straight (:branch "release/1.10")
+    :load-path "straight/repos/mu/build/mu4e"
+    :commands mu4e-running-p mu4e
+    :custom
+    (mu4e-mu-binary (concat user-emacs-directory "straight/repos/mu/build/mu/mu"))
+    (mu4e-bookmarks
+     (quote
+      (("(maildir:/INBOX OR maildir:/AutoNotifications) AND NOT flag:trashed" "INBOX" 105)
+       ("flag:unread AND NOT flag:trashed AND NOT maildir:Trash" "Unread messages" 117)
+       ("date:today..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Today's messages" 116)
+       ("date:7d..now AND NOT flag:trashed AND NOT maildir:Trash AND NOT maildir:/Junk" "Last 7 days" 119))))
+    (mu4e-headers-fields
+     '( (:human-date . 12)
+        (:flags . 6)
+        (:from-or-to . 30)
+        (:subject)))
+    (mu4e-compose-signature-auto-include nil)
+    (mu4e-compose-dont-reply-to-self t)
+    (mu4e-compose-complete-only-after "2020-01-01")
+    (mu4e-drafts-folder "/Drafts")
+    (mu4e-get-mail-command "~/bin/Linux/call_mbsync.sh")
+    (mu4e-completing-read-function 'completing-read)
+    (mu4e-headers-include-related nil)
+    (mu4e-index-update-error-warning nil)
+    (mu4e-hide-index-messages t)
+    (mu4e-sent-folder "/Sent")
+    (mu4e-trash-folder "/Trash")
+    (mu4e-update-interval 120)
+    (mu4e-use-fancy-chars t)
+    (mu4e-attachment-dir "/tmp")
+    (mu4e-change-filenames-when-moving t)
+    (mu4e-headers-visible-lines 20)
+    (mu4e-org-link-query-in-headers-mode t)
+    (mu4e-modeline-support nil)
+    (message-send-mail-function (quote smtpmail-send-it))
+
+    (smtpmail-debug-info nil)
+    (smtpmail-local-domain "3ds.com")
+    (smtpmail-smtp-server "smtps.emea.3ds.com")
+    (smtpmail-smtp-service 587)
+    (smtpmail-stream-type (quote starttls))
+
+    (mail-user-agent 'mu4e-user-agent)
+    (shr-color-visible-luminance-min 80)
+    :config
+    (set-variable 'read-mail-command 'mu4e)
+    (advice-add 'mu4e-view-headers-next :around #'ma-view-previous-next-advice)
+    (advice-add 'mu4e-view-headers-prev :around #'ma-view-previous-next-advice)
+    (advice-add 'mu4e-headers-mark-and-next :around #'ma-view-previous-next-advice)
+
+    (add-to-list 'display-buffer-alist
+                 `("^\\*mu4e-headers\\*$"
+                   (display-buffer-reuse-window)
+                   (window-min-height . 0.25)))
+
+    (add-to-list 'display-buffer-alist
+                 `("^\\*mu4e"
+                   (display-buffer-reuse-window)))
+
+    (add-to-list 'display-buffer-alist
+                 `("^\\*Article\\*"
+                   (display-buffer-reuse-window)))
+
+    :bind ("<f4>" . ma-switch-to-mu4e)))
+
+(use-package mu4e-alert
+  :after (mu4e)
+  :custom
+  (mu4e-alert-email-notification-types '(count))
+  (mu4e-alert-style 'notifications)
+  (mu4e-alert-interesting-mail-query "maildir:/INBOX AND NOT flag:trashed AND flag:unread")
+  :init
+  (mu4e-alert-enable-notifications)
+  :config
+  (mu4e-alert-enable-mode-line-display))
+
+(defun ma-define-snippets-for-mail ()
+  "Define snippets to be used in org-msg-edit-mode."
+
+  (yas-define-snippets 'org-msg-edit-mode
+                       '(("ger"
+                          "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nViele Grüße,\n\nMartin\n#+end_signature\n"
+                          "MailDeutsch")
+                         ("eng"
+                          "\nHi `(org-msg-get-to-name)`,\n\n$0\n\n#+begin_signature\n--\nBest Regards,\n\nMartin\n#+end_signature\n"
+                          "MailEnglisch"))))
+
+(defun ma-make-display-buffer-matcher-function-org-msg()
+  (lambda (buffer-name action)
+    (with-current-buffer buffer-name (derived-mode-p org-msg-mode))))
+
+(use-package org-msg
+  :after (mu4e)
+  :custom
+  (org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t")
+  (org-msg-startup "hidestars indent inlineimages")
+  (org-msg-greeting-fmt nil)
+  (org-msg-recipient-names '(("martin.apel@3ds.com" . "Martin")
+                             ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")
+                             ("Rajanagaprasad.KODALI@3ds.com" . "Prasad")
+                             ("David.BLUMENTHAL@3ds.com" . "Dave")
+                             ("Edward.WATRAS@3ds.com" . "Ed")))
+  (org-msg-greeting-name-limit 3)
+  (org-msg-default-alternatives '((new		. (html))
+                                  (reply-to-html	. (html))
+                                  (reply-to-text	. (html))))
+  (org-msg-convert-citation t)
+  (org-msg-signature nil)
+
+  :config
+  (add-to-list 'display-buffer-alist
+               `(,(ma-make-display-buffer-matcher-function '(org-mode))
+                 (display-buffer-reuse-window)))
+  (ma-define-snippets-for-mail))
+
+(defun ma-org-msg-get-to-name-advice(orig &rest args)
+  "Return first name of addressee or defer to org-msg-get-to-name."
+  (save-excursion
+    (let ((to (org-msg-message-fetch-field "to")))
+      (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <\\([[:alpha:]]+\.[[:alpha:]]+@3ds\.com\\)>$" to)
+          (let ((mail-addr (match-string 3 to)))
+            (or (assoc-default mail-addr org-msg-recipient-names)
+                (match-string 2 to)))
+        (apply orig args)))))
+
+(advice-add 'org-msg-get-to-name :around #'ma-org-msg-get-to-name-advice)
+
+(org-msg-mode)
+
+(add-hook 'org-msg-edit-mode-hook
           (lambda ()
-            (local-unset-key [?\C-C ?\C-r])
-            (idle-highlight-mode)
-            (which-function-mode)
-            (imenu-add-to-menubar "Functions")))
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-s") 'message-goto-subject)
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-t") 'message-goto-to)
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-c") 'message-goto-cc)
+            (define-key org-msg-edit-mode-map (kbd "C-c C-f C-b") 'message-goto-bcc)
+            (flyspell-mode 1)
+            (setq flyspell-generic-check-word-predicate 'mail-mode-flyspell-verify)
+            (guess-language-mode 1)))
+
+(use-package german-holidays
+  :custom calendar-holidays holiday-german-BY-holidays)
+
+(setq diary-file "~/.emacs.d/diary")
+(setq calendar-url "http://localhost:1080/users/Martin.APEL@3ds.com/calendar/")
+(setq calendar-view-diary-initially-flag t)
+(setq diary-number-of-entries 3)
+(setq calendar-time-display-form '(24-hours ":" minutes))
+(setq calendar-week-start-day 1)
+(setq appt-display-diary t)
+(setq appt-display-format 'window)
+(setq org-agenda-include-diary t)
+
+(add-hook 'diary-list-entries-hook #'diary-sort-entries t)
+
+(defvar ma--getcal-last-update nil "Last time the calendar has been updated.")
+
+(defun ma--getcal-do (url file)
+  "Download ics file and add it to file"
+  (let ((tmpfile (url-file-local-copy url)))
+    (icalendar-import-file tmpfile file)
+    (let ((tmp-buffer (find-buffer-visiting tmpfile)))
+      (when tmp-buffer
+        (kill-buffer tmp-buffer)))
+    (delete-file tmpfile)))
+
+(defun ma-getcal ()
+  "Load an ICS calendar into the Emacs diary"
+  (interactive)
+  (message (concat "Loading " calendar-url " into " diary-file))
+  (let ((diary-buffer (find-file-noselect diary-file)))
+    (with-current-buffer diary-buffer
+      (erase-buffer)
+      (ma--getcal-do calendar-url diary-file)
+      (save-buffer)))
+  (setq ma--getcal-last-update (float-time)))
+
+(defun ma--getcal-if-necessary ()
+  "Reload the calendar if it hasn't been updated for an hour."
+  (when (or (not (and (floatp ma--getcal-last-update) (< (- (float-time) ma--getcal-last-update) 3600))))
+    (ma-getcal)))
+
+(when work
+  (appt-activate 1)
+  (run-with-idle-timer 60 t 'ma--getcal-if-necessary))
+
+(defun ma-show-agenda-if-hidden ()
+  "Show Org agenda of today if it is currently hidden. Returns t, if it already was visible, otherwise nil"
+  (interactive)
+  (let* ((buf (get-buffer "*Org Agenda*")))
+    (if (not buf)
+        (progn
+          (org-agenda-list 1)
+          nil)
+      (if (not (get-buffer-window buf))
+          (progn
+            (switch-to-buffer buf)
+            nil)
+        t)
+      )
+    )
+  )
+
+(use-package org
+  :straight (:type built-in)
+  :custom
+  (org-agenda-files '("~/org" "~/org/jira" "~/org-roam"))
+  (org-agenda-custom-commands
+   (quote
+    (("w" "Work agenda only" alltodo ""
+      ((org-agenda-files (list ma-na-org))))
+     ("h" "Home agenda only" agenda ""
+      ((org-agenda-files (list ma-private-org))))
+     ("s" "Unscheduled items" alltodo ""
+      ((org-agenda-skip-function
+        (quote
+         (org-agenda-skip-entry-if
+          (quote scheduled)
+          (quote nottodo)
+          (quote todo))))))
+     )))
+  (org-agenda-repeating-timestamp-show-all nil)
+  (org-agenda-skip-deadline-prewarning-if-scheduled t)
+  (org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (org-agenda-start-on-weekday nil)
+  (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t) (shell . t))))
+  (org-export-backends (quote (ascii html icalendar latex md pandoc jira)))
+  (org-capture-templates
+   (quote
+    (
+     ("g" "General" entry
+      (file+olp "~/org/na.org" "Unsorted")
+      "** TODO %?")
+     ("t" "Test" entry (file "~/org/test.org") nil)
+     ("m" "TODO from Mail" entry
+      (file+headline "~/org/na.org" "Mail")
+      "** TODO [#A] %?Mail: %a\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n" :immediate-finish t :jump-to-captured t))))
+  (sorg-scheduled-past-days 5)
+  :bind
+  ("C-c a" . 'org-agenda)
+  ("C-c C" . 'org-capture)
+  :hook (org . hl-line-mode)
+  :config
+  (define-key org-mode-map (kbd "C-c C-z") nil))      ;; Free up for global magit-status binding
+
+(use-package ox-pandoc
+  :straight t)
+
+(use-package org-jira
+  :if work
+  :custom
+  (jiralib-url "https://spck-jira.ux.dsone.3ds.com:8443")
+  (org-jira-working-dir "~/org/jira")
+  ;;                            other         dev 2023               dev 2023x    in progress       testing             ready
+  (org-jira-default-jql "filter = 33100 OR filter = 62300 OR filter = 33400 OR filter = 10903 OR filter = 14101 ORDER BY status asc")
+  (org-jira-use-status-as-todo t)
+  :config
+  (add-hook 'org-mode-hook
+            (lambda()
+              (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "~/org/jira"))
+                  (org-jira-mode 1)))))
+
+(use-package ox-jira
+  :if work)
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+
+(use-package emacsql
+  :if work)
+(use-package org-roam
+  :if work
+  :custom
+  (org-roam-directory "~/org-roam")
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?" :target
+      (file+head "%<%Y-%m-%d_%H:%M:%S>-${slug}.org" "#+title: ${title}")
+      :unnarrowed t)
+     ("s" "spck" plain (file "~/org-roam/templates/spck-template.org")
+      :target (file "%<%Y-%m-%d_%H:%M:%S>-SPCK-${slug}.org")
+      :unnarrowed t)
+     ))
+  (org-roam-database-connector 'sqlite-builtin)
+  :bind
+  ("C-c n l" . 'org-roam-buffer-toggle)
+  ("C-c n f" . 'org-roam-node-find)
+  ("C-c n i" . 'org-roam-node-insert)
+  :after emacsql
+  :config
+  (org-roam-db-autosync-mode))
+
+(use-package org-auto-tangle
+  :diminish org-auto-tangle-mode
+  :hook (org-mode . org-auto-tangle-mode))
+
+(when work-linux-local
+  (defun ma-bitlbee-identify ()
+    "Auto-identify for Bitlbee channels using authinfo"
+    (interactive)
+    (when (string= (buffer-name) "&bitlbee")
+      (let* ((entry (nth 0 (auth-source-search :max 1
+                                               :host "dell1254cem"
+                                               :user "MAL1"
+                                               :port 6667)))
+             (secret (plist-get entry :secret))
+             (user (plist-get entry :user))
+             (password (if (functionp secret)
+                           (funcall secret)
+                         secret)))
+        (erc-message "PRIVMSG" (concat (erc-default-target) " account add sipe martin.apel@3ds.com,dsone\\\\" user " " password))
+        (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe set useragent \"UCCAPI/16.0.6001.1073 OC/16.0.6001.1073 (Skype for Business)\""))
+        (erc-message "PRIVMSG" (concat (erc-default-target) " account sipe on"))
+        (erc-log-mode 1)
+        )
+      ))
+
+  (defun ma-bitlbee-ignore-unimportant (msg)
+    "less noise from bitlbee"
+    (if (string-match "localhost has changed mode for " msg)
+        (setq erc-insert-this nil)))
+
+  (defun ma-erc-format-nick (&optional user _channel-data)
+    "Format the nick name."
+    (when user
+      (progn
+        (message "User is %s" user)
+        (message "Nickname is %s" (erc-server-user-nickname user))
+        (erc-server-user-nickname user))))
+  )
+
+(use-package erc
+  :if work-linux-local
+;;  :custom
+;;   (erc-autoaway-idle-seconds 1800)
+;;   (erc-autoaway-message "Away")
+;;   (erc-notifications-mode t)
+;;   (erc-track-showcount t)
+;;   (erc-hide-list '("JOIN" "PART" "QUIT" "MODE" "MODE-nick"))
+;;   (erc-nick "martin")
+;;   (erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
+;;   (erc-server "dell1254cem")
+;;   (erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
+;;   (erc-user-full-name "Martin Apel")
+;;  :config
+;;   (add-to-list 'erc-modules 'autoaway)
+;;   (add-to-list 'erc-modules 'dcc)
+;;   (add-to-list 'erc-modules 'notifications)
+;;   (add-to-list 'erc-modules 'smiley)
+;;   (add-to-list 'erc-modules 'spelling)
+;;   (erc-update-modules)
+  :requires 'auth-source)
+
+(when work-linux-local
+  (progn
+    (add-hook 'erc-insert-pre-hook 'ma-bitlbee-ignore-unimportant)
+    (add-hook 'erc-join-hook 'ma-bitlbee-identify)
+    (erc :server "localhost" :nick "martin" :password "")))
+
+(use-package subword
+  :straight (:type built-in)
+  :config
+  (add-hook 'prog-mode-hook
+            (lambda()
+              (local-set-key (kbd "M-<left>") 'subword-backward)
+              (local-set-key (kbd "M-<right>") 'subword-forward)
+              (subword-mode t))))
+
+(use-package idle-highlight-mode
+  :hook prog-mode)
+
+(add-hook 'prog-mode-hook 'hl-line-mode)
 
 (add-hook 'prog-mode-hook
           (lambda()
             (lock-file-mode nil)
             (smartscan-mode 1)))
 
-(add-hook 'shell-mode-hook
-          'dirtrack-mode)
+(use-package lsp-mode
+  :custom
+  (read-process-output-max (* 1024 1024)) ;; 1mb
+  (gc-cons-threshold 100000000)
 
-(add-hook 'before-save-hook
-          'delete-trailing-whitespace)
+  (lsp-completion-provider :capf)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
+  (lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
+  (lsp-completion-no-cache t)
+  (lsp-enable-indentation nil)
+  (lsp-enable-folding nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-keymap-prefix "C-r")
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-scope :file)
+  (lsp-response-timeout 2)
+  (lsp-restart 'auto-restart)
+  :hook (prog-mode . #'lsp-deferred)
+        (lsp-mode . lsp-enable-which-key-integration))
 
-(add-hook 'after-save-hook
-  'executable-make-buffer-file-executable-if-script-p)
+(use-package lsp-ui
+  :after (lsp)
+  :hook (c++-mode . yas-minor-mode)
+        (c++ts-mode . yas-minor-mode))
+
+(use-package modern-cpp-font-lock
+  :config (modern-c++-font-lock-global-mode t))
+
+(add-hook 'c-mode-common-hook 'smerge-start-session)
+
+(add-hook 'c-mode-common-hook
+           (lambda ()
+             (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+             (local-set-key (kbd "C-c C-s") 'hs-show-block)
+             (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+             (local-set-key (kbd "C-M-e") 'end-of-defun)
+             (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+             (local-set-key (kbd "C-c =") 'align-regexp)
+             (local-set-key (kbd "C-c *") 'ma-insert-separator)
+             (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+             (local-unset-key (kbd "C-c C-n"))
+             (local-unset-key (kbd "C-c C-p"))
+             (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+;; (add-hook 'c-ts-base-mode-hook
+;;            (lambda ()
+;;              (local-set-key (kbd "C-c C-o") 'ff-find-other-file)
+;;              (local-set-key (kbd "C-c C-s") 'hs-show-block)
+;;              (local-set-key (kbd "C-M-a") 'beginning-of-defun)
+;;              (local-set-key (kbd "C-M-e") 'end-of-defun)
+;;              (local-set-key (kbd "<delete>") 'c-electric-delete-forward)
+;;              (local-set-key (kbd "C-c =") 'align-regexp)
+;;              (local-set-key (kbd "C-c *") 'ma-insert-separator)
+;;              (local-unset-key (kbd "C-c C-a"))                       ;; Free keybinding for multiple-cursors
+;;              (local-unset-key (kbd "C-c C-n"))
+;;              (local-unset-key (kbd "C-c C-p"))
+;;              (local-unset-key (kbd "C-c C-z"))))                     ;; Free keybinding for magit-status
+
+(defun ma-indent-style()
+  "Override the built-in BSD indentation style with some additional rules"
+  `(;; Here are your custom rules
+;;     ((node-is ")") parent-bol 0)
+;;     ((match nil "argument_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+;;     ((parent-is "argument_list") prev-sibling 0)
+;;     ((match nil "parameter_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+;;     ((parent-is "parameter_list") prev-sibling 0)
+    ((and (parent-is "if_statement") (not (node-is "compound_statement"))) parent-bol 3)
+
+    ;; Append here the indent style you want as base
+    ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+
+(use-package c-ts-mode
+  :if (treesit-language-available-p 'c)
+  :disabled t
+  :custom
+  (c-ts-mode-indent-offset 3)
+  (c-ts-mode-indent-style #'ma-indent-style)
+  :init
+  ;; Remap the standard C/C++ modes
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode)))
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (imenu-add-to-menubar "Functions")
+            (local-set-key (kbd "C-c C-i") 'imenu)
+            (if work
+                (add-hook 'before-save-hook 'ma-create-or-update-copyright))
+            (c-toggle-hungry-state 1)
+            (cwarn-mode)
+            (hs-minor-mode)
+            (hs-hide-initial-comment-block)))
+(add-to-list 'auto-mode-alist '("\\.h" . c++-mode))
+
+(use-package cmake-mode
+  :custom (cmake-tab-width 3)
+  :init
+  (add-hook 'cmake-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c C-d") 'cmake-help)
+              (flyspell-prog-mode)
+              (setq indent-line-function 'indent-relative))))
+
+(use-package dockerfile-mode)
+
+(use-package docker-compose-mode)
+
+(use-package js2-mode
+:mode ("\\.js$" "\\.sjs$" "\\.qs$")
+:custom
+(js2-include-node-externs t)
+(js2-mode-assume-strict t)
+(js2-include-browser-externs nil))
+
+(use-package jenkinsfile-mode)
+
+(use-package auto-compile
+  :custom (load-prefer-newer t)
+  :config (auto-compile-on-load-mode 1)
+  (auto-compile-on-save-mode 1))
 
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
             (local-set-key (kbd "M-.") 'find-function-other-window)))
-
-(add-hook 'cmake-mode-hook
-          (lambda ()
-            (local-set-key [?\C-c ?\C-d] 'cmake-help)
-            (flyspell-prog-mode)
-            (setq indent-line-function 'indent-relative)
-            (subword-mode t)))
 
 (add-hook 'sh-set-shell-hook
           (lambda()
@@ -753,32 +915,126 @@
                 (require 'csh-mode)
                 (setq-local indent-line-function 'csh-indent-line)
                 (setq-local indent-region-function 'csh-indent-region)))))
+(add-hook 'shell-mode-hook
+          'dirtrack-mode)
+(add-hook 'after-save-hook
+          'executable-make-buffer-file-executable-if-script-p)
 
-(server-start)
+(use-package restclient)
 
-(global-font-lock-mode 1)
-(global-hl-line-mode)
+(use-package generic
+  :straight (:type built-in)
+  :if work
+  :config
+  (define-generic-mode
+      'spck-mode
+    '("!")
+    '("body"
+      "constr"
+      "control"
+      "ens"
+      "express"
+      "force"
+      "joint"
+      "marker"
+      "poly"
+      "prim"
+      "road"
+      "refsys"
+      "sensor"
+      "slv"
+      "substr"
+      "subvar"
+      "track"
+      "timex"
+      "view"
+      "yout")
+    '(
+      ("\\(\\$[A-Za-z0-9_]+\\)" 1 font-lock-variable-name-face)
+      ("\\([+-]?[0-9]\\.[0-9]+E[+-][0-9]+\\)" 1 font-lock-constant-face)
+      ("'\\([^']+\\)'" 1 font-lock-string-face)
+      )
+    '("\\.sys$" "\\.ani$" "\\.spck$")
+    (list
+     (function
+      (lambda ()
+        (setq imenu-generic-expression
+              '((nil "(.*\\(\\$[A-Za-z0-9_]+\\).*) *=" 1)))
+        (imenu-add-menubar-index)
+        (local-set-key [?\C-c ?\C-j] 'imenu))))
+    "A mode for SIMPACK model files"))
 
-(global-set-key [f2] 'customize-group)
+(use-package skeleton
+  :straight (:type built-in)
+  :if work
+  :config
+  (define-skeleton header-skeleton
+    "Define a C++ header file skeleton"
+    ""
+    "// Copyright Dassault Systemes Simulia Corp.\n\n"
+    "#pragma once\n\n"
+    "#include \"base/WinExportDefs.h\"\n\n"
+    "namespace " (skeleton-read "Namespace name?") "\n"
+    "{\n\n"
+    "class SPCK_XXX_EXPORT " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "\n"
+    "{\n"
+    "public:\n\n"
+    "   " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "(const " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "&) = delete;\n"
+    "   " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "& operator=(const " (file-name-sans-extension (file-name-nondirectory buffer-file-name)) "&) = delete;\n"
+    "};\n"
+    "}\n"
+    ))
 
-(setq-default ediff-ignore-similar-regions t)
+(use-package auto-insert
+  :straight (:type built-in)
+  :after (skeleton)
+  :hook (find-file-hook . auto-insert)
+  :config (define-auto-insert "\\.h\\'" 'header-skeleton))
 
-(add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+(use-package scad-mode
+  :if home)
+(use-package scad-dbus
+  :straight (:type git :flavor melpa :files ("scad-dbus.el") :host github :repo "Lenbok/scad-dbus" :depends "hydra")
+  :if home)
 
-(if work-linux
-   (progn
-     (require 'atl-stash)
-     (stash-update-stash-info)
-     (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
-     (run-with-timer 60 60 'stash-update-stash-info)
-     (global-set-key (kbd "C-c p") 'stash-show-pull-requests)
-     (run-with-idle-timer 1800 t 'ma-kill-old-buffers)
-     (load "marginalia-jira")
-     ))
+(add-to-list 'load-path "~/.emacs.d/ma-funcs")
+(require 'ma-funcs)
+(require 'ma-simpack-js-mode)
+(add-hook 'js2-mode-hook 'ma-simpack-js-mode)
 
+(use-package atl-stash
+  :straight (:type built-in)
+  :if work
+  :commands (stash-update-stash-info
+             stash-create-branch
+             stash-show-pull-requests)
+  :config (add-to-list 'mode-line-misc-info '(" " stash-mode-line-string " ") t)
+  :bind ("C-c p" . stash-show-pull-requests))
+(when work
+  (run-with-idle-timer 60 60 'stash-update-stash-info))
 
-(require 'whitespace)
-(setq whitespace-line-column 120)
-(setq whitespace-style '(face lines-tail))
-(add-hook 'prog-mode-hook 'whitespace-mode)
+(run-with-idle-timer 1800 t 'ma-kill-old-buffers)
+
+(use-package marginalia-jira
+  :straight (:type built-in)
+  :defer 10
+  :if work)
+
+(use-package vterm
+  :if work
+  :bind (:map vterm-mode-map
+  ("C-g" . vterm--self-insert)
+  ("<f4>" . ma-switch-to-mu4e)
+  ("<f3>" . ma-ssh-connect-with-tmux-support))
+  :custom (vterm-copy-exclude-prompt  t)
+  :config
+  (add-to-list 'display-buffer-alist
+               `("^\\*vterm\\*$"
+                 (display-buffer-reuse-window))))
+(use-package vterm-toggle
+  :if work
+  :after vterm
+  :bind (:map vterm-mode-map ("<f5>" . vterm-toggle))
+  :init
+  (global-set-key (kbd "<f5>") 'vterm-toggle)
+  (global-set-key (kbd "C-<f5>") 'vterm-toggle-cd))
