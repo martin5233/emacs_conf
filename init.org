@@ -987,7 +987,7 @@ works flawlessly. For reference the identical settings are kept below.
 
     (lsp-completion-provider :capf)
     (lsp-eldoc-enable-hover nil)
-    (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-perl lsp-php lsp-pyls lsp-xml lsp-yaml))
+    (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-php lsp-pyls lsp-xml lsp-yaml))
     (lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
     (lsp-completion-no-cache t)
     (lsp-enable-indentation nil)
@@ -1005,6 +1005,40 @@ works flawlessly. For reference the identical settings are kept below.
     :after (lsp)
     :hook (c++-mode . yas-minor-mode)
           (c++ts-mode . yas-minor-mode))
+#+end_src
+*** Treesitter
+#+begin_src emacs-lisp
+  (use-package treesit
+    :if featurep 'treesit
+    :disabled
+    :config
+    (treesit-language-source-alist
+     '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+       (c "https://github.com/tree-sitter/tree-sitter-c")
+       (c-sharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
+       (clojure "https://github.com/sogaiu/tree-sitter-clojure")
+       (cmake "https://github.com/uyha/tree-sitter-cmake")
+       (commonlisp "https://github.com/theHamsta/tree-sitter-commonlisp")
+       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+       (css "https://github.com/tree-sitter/tree-sitter-css")
+       (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+       (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+       (json "https://github.com/tree-sitter/tree-sitter-json")
+       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+       (python "https://github.com/tree-sitter/tree-sitter-python")
+       (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+       (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+       (yaml "https://github.com/ikatyang/tree-sitter-yaml"))))
+#+end_src
+*** Compilation mode
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+     '("\\*Compilation\\*"
+       (display-buffer-in-side-window)
+       (side . bottom)
+       (slot . 0)
+       (window-height . 0.25)))
 #+end_src
 ** C++
 *** Modern-cpp-font-lock
