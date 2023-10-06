@@ -226,17 +226,26 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 ** Remote work
 #+begin_src emacs-lisp
+  (setq ma-linux-desktop-machine "dell1254cem")
   (if work-linux-remote
       (progn
-        (setq work-remote-machine "dell1254cem")
-        (setq work-remote-url "/ssh:MAL1@dell1254cem:")
+        (setq work-remote-machine ma-linux-desktop-machine)
+        (setq work-remote-url (concat "/ssh:MAL1@" ma-linux-desktop-machine ":"))
         (setq enable-remote-dir-locals nil)
         (setq remote-file-name-inhibit-locks t)
         ;; Avoid version-control checks for tramp buffers
         (setq vc-ignore-dir-regexp
               (format "\\(%s\\)\\|\\(%s\\)"
                       vc-ignore-dir-regexp
-                      tramp-file-name-regexp)))
+                      tramp-file-name-regexp))
+
+        (defun ma-ensure-ssh-running()
+          (interactive)
+          (let ((pname "remote-ssh"))
+            (unless (get-process pname)
+              (make-process :name pname
+                            :command `("ssh" "-N" ,ma-linux-desktop-machine "-l" "mal1")
+                            :buffer (get-buffer-create "remote-ssh"))))))
     (setq work-remote-url "")
     (setq work-remote-machine nil))
 #+end_src
@@ -885,13 +894,13 @@ Since init.el will be generated from this file, we save customization in a dedic
 For some reason any settings via use-package are not effective for ERC. Therefore all settings are done via the customize interface, which
 works flawlessly. For reference the identical settings are kept below.
 #+begin_src emacs-lisp
-  (when work-linux-local
+  (when work-linux
     (defun ma-bitlbee-identify ()
       "Auto-identify for Bitlbee channels using authinfo"
       (interactive)
       (when (string= (buffer-name) "&bitlbee")
         (let* ((entry (nth 0 (auth-source-search :max 1
-                                                 :host "dell1254cem"
+                                                 :host ma-linux-desktop-machine
                                                  :user "MAL1"
                                                  :port 6667)))
                (secret (plist-get entry :secret))
@@ -921,7 +930,7 @@ works flawlessly. For reference the identical settings are kept below.
     )
 
   (use-package erc
-    :if work-linux-local
+    :if work-linux
   ;;  :custom
   ;;   (erc-autoaway-idle-seconds 1800)
   ;;   (erc-autoaway-message "Away")
@@ -942,10 +951,13 @@ works flawlessly. For reference the identical settings are kept below.
   ;;   (erc-update-modules)
     :requires 'auth-source)
 
-  (when work-linux-local
+  (when work-linux
     (progn
       (add-hook 'erc-insert-pre-hook 'ma-bitlbee-ignore-unimportant)
       (add-hook 'erc-join-hook 'ma-bitlbee-identify)
+      (setq erc-notifications-mode (not work-linux-remote))
+      (when work-linux-remote
+        (ma-ensure-ssh-running))
       (erc :server "localhost" :nick "martin" :password "")))
 #+end_src
 
@@ -1035,9 +1047,7 @@ works flawlessly. For reference the identical settings are kept below.
 #+begin_src emacs-lisp
   (add-to-list 'display-buffer-alist
      '("\\*Compilation\\*"
-       (display-buffer-in-side-window)
-       (side . bottom)
-       (slot . 0)
+       (display-buffer-at-bottom)
        (window-height . 0.25)))
 #+end_src
 ** C++
@@ -1310,11 +1320,29 @@ works flawlessly. For reference the identical settings are kept below.
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"
                    (display-buffer-reuse-window))))
-  (use-package vterm-toggle
-    :if work
-    :after vterm
-    :bind (:map vterm-mode-map ("<f5>" . vterm-toggle))
-    :init
-    (global-set-key (kbd "<f5>") 'vterm-toggle)
-    (global-set-key (kbd "C-<f5>") 'vterm-toggle-cd))
+
+  (when work
+    (defun ma-switch-to-remote-vterm ()
+      "Create a vterm with a remote terminal"
+      (interactive)
+      (let* ((buffer-name "*vterm-remote*")
+             (buffer (get-buffer buffer-name)))
+        (if buffer
+            (pop-to-buffer buffer)
+          (with-current-buffer (vterm buffer-name)
+            (vterm-insert "remote\n")
+            (vterm-insert "tmux attach\n")
+            (pop-to-buffer buffer)))))
+
+    (defun ma-switch-to-local-vterm ()
+      "Create a vterm with a local terminal"
+      (interactive)
+      (let* ((default-directory "~")
+             (buffer-name "*vterm-local*")
+             (buffer (get-buffer buffer-name)))
+        (pop-to-buffer (or buffer (vterm buffer-name)))))
+
+    (global-set-key (kbd "<f5>") 'ma-switch-to-remote-vterm)
+    (global-set-key (kbd "<f6>") 'ma-switch-to-local-vterm))
+
 #+end_src

@@ -434,7 +434,7 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
 (defun ma-dired-current-dev()
   "Open dired in the directory for the current dev issue."
   (interactive)
-  (unless ma-current-dev
+  (if (string= ma-current-dev "")
     (ma-set-current-dev))
   (let ((dir (ma--current-dev-dir)))
     (unless (file-exists-p dir)
@@ -495,6 +495,7 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
 
 (defun ma-start-unison (config buffer-name sleep-before)
   "Start a unison session asynchronously and redirect output to BUFFER-NAME."
+  (ma-ensure-ssh-running)
   (let ((cmd (format "sleep %s; for ((i=0; i<100;i++)); do unison %s -repeat watch -logfile /tmp/unison_%s.log; done" (number-to-string sleep-before) config config))
         (buffer (get-buffer-create buffer-name)))
     (async-shell-command cmd buffer)))
