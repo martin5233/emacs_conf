@@ -165,7 +165,7 @@
  '(erc-notifications-icon "/usr/share/icons/Adwaita/48x48/actions/call-start.png")
  '(erc-server "localhost")
  '(erc-track-exclude-types '("JOIN" "NICK" "PART" "333" "353"))
- '(erc-track-showcount nil t)
+ '(erc-track-showcount nil)
  '(erc-user-full-name "Martin Apel")
  '(eudc-protocol 'ldap)
  '(eudc-query-form-attributes '(name firstname email phone Uid))
@@ -240,6 +240,7 @@
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages '(csv-mode nil))
  '(perl-indent-level 3)
+ '(projectile-git-use-fd nil)
  '(remote-file-name-inhibit-cache nil)
  '(require-final-newline t)
  '(safe-local-variable-values

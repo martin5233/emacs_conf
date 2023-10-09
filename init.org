@@ -59,6 +59,11 @@
   (if work
       (setq browse-url-firefox-program "/home/home_dev/MAL1/tools/firefox/firefox"))
 #+end_src
+** Adjust path if necessary
+#+begin_src emacs-lisp
+  (when work-linux-local
+    (setenv "PATH" "/opt/rh/gcc-toolset-11/root/usr/bin/:$PATH" t))
+#+end_src
 ** use-package
 #+begin_src emacs-lisp
   (straight-use-package 'use-package)
