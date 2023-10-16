@@ -1005,7 +1005,7 @@ works flawlessly. For reference the identical settings are kept below.
     (lsp-completion-provider :capf)
     (lsp-eldoc-enable-hover nil)
     (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-php lsp-pyls lsp-xml lsp-yaml))
-    (lsp-clients-clangd-args '("--background-index" "--log=info" "-j=8" "--clang-tidy"))
+    (lsp-clients-clangd-args '("--background-index" "--background-index-priority=low" "--log=info" "-j=8" "--clang-tidy"))
     (lsp-completion-no-cache t)
     (lsp-enable-indentation nil)
     (lsp-enable-folding nil)
@@ -1317,37 +1317,44 @@ works flawlessly. For reference the identical settings are kept below.
   (use-package vterm
     :if work
     :bind (:map vterm-mode-map
-    ("C-g" . vterm--self-insert)
-    ("<f4>" . ma-switch-to-mu4e)
-    ("<f3>" . ma-ssh-connect-with-tmux-support))
+                ("C-g" . vterm--self-insert)
+                ("<f4>" . ma-switch-to-mu4e)
+                ("<f3>" . ma-ssh-connect-with-tmux-support))
     :custom (vterm-copy-exclude-prompt  t)
     :config
     (add-to-list 'display-buffer-alist
                  `("^\\*vterm\\*$"
                    (display-buffer-reuse-window))))
 
-  (when work
-    (defun ma-switch-to-remote-vterm ()
-      "Create a vterm with a remote terminal"
-      (interactive)
-      (let* ((buffer-name "*vterm-remote*")
-             (buffer (get-buffer buffer-name)))
-        (if buffer
-            (pop-to-buffer buffer)
-          (with-current-buffer (vterm buffer-name)
-            (vterm-insert "remote\n")
-            (vterm-insert "tmux attach\n")
-            (pop-to-buffer buffer)))))
+  (defun ma-switch-to-local-vterm ()
+    "Create a vterm with a local terminal"
+    (interactive)
+    (let* ((default-directory "~")
+           (buffer-name "*vterm-local*")
+           (buffer (get-buffer buffer-name)))
+      (pop-to-buffer (or buffer (vterm buffer-name)))
+      (when work-linux-local
+        (with-current-buffer (vterm buffer-name)
+          (vterm-insert "tmux new-session -A\n")))))
 
-    (defun ma-switch-to-local-vterm ()
-      "Create a vterm with a local terminal"
-      (interactive)
-      (let* ((default-directory "~")
-             (buffer-name "*vterm-local*")
-             (buffer (get-buffer buffer-name)))
-        (pop-to-buffer (or buffer (vterm buffer-name)))))
+  (if work-linux-remote
+      (progn
+        (defun ma-switch-to-remote-vterm ()
+          "Create a vterm with a remote terminal"
+          (interactive)
+          (let* ((buffer-name "*vterm-remote*")
+                 (buffer (get-buffer buffer-name)))
+            (if buffer
+                (pop-to-buffer buffer)
+              (with-current-buffer (vterm buffer-name)
+                (vterm-insert "remote\n")
+                (vterm-insert "tmux attach\n")
+                (pop-to-buffer buffer)))))
 
-    (global-set-key (kbd "<f5>") 'ma-switch-to-remote-vterm)
-    (global-set-key (kbd "<f6>") 'ma-switch-to-local-vterm))
+        (global-set-key (kbd "<f5>") 'ma-switch-to-remote-vterm)
+        (global-set-key (kbd "<f6>") 'ma-switch-to-local-vterm))
+    (progn
+      (global-set-key (kbd "<f5>") 'ma-switch-to-local-vterm)
+      (global-set-key (kbd "<f6>") 'ma-switch-to-local-vterm)))
 
 #+end_src
