@@ -216,8 +216,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** git-timemachine
 #+begin_src emacs-lisp
-  (use-package git-timemachine
-    :straight (:repo "https://codeberg.org/pidu/git-timemachine"))
+  (use-package git-timemachine)
 #+end_src
 *** git-gutter
 #+begin_src emacs-lisp
@@ -569,14 +568,20 @@ Since init.el will be generated from this file, we save customization in a dedic
     (defun ma-switch-to-mu4e ()
       "Switch to unread mail in mu4e"
       (interactive)
-      (unless (mu4e-running-p)
-        (mu4e t))
-      (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
-      (mu4e-headers-change-sorting :date 'ascending))
+      (let ((default-directory nil))
+        (unless (mu4e-running-p)
+          (mu4e t))
+        (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
+        (mu4e-headers-change-sorting :date 'ascending)))
 
     (defun ma-view-previous-next-advice(orig &rest args)
       (let ((switch-to-buffer-obey-display-actions nil))
         (apply orig args)))
+
+    (defun ma-contact-process-function(address)
+      "Process contacts to filter out JIRA senders."
+      (unless (string-match "<jira@dsone.3ds.com>" address)
+        address))
 
     (use-package mu4e
       :straight (:branch "release/1.10")
@@ -613,6 +618,7 @@ Since init.el will be generated from this file, we save customization in a dedic
       (mu4e-headers-visible-lines 20)
       (mu4e-org-link-query-in-headers-mode t)
       (mu4e-modeline-support nil)
+      (mu4e-contact-process-function 'ma-contact-process-function)
       (message-send-mail-function (quote smtpmail-send-it))
 
       (smtpmail-debug-info nil)
@@ -703,8 +709,8 @@ Since init.el will be generated from this file, we save customization in a dedic
     "Return first name of addressee or defer to org-msg-get-to-name."
     (save-excursion
       (let ((to (org-msg-message-fetch-field "to")))
-        (if (string-match "^\\([[:upper:]]+\\) \\([[:alpha:]]+\\) <\\([[:alpha:]]+\.[[:alpha:]]+@3ds\.com\\)>$" to)
-            (let ((mail-addr (match-string 3 to)))
+        (if (string-match "<\\(\\([[:alpha:]]+\\)\.[[:alpha:]]+@3ds\.com\\)>$" to)
+            (let ((mail-addr (match-string 1 to)))
               (or (assoc-default mail-addr org-msg-recipient-names)
                   (match-string 2 to)))
           (apply orig args)))))
