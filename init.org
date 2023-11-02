@@ -568,11 +568,10 @@ Since init.el will be generated from this file, we save customization in a dedic
     (defun ma-switch-to-mu4e ()
       "Switch to unread mail in mu4e"
       (interactive)
-      (let ((default-directory nil))
-        (unless (mu4e-running-p)
-          (mu4e t))
-        (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
-        (mu4e-headers-change-sorting :date 'ascending)))
+      (unless (mu4e-running-p)
+        (mu4e t))
+      (mu4e-search-bookmark (mu4e-get-bookmark-query ?i))
+      (mu4e-headers-change-sorting :date 'ascending))
 
     (defun ma-view-previous-next-advice(orig &rest args)
       (let ((switch-to-buffer-obey-display-actions nil))
@@ -691,6 +690,7 @@ Since init.el will be generated from this file, we save customization in a dedic
                                ("Magdalena.NIEDHAMMER@3ds.com" . "Lena")
                                ("Rajanagaprasad.KODALI@3ds.com" . "Prasad")
                                ("David.BLUMENTHAL@3ds.com" . "Dave")
+                               ("Jonathan.HINES@3ds.com" . "Jon")
                                ("Edward.WATRAS@3ds.com" . "Ed")))
     (org-msg-greeting-name-limit 3)
     (org-msg-default-alternatives '((new		. (html))
@@ -1290,8 +1290,8 @@ works flawlessly. For reference the identical settings are kept below.
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/ma-funcs")
   (require 'ma-funcs)
-  ;; (require 'ma-simpack-js-mode)
-  ;; (add-hook 'js2-mode-hook 'ma-simpack-js-mode)
+  (require 'ma-simpack-js-mode)
+  (add-hook 'js2-mode-hook 'ma-simpack-js-mode)
 #+end_src
 ** Bitbucket interface
 #+begin_src emacs-lisp
