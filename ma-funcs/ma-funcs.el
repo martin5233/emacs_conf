@@ -548,8 +548,21 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
         (apply #'start-process "ssh-tmux" nil (car command) (cdr command))))))
 
 (defun ma-query-trigram(trigram)
-  "Print name of user belonging to the given trigram."
+  "Print name of user belonging to the given TRIGRAM."
   (interactive "MTrigram: ")
   (message "User is %s" (cadr (assoc "displayName" (car (ldap-search (format "(&(Uid=%s))" trigram)))))))
 
+(defun ma-dired-jira(url)
+  "Open Dired for Jira issue.  URL should contain something like emacs://SPCK-12345."
+  (if (string-match "^emacs://SPCK-\\([0-9]+\\)/?$" url)
+      (let* ((id (match-string 1 url))
+             (file (if work-linux-remote
+                       (concat work-remote-url "/home/home_dev/MAL1/devs/" id)
+                   (concat "/home/home_dev/MAL1/devs/" id))))
+        (if (file-directory-p file)
+            (dired file)
+          (message (concat "No directory exists for SPCK-" id))))
+    (message (concat "Invalid URL: " url))))
+
 (provide 'ma-funcs)
+;;; ma-funcs.el ends here
