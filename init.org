@@ -427,7 +427,9 @@ Since init.el will be generated from this file, we save customization in a dedic
                 :variable-pitch-family "Nimbus Roman"
                 :variable-pitch-height 100)
                (work
-                :inherit home)
+                :inherit home
+                :default-height 70
+                :fixed-pitch-height 80)
                (screen-sharing
                 :inherit home
                 :default-height 100
@@ -1336,12 +1338,12 @@ works flawlessly. For reference the identical settings are kept below.
     "Create a vterm with a local terminal"
     (interactive)
     (let* ((default-directory "~")
-           (buffer-name "*vterm-local*")
-           (buffer (get-buffer buffer-name)))
-      (pop-to-buffer (or buffer (vterm buffer-name)))
-      (when work-linux-local
-        (with-current-buffer (vterm buffer-name)
-          (vterm-insert "tmux new-session -A\n")))))
+           (buffer-name "*vterm-local*"))
+      (if (get-buffer buffer-name)
+          (pop-to-buffer (get-buffer buffer-name))
+        (when work-linux-local
+          (with-current-buffer (vterm buffer-name)
+            (vterm-insert "tmux new-session -A\n"))))))
 
   (if work-linux-remote
       (progn
