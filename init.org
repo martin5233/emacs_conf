@@ -1257,7 +1257,7 @@ works flawlessly. For reference the identical settings are kept below.
     (define-skeleton header-skeleton
       "Define a C++ header file skeleton"
       ""
-      "// Copyright Dassault Systemes Simulia Corp.\n\n"
+      "// Copyright Dassault Systemes Americas Corp.\n\n"
       "#pragma once\n\n"
       "#include \"base/WinExportDefs.h\"\n\n"
       "namespace " (skeleton-read "Namespace name?") "\n"
