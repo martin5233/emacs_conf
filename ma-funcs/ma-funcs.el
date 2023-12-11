@@ -262,7 +262,7 @@
 
 (advice-add 'cmake-symbol-at-point :filter-return #'ma-lowercase-args)
 
-(defconst ma-simpack-copyright "Copyright Dassault Systemes Simulia Corp.")
+(defconst ma-simpack-copyright "Copyright Dassault Systemes Americas Corp.")
 (defcustom ma-skip-copyright nil "Skip copyright update upon save, if set"
   :type 'boolean)
 (make-variable-buffer-local 'ma-skip-copyright)

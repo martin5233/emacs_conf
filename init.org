@@ -230,7 +230,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 ** Remote work
 #+begin_src emacs-lisp
-  (setq ma-linux-desktop-machine "dell1254cem")
+  (setq ma-linux-desktop-machine "dell1254cem.dsone.3ds.com")
   (if work-linux-remote
       (progn
         (setq work-remote-machine ma-linux-desktop-machine)
@@ -1341,9 +1341,9 @@ works flawlessly. For reference the identical settings are kept below.
            (buffer-name "*vterm-local*"))
       (if (get-buffer buffer-name)
           (pop-to-buffer (get-buffer buffer-name))
-        (when work-linux-local
-          (with-current-buffer (vterm buffer-name)
-            (vterm-insert "tmux new-session -A\n"))))))
+        (with-current-buffer (vterm buffer-name)
+          (when work-linux-local
+            (vterm-insert "tmux new-session -A -s Default\n"))))))
 
   (if work-linux-remote
       (progn
