@@ -15,6 +15,10 @@
   ;; Do not modify, modify the source instead
 
 #+end_src
+** GC settings
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold 100000000)
+#+end_src
 ** Set up straight
 *** Bootstrap Straight
 #+begin_src emacs-lisp
@@ -157,11 +161,6 @@ Since init.el will be generated from this file, we save customization in a dedic
 		      ("C-c C-p" . mc/mark-previous-like-this)
 		      ("C-c C-a" . mc/mark-all-like-this-in-defun)
 		      ("C-c C-|" . mc/edit-lines)))
-#+end_src
-*** Swiper
-#+begin_src emacs-lisp
-  (use-package swiper
-    :bind ("C-s" . swiper-isearch))
 #+end_src
 *** Smartscan
 #+begin_src emacs-lisp
@@ -561,6 +560,74 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package marginalia
     :init
     (marginalia-mode))
+#+end_src
+** Consult
+#+begin_src emacs-lisp
+  (use-package consult
+    :bind (;; C-c bindings in `mode-specific-map'
+           ("C-c M-x" . consult-mode-command)
+           ([remap Info-search] . consult-info)
+           ;; C-x bindings in `ctl-x-map'
+           ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+           ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+           ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+           ;; Custom M-# bindings for fast register access
+           ("M-#" . consult-register-load)
+           ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+           ("C-M-#" . consult-register)
+           ;; Other custom bindings
+           ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+           ("C-s" . consult-line)
+           :map isearch-mode-map
+           ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+           ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+           ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+           ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+           ;; Minibuffer history
+           :map minibuffer-local-map
+           ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+           ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+    ;; Enable automatic preview at point in the *Completions* buffer. This is
+    ;; relevant when you use the default completion UI.
+    :hook (completion-list-mode . consult-preview-at-point-mode)
+
+    ;; The :init configuration is always executed (Not lazy)
+    :init
+
+    ;; Optionally configure the register formatting. This improves the register
+    ;; preview for `consult-register', `consult-register-load',
+    ;; `consult-register-store' and the Emacs built-ins.
+    (setq register-preview-delay 0.5
+          register-preview-function #'consult-register-format)
+
+    ;; Optionally tweak the register preview window.
+    ;; This adds thin lines, sorting and hides the mode line of the window.
+    (advice-add #'register-preview :override #'consult-register-window)
+
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
+
+    ;; Configure other variables and modes in the :config section,
+    ;; after lazily loading the package.
+    :config
+
+    ;; Optionally configure preview. The default value
+    ;; is 'any, such that any key triggers the preview.
+    ;; (setq consult-preview-key 'any)
+    ;; (setq consult-preview-key "M-.")
+    ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+    ;; For some commands and buffer sources it is useful to configure the
+    ;; :preview-key on a per-command basis using the `consult-customize' macro.
+    (consult-customize
+     consult-theme :preview-key '(:debounce 0.2 any)
+     consult-ripgrep consult-git-grep consult-grep
+     consult-bookmark consult-recent-file consult-xref
+     consult--source-bookmark consult--source-file-register
+     consult--source-recent-file consult--source-project-recent-file
+     ;; :preview-key "M-."
+     :preview-key '(:debounce 0.4 any)))
 #+end_src
 * PIM
 ** Mail
@@ -1008,7 +1075,6 @@ works flawlessly. For reference the identical settings are kept below.
   (use-package lsp-mode
     :custom
     (read-process-output-max (* 1024 1024)) ;; 1mb
-    (gc-cons-threshold 100000000)
 
     (lsp-completion-provider :capf)
     (lsp-eldoc-enable-hover nil)
@@ -1287,6 +1353,11 @@ works flawlessly. For reference the identical settings are kept below.
   (use-package scad-dbus
     :straight (:type git :flavor melpa :files ("scad-dbus.el") :host github :repo "Lenbok/scad-dbus" :depends "hydra")
     :if home)
+#+end_src
+** Platformio
+  (use-package platformio-mode
+    :if home)
+#+begin_src emacs-lisp
 #+end_src
 * Martin's specials
 #+begin_src emacs-lisp
