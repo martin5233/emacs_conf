@@ -348,6 +348,10 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package hydra
     :straight (:host github :repo "abo-abo/hydra"))
 #+end_src
+*** Dired
+#+begin_src emacs-lisp
+  (dired-async-mode t)
+#+end_src
 * Appearance
 ** Icons
 #+begin_src emacs-lisp
@@ -870,7 +874,7 @@ Since init.el will be generated from this file, we save customization in a dedic
   (use-package org
     :straight (:type built-in)
     :custom
-    (org-agenda-files '("~/org" "~/org/jira" "~/org-roam"))
+    (org-agenda-files '("~/org" "~/org-roam"))
     (org-agenda-custom-commands
      (quote
       (("w" "Work agenda only" alltodo ""
