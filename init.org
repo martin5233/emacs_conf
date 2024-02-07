@@ -349,7 +349,9 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+end_src
 *** Dired
 #+begin_src emacs-lisp
-  (dired-async-mode t)
+  (use-package dired-async
+    :straight async
+    :config (dired-async-mode t))
 #+end_src
 * Appearance
 ** Icons
