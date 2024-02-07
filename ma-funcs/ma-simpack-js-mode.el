@@ -89,6 +89,11 @@ import { MessageBox, Tree } from \"./SpckGUI\";\n")
 
 (provide 'ma-simpack-js-mode)
 
+;; Idea: When user opens SJS file a temporary directory is created, where a tsconfig.json file and a TS file is created.
+;; After this has been done, the TS file is loaded instead.
+;; When the TS file is saved, the SJS file is saved as well
+
+
 
 
 ;; Idea: When user opens SJS file, for which no TS file exists, create TS file with contents of SJS file and added header

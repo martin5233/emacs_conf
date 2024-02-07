@@ -434,13 +434,13 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
 (defun ma-dired-current-dev()
   "Open dired in the directory for the current dev issue."
   (interactive)
-  (if (string= ma-current-dev "")
+  (if (or (not ma-current-dev) (string-equal ma-current-dev ""))
     (ma-set-current-dev))
   (let ((dir (ma--current-dev-dir)))
     (unless (file-exists-p dir)
       (progn
         (message (concat "Downloading data for SPCK-" (number-to-string ma-current-dev)))
-        (shell-command (concat "ssh MAL1@dell1254cem /home/home_dev/MAL1/perl/download_jira_attachments.pl " (number-to-string ma-current-dev))
+        (shell-command (concat "ssh MAL1@dell1254cem.dsone.3ds.com /home/home_dev/MAL1/perl/download_jira_attachments.pl " (number-to-string ma-current-dev))
                        (generate-new-buffer (concat "*Download " ma-current-dev "*")))))
     (dired (file-truename (ma--current-dev-dir)))))
 (global-set-key (kbd "C-c m d") 'ma-dired-current-dev)

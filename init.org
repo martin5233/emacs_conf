@@ -97,7 +97,6 @@ Since init.el will be generated from this file, we save customization in a dedic
 ** Global keybindings
 #+begin_src emacs-lisp
   (global-set-key (kbd "<delete>") 'c-electric-delete-forward)
-  (global-set-key (kbd "C-c C-g") 'goto-line)
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 
   (global-unset-key (kbd "C-x C-c"))
@@ -457,6 +456,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
   (setq frame-inhibit-implied-resize t)
+  (setq visible-bell t)
 #+end_src
 * Documentation
 ** Devdocs
@@ -512,6 +512,28 @@ Since init.el will be generated from this file, we save customization in a dedic
                  (display-buffer-reuse-window display-buffer-in-direction)
                  (direction . bottom)
                  (window-height . 0.5)))
+#+end_src
+** Engine-mode
+#+begin_src emacs-lisp
+    (use-package engine-mode
+      :config
+      (engine-mode t))
+
+  (defengine duckduckgo-ff
+             "https://duckduckgo.com/?q=%s"
+             :keybinding "D")
+  (defengine duckduckgo-eww
+             "https://duckduckgo.com/?q=%s"
+             :browser 'eww-browse-url
+             :keybinding "d")
+
+  (defengine google-ff
+             "https://www.google.com/search?q=%s"
+             :keybinding "G")
+  (defengine google-eww
+             "https://www.google.com/search?q=%s"
+             :browser 'eww-browse-url
+             :keybinding "g")
 #+end_src
 * Completion
 ** Company
@@ -582,6 +604,10 @@ Since init.el will be generated from this file, we save customization in a dedic
            ;; Other custom bindings
            ("M-y" . consult-yank-pop)                ;; orig. yank-pop
            ("C-s" . consult-line)
+           ("C-c C-g" . consult-goto-line)
+           ("C-c C-i" . consult-imenu)
+           ("C-c C-I" . consult-imenu-multi)
+           ("C-S-s-M-f" . consult-focus-lines)
            :map isearch-mode-map
            ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
            ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
@@ -893,7 +919,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     (org-agenda-skip-deadline-prewarning-if-scheduled t)
     (org-agenda-skip-scheduled-if-deadline-is-shown t)
     (org-agenda-start-on-weekday nil)
-    (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t) (shell . t))))
+    (org-babel-load-languages (quote ((emacs-lisp . t) (dot . t) (ditaa . t) (shell . t) (sql . t))))
     (org-export-backends (quote (ascii html icalendar latex md pandoc jira)))
     (org-capture-templates
      (quote
@@ -1204,7 +1230,6 @@ works flawlessly. For reference the identical settings are kept below.
   (add-hook 'c-mode-common-hook
             (lambda ()
               (imenu-add-to-menubar "Functions")
-              (local-set-key (kbd "C-c C-i") 'imenu)
               (if work
                   (add-hook 'before-save-hook 'ma-create-or-update-copyright))
               (c-toggle-hungry-state 1)
@@ -1313,8 +1338,7 @@ works flawlessly. For reference the identical settings are kept below.
         (lambda ()
           (setq imenu-generic-expression
                 '((nil "(.*\\(\\$[A-Za-z0-9_]+\\).*) *=" 1)))
-          (imenu-add-menubar-index)
-          (local-set-key [?\C-c ?\C-j] 'imenu))))
+          (imenu-add-menubar-index))))
       "A mode for SIMPACK model files"))
 #+end_src
 
@@ -1368,7 +1392,7 @@ works flawlessly. For reference the identical settings are kept below.
   (add-to-list 'load-path "~/.emacs.d/ma-funcs")
   (require 'ma-funcs)
   (require 'ma-simpack-js-mode)
-  (add-hook 'js2-mode-hook 'ma-simpack-js-mode)
+;  (add-hook 'js2-mode-hook 'ma-simpack-js-mode)
 #+end_src
 ** Bitbucket interface
 #+begin_src emacs-lisp
