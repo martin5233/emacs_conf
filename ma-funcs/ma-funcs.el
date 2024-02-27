@@ -564,5 +564,21 @@ This uses trees defined via ma-src-trees and offers each one of them to the user
           (message (concat "No directory exists for SPCK-" id))))
     (message (concat "Invalid URL: " url))))
 
+(defun ma-klocwork-from-mail()
+  "Extract Klocwork issue ids from current mail and open Klocwork in browser with respective issues."
+  (interactive)
+  (if (not (string-equal major-mode "mu4e-view-mode"))
+      (message (format "Unexpected major mode for current buffer: %s" major-mode))
+    (save-excursion
+      (when (use-region-p)
+          (narrow-to-region (region-beginning) (region-end)))
+      (goto-char (point-min))
+      (let ((numbers))
+        (while (re-search-forward "[[:digit:]]\\{5\\}+" nil t)
+          (push (match-string-no-properties 0) numbers))
+        (message (format "Found Klocwork issues %s" (string-join numbers ", ")))
+        (browse-url (format "https://spck-simdev.ux.dsone.3ds.com:8080/review/insight-review.html#issuelist_goto:project=new_arch,searchquery=id%%253A%s,sortcolumn=id,sortdirection=ASC,start=0,view_id=1" (string-join numbers "%252C"))))))
+  )
+
 (provide 'ma-funcs)
 ;;; ma-funcs.el ends here
