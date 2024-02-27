@@ -332,11 +332,13 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (defun ma-deadgrep-root-function()
     "Determine root directory for current buffer."
-      (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa"))
-          "/scratch/apel/new_arch/develop/src/ooa"
+    (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/ooa"))
+        "/scratch/apel/new_arch/develop/src/ooa"
+      (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src/postproc"))
+          "/scratch/apel/new_arch/develop/src/postproc"
         (if (and (buffer-file-name) (file-in-directory-p (buffer-file-name) "/scratch/apel/new_arch/develop/src"))
             "/scratch/apel/new_arch/develop/src"
-          (deadgrep--project-root))))
+          (deadgrep--project-root)))))
   (use-package deadgrep
     :bind ("C-c C-r" . deadgrep)
     :custom (deadgrep-max-buffers  1)
@@ -474,7 +476,7 @@ Since init.el will be generated from this file, we save customization in a dedic
     :init
     (add-hook 'c-mode-common-hook
               (lambda()
-                (setq-local devdocs-current-docs '("cpp" "qt~5.12"))
+                (setq-local devdocs-current-docs '("cpp" "qt"))
                 (local-unset-key (kbd "C-c C-d"))))
     (add-hook 'cmake-mode-hook
               (lambda()
@@ -607,7 +609,7 @@ Since init.el will be generated from this file, we save customization in a dedic
            ("M-y" . consult-yank-pop)                ;; orig. yank-pop
            ("C-s" . consult-line)
            ("C-c C-g" . consult-goto-line)
-           ("C-c C-i" . consult-imenu)
+           ("M-i" . consult-imenu)
            ("C-c C-I" . consult-imenu-multi)
            ("C-S-s-M-f" . consult-focus-lines)
            :map isearch-mode-map
@@ -1067,7 +1069,6 @@ works flawlessly. For reference the identical settings are kept below.
     (progn
       (add-hook 'erc-insert-pre-hook 'ma-bitlbee-ignore-unimportant)
       (add-hook 'erc-join-hook 'ma-bitlbee-identify)
-      (setq erc-notifications-mode (not work-linux-remote))
       (when work-linux-remote
         (ma-ensure-ssh-running))
       (erc :server "localhost" :nick "martin" :password "")))
