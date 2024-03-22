@@ -189,7 +189,6 @@ Since init.el will be generated from this file, we save customization in a dedic
     :hook
     (prog-mode . yas-minor-mode)
     (org-mode . yas-minor-mode))
-  (use-package yasnippet-snippets)
 #+end_src
 *** Miscellaneous
 #+begin_src emacs-lisp
@@ -685,6 +684,17 @@ Since init.el will be generated from this file, we save customization in a dedic
       (unless (string-match "<jira@dsone.3ds.com>" address)
         address))
 
+    (defcustom ma-refile-sender-alist nil "Alist to map senders to a refile folder in mu4e"
+      :group 'ma
+      :type '(repeat (cons string string)))
+
+    (defun ma-refile-folder-function(msg)
+      "Function to return a refile folder for the MSG."
+      (let ((sender (mu4e-contact-name (car-safe (mu4e-message-field msg :from)))))
+        (dolist (entry ma-refile-sender-alist)
+          (when (string-match (car entry) sender)
+            (cl-return (cdr entry))))))
+
     (use-package mu4e
       :straight (:branch "release/1.10")
       :load-path "straight/repos/mu/build/mu4e"
@@ -1111,7 +1121,7 @@ works flawlessly. For reference the identical settings are kept below.
 
     (lsp-completion-provider :capf)
     (lsp-eldoc-enable-hover nil)
-    (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-cmake lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-php lsp-pyls lsp-xml lsp-yaml))
+    (lsp-client-packages '(lsp-bash lsp-clangd lsp-clients lsp-dockerfile lsp-groovy lsp-javascript lsp-json lsp-php lsp-pyls lsp-xml lsp-yaml lsp-ansible))
     (lsp-clients-clangd-args '("--background-index" "--background-index-priority=low" "--log=info" "-j=8" "--clang-tidy"))
     (lsp-completion-no-cache t)
     (lsp-enable-indentation nil)
@@ -1129,6 +1139,25 @@ works flawlessly. For reference the identical settings are kept below.
     :after (lsp)
     :hook (c++-mode . yas-minor-mode)
           (c++ts-mode . yas-minor-mode))
+
+  (defun ma-lsp-ansible-check-mode (&rest _)
+    "Check whether we are possibly in an ansible buffer."
+    (when (and (or (derived-mode-p 'yaml-mode)
+             (derived-mode-p 'yaml-ts-mode)))
+      (let ((patterns '("/handlers/*.yml"
+                       "/tasks/*.yml"
+                       "/roles/*.yml"
+                       "/vars/*.yml"
+                       "/meta/*.yml"
+                       "playbook.yml"
+                       "site.yml"))
+            (match (lambda (pattern)
+                     (string-match pattern (buffer-file-name)))))
+        (seq-filter match patterns))))
+
+  (with-eval-after-load "lsp-ansible"
+    (advice-add #'lsp-ansible-check-ansible-minor-mode :override #'ma-lsp-ansible-check-mode))
+
 #+end_src
 *** Treesitter
 #+begin_src emacs-lisp
@@ -1272,7 +1301,14 @@ works flawlessly. For reference the identical settings are kept below.
 #+end_src
 ** Jenkinsfile
 #+begin_src emacs-lisp
-  (use-package jenkinsfile-mode)
+  (defun ma-lint-Jenkinsfile ()
+    "Pass the current buffer, which is assumed to be a Jenkinsfile, to the linter of Jenkins for syntax checking"
+    (interactive)
+    (shell-command-on-region (point-min) (point-max)  "ssh -p 9002 mal1@spck-simdev declarative-linter" (get-buffer-create "*Jenkins Lint Output*"))
+    )
+    (use-package jenkinsfile-mode
+    :bind
+    ("C-c C-c" . ma-lint-Jenkinsfile))
 #+end_src
 ** Elisp
 *** Auto-compile
