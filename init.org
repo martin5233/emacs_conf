@@ -572,7 +572,7 @@ Since init.el will be generated from this file, we save customization in a dedic
 #+begin_src emacs-lisp
   (use-package vertico
     :custom
-      (vertico-sort-function #'vertico-sort-history-alpha)
+      (vertico-sort-function #'vertico-sort-history-length-alpha)
     :config
     (progn
       (vertico-mode)
@@ -1422,9 +1422,14 @@ works flawlessly. For reference the identical settings are kept below.
     :if home)
 #+end_src
 ** Platformio
+#+begin_src emacs-lisp
   (use-package platformio-mode
     :if home)
+#+end_src
+** Casual for Calc
 #+begin_src emacs-lisp
+  (use-package casual
+    :straight (:type git :flavor melpa :host github :repo "kickingvegas/Casual"))
 #+end_src
 * Martin's specials
 #+begin_src emacs-lisp
